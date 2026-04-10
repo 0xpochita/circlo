@@ -152,6 +152,7 @@ export default function NotificationSheet({ open, onClose }: NotificationSheetPr
                             <span className="h-2 w-2 shrink-0 rounded-full bg-brand" />
                           )}
                         </div>
+                        <p className="text-[11px] text-muted">{n.user.username}</p>
                         <p className="text-xs text-muted truncate">{n.description}</p>
                         <p className="mt-1 text-[11px] text-muted">{n.time}</p>
                       </div>

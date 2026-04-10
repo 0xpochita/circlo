@@ -37,6 +37,7 @@ export default function MemberActivity() {
               <EmojiAvatar avatar={m.user.avatar} size={40} />
               <div>
                 <p className="text-sm font-semibold text-main-text">{m.user.name}</p>
+                <p className="text-xs text-muted mb-1">{m.user.username}</p>
                 <span
                   className={`inline-block rounded-md px-2 py-0.5 text-xs font-medium ${
                     m.status === "Joined"

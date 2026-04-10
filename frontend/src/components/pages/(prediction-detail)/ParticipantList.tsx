@@ -28,11 +28,12 @@ export default function ParticipantList() {
             className="flex items-center justify-between px-4 py-3"
           >
             <div className="flex items-center gap-3">
-              <EmojiAvatar avatar={p.user.avatar} size={36} />
+              <EmojiAvatar avatar={p.user.avatar} size={40} />
               <div>
                 <p className="text-sm font-semibold text-main-text">{p.user.name}</p>
+                <p className="text-xs text-muted">{p.user.username}</p>
                 <p className="text-xs text-muted inline-flex items-center gap-1">
-                  Staked {p.stake} <UsdtLabel size={12} />
+                  Staked {p.stake} <UsdtLabel size={11} />
                 </p>
               </div>
             </div>

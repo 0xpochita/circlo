@@ -37,6 +37,7 @@ export default function RecentActivity() {
               <EmojiAvatar avatar={a.user.avatar} size={40} />
               <div>
                 <p className="text-sm font-semibold text-main-text">{a.user.name}</p>
+                <p className="text-xs text-muted mb-1">{a.user.username}</p>
                 <span
                   className={`inline-block rounded-md px-2 py-0.5 text-xs font-medium ${
                     a.status === "Verified"

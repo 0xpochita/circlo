@@ -30,7 +30,10 @@ export default function DetailsMembers() {
           >
             <div className="flex items-center gap-3">
               <EmojiAvatar avatar={m.user.avatar} size={40} />
-              <p className="text-sm font-semibold text-main-text">{m.user.name}</p>
+              <div>
+                <p className="text-sm font-semibold text-main-text">{m.user.name}</p>
+                <p className="text-xs text-muted">{m.user.username}</p>
+              </div>
             </div>
             <span
               className={`rounded-full px-3 py-1 text-xs font-medium ${
