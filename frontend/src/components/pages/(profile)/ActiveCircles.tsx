@@ -48,17 +48,19 @@ export default function ActiveCircles() {
         {circles.map((c) => (
           <div
             key={c.name}
-            className="flex min-w-[160px] flex-col rounded-2xl bg-white p-4 cursor-pointer transition-all duration-200 active:scale-[0.97]"
+            className="flex min-w-[160px] flex-col rounded-2xl bg-white p-1 cursor-pointer transition-all duration-200 active:scale-[0.97]"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl mb-8">
-              {c.image ? (
-                <Image src={c.image} alt={c.name} width={24} height={24} />
-              ) : (
-                c.icon && <c.icon className="w-5 h-5 text-brand" />
-              )}
+            <div className="flex aspect-square flex-col justify-between rounded-2xl bg-gray-50 p-3">
+              <div>
+                {c.image ? (
+                  <Image src={c.image} alt={c.name} width={28} height={28} />
+                ) : (
+                  c.icon && <c.icon className="w-6 h-6 text-brand" />
+                )}
+              </div>
+              <p className="text-sm text-muted">{c.name}</p>
             </div>
-            <p className="text-sm text-muted mb-1">{c.name}</p>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 px-2 py-2">
               <p className="text-base font-bold text-main-text">{c.staked}</p>
               <p className={`text-xs font-medium ${c.positive ? "text-emerald-500" : "text-red-400"}`}>
                 {c.change}

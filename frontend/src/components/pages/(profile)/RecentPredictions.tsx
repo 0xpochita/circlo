@@ -21,13 +21,15 @@ export default function RecentPredictions() {
         {predictions.map((p) => (
           <div
             key={p.title}
-            className="flex min-w-[160px] flex-col rounded-2xl bg-white p-4 cursor-pointer transition-all duration-200 active:scale-[0.97]"
+            className="flex min-w-[160px] flex-col rounded-2xl bg-white p-1 cursor-pointer transition-all duration-200 active:scale-[0.97]"
           >
-            <div className={`flex h-10 w-10 items-center justify-center rounded-xl mb-8 ${p.result === "Won" ? "bg-emerald-50" : "bg-red-50"}`}>
-              <HiOutlineArrowRight className={`w-5 h-5 ${p.result === "Won" ? "text-emerald-500 -rotate-45" : "text-red-400 rotate-45"}`} />
+            <div className="flex aspect-square flex-col justify-between rounded-2xl bg-gray-50 p-3">
+              <div>
+                <HiOutlineArrowRight className={`w-6 h-6 ${p.result === "Won" ? "text-emerald-500 -rotate-45" : "text-red-400 rotate-45"}`} />
+              </div>
+              <p className="text-sm text-muted">{p.title}</p>
             </div>
-            <p className="text-sm text-muted mb-1">{p.title}</p>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 px-2 py-2">
               <p className="text-base font-bold text-main-text">{p.amount}</p>
               <p className={`text-xs font-medium ${p.result === "Won" ? "text-emerald-500" : "text-red-400"}`}>
                 {p.result}
