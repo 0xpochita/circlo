@@ -21,11 +21,11 @@ export default function PredictionForm() {
     <div className="px-4 py-2 flex flex-col gap-4">
       <div className="rounded-2xl bg-white p-4">
         <label className="text-sm font-medium text-main-text mb-2 block">
-          Prediction Title
+          Goal Title
         </label>
         <input
           type="text"
-          placeholder="e.g. BTC will hit 80k this week"
+          placeholder="e.g. Will Sandra get a job in 2026?"
           className="w-full rounded-xl bg-gray-50 px-4 py-3 text-sm text-main-text placeholder:text-muted outline-none transition-all duration-200 focus:ring-2 focus:ring-brand"
         />
       </div>
@@ -35,7 +35,7 @@ export default function PredictionForm() {
           Description (optional)
         </label>
         <textarea
-          placeholder="Add more context for your prediction..."
+          placeholder="Add more context for this goal..."
           rows={3}
           className="w-full resize-none rounded-xl bg-gray-50 px-4 py-3 text-sm text-main-text placeholder:text-muted outline-none transition-all duration-200 focus:ring-2 focus:ring-brand"
         />

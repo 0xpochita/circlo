@@ -1,10 +1,11 @@
 "use client";
 
 const info = [
-  { label: "Created by", value: "Crypto Circle" },
+  { label: "Goal owner", value: "Sandra Flavor" },
+  { label: "Circle", value: "Friends 2026" },
   { label: "Start date", value: "Apr 9, 2026" },
-  { label: "End date", value: "Apr 12, 2026" },
-  { label: "Resolution source", value: "CoinGecko API" },
+  { label: "Deadline", value: "Dec 31, 2026" },
+  { label: "Resolved by", value: "Circle vote" },
   { label: "Minimum stake", value: "0.10 USDm" },
 ];
 

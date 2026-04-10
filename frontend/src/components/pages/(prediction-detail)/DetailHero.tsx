@@ -14,23 +14,24 @@ export default function DetailHero() {
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ type: "spring" as const, stiffness: 300, damping: 20 }}
-              className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white mb-4"
+              className="flex h-16 w-16 items-center justify-center rounded-full overflow-hidden bg-white mb-4"
             >
               <Image
-                src="/Assets/Images/Logo/logo-coin/btc-logo.svg"
-                alt="BTC"
-                width={40}
-                height={40}
+                src="/Assets/Images/Avatar/avatar-2.jpeg"
+                alt="Sandra"
+                width={64}
+                height={64}
+                className="object-cover"
               />
             </motion.div>
             <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-500 mb-2">
-              Active
+              Active Goal
             </span>
             <h1 className="text-xl font-bold text-main-text mb-1">
-              BTC will hit 80k this week
+              Will Sandra get a job in 2026?
             </h1>
             <p className="text-sm text-muted max-w-xs">
-              Bitcoin reaches 80,000 USDT before end of the week.
+              Sandra is actively applying and interviewing. Circle members stake on whether she lands a role before Dec 31.
             </p>
           </div>
 
