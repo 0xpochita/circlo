@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { HiOutlinePencil } from "react-icons/hi2";
+import { EmojiAvatar, EmojiPicker } from "@/components/shared";
+import type { UserAvatar } from "@/types";
 
 const durations = [
   { label: "1D", full: "1 Day", hours: 24 },
@@ -16,9 +19,36 @@ const outcomes = ["Yes / No", "Multiple Choice", "Numeric Range"];
 export default function PredictionForm() {
   const [selectedDuration, setSelectedDuration] = useState(2);
   const [selectedOutcome, setSelectedOutcome] = useState(0);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [goalAvatar, setGoalAvatar] = useState<UserAvatar>({
+    emoji: "🎯",
+    color: "#ec4899",
+  });
 
   return (
     <div className="px-4 py-2 flex flex-col gap-4">
+      <div className="rounded-2xl bg-white p-4">
+        <p className="text-sm font-medium text-main-text mb-3">Goal Image</p>
+        <div className="flex items-center gap-4">
+          <button
+            type="button"
+            onClick={() => setPickerOpen(true)}
+            className="relative cursor-pointer transition-transform duration-200 active:scale-[0.95]"
+          >
+            <EmojiAvatar avatar={goalAvatar} size={72} />
+            <div className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-white border border-gray-100">
+              <HiOutlinePencil className="w-3.5 h-3.5 text-main-text" />
+            </div>
+          </button>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-main-text">Pick a vibe</p>
+            <p className="text-xs text-muted">
+              Choose an emoji and color that represent this goal
+            </p>
+          </div>
+        </div>
+      </div>
+
       <div className="rounded-2xl bg-white p-4">
         <label className="text-sm font-medium text-main-text mb-2 block">
           Goal Title
@@ -119,6 +149,15 @@ export default function PredictionForm() {
           ))}
         </div>
       </div>
+
+      <EmojiPicker
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        value={goalAvatar}
+        onSave={setGoalAvatar}
+        title="Pick a vibe for your goal"
+        subtitle="Choose an emoji and color that describe it"
+      />
     </div>
   );
 }

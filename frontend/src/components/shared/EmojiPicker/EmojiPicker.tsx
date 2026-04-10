@@ -4,27 +4,35 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { HiXMark, HiCheck } from "react-icons/hi2";
 import { EMOJI_OPTIONS, COLOR_OPTIONS, getRandomAvatar } from "@/lib/emojiOptions";
-import { useUserStore } from "@/stores/userStore";
 import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
+import type { UserAvatar } from "@/types";
 
 type EmojiPickerProps = {
   open: boolean;
   onClose: () => void;
+  value: UserAvatar;
+  onSave: (avatar: UserAvatar) => void;
+  title?: string;
+  subtitle?: string;
 };
 
-export default function EmojiPicker({ open, onClose }: EmojiPickerProps) {
-  const currentAvatar = useUserStore((s) => s.avatar);
-  const setAvatar = useUserStore((s) => s.setAvatar);
-
-  const [emoji, setEmoji] = useState(currentAvatar.emoji);
-  const [color, setColor] = useState(currentAvatar.color);
+export default function EmojiPicker({
+  open,
+  onClose,
+  value,
+  onSave,
+  title = "What emoji expresses you?",
+  subtitle = "Pick one that feels like you today",
+}: EmojiPickerProps) {
+  const [emoji, setEmoji] = useState(value.emoji);
+  const [color, setColor] = useState(value.color);
 
   useEffect(() => {
     if (open) {
-      setEmoji(currentAvatar.emoji);
-      setColor(currentAvatar.color);
+      setEmoji(value.emoji);
+      setColor(value.color);
     }
-  }, [open, currentAvatar]);
+  }, [open, value]);
 
   useEffect(() => {
     if (open) {
@@ -44,7 +52,7 @@ export default function EmojiPicker({ open, onClose }: EmojiPickerProps) {
   }
 
   function handleSave() {
-    setAvatar({ emoji, color });
+    onSave({ emoji, color });
     onClose();
   }
 
@@ -69,8 +77,8 @@ export default function EmojiPicker({ open, onClose }: EmojiPickerProps) {
           >
             <div className="flex items-start justify-between px-6 pt-6 pb-4 shrink-0">
               <div>
-                <h2 className="text-xl font-bold text-main-text">What emoji expresses you?</h2>
-                <p className="mt-1 text-sm text-muted">Pick one that feels like you today</p>
+                <h2 className="text-xl font-bold text-main-text">{title}</h2>
+                <p className="mt-1 text-sm text-muted">{subtitle}</p>
               </div>
               <button
                 type="button"

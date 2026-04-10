@@ -9,6 +9,7 @@ import { EmojiAvatar, EmojiPicker } from "@/components/shared";
 export default function ProfileHero() {
   const name = useUserStore((s) => s.name);
   const avatar = useUserStore((s) => s.avatar);
+  const setAvatar = useUserStore((s) => s.setAvatar);
   const [pickerOpen, setPickerOpen] = useState(false);
 
   return (
@@ -64,7 +65,12 @@ export default function ProfileHero() {
         </div>
       </div>
 
-      <EmojiPicker open={pickerOpen} onClose={() => setPickerOpen(false)} />
+      <EmojiPicker
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        value={avatar}
+        onSave={setAvatar}
+      />
     </>
   );
 }
