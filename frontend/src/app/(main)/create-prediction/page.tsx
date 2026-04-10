@@ -1,4 +1,4 @@
-import { PredictionHeader, CircleSelector, PredictionForm, PredictionSummary, ConfirmButton } from "@/components/pages/(create-prediction)";
+import { PredictionHeader, CircleSelector, PredictionForm, ResolverPicker, PredictionSummary, ConfirmButton } from "@/components/pages/(create-prediction)";
 import { PageTransition } from "@/components/pages/(app)";
 
 export default function CreatePredictionPage() {
@@ -8,6 +8,9 @@ export default function CreatePredictionPage() {
       <PageTransition>
         <CircleSelector />
         <PredictionForm />
+        <div className="px-4 py-2">
+          <ResolverPicker />
+        </div>
         <PredictionSummary />
       </PageTransition>
       <ConfirmButton />

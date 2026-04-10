@@ -50,7 +50,18 @@ export default function ProfileHero() {
 
           <div className="mb-4">
             <p className="text-sm text-white/70">My Wallet</p>
-            <p className="text-3xl font-bold text-white">12.50 <span className="text-lg font-medium">USDm</span></p>
+            <div className="flex items-center gap-2">
+              <p className="text-3xl font-bold text-white">12.50</p>
+              <div className="flex items-center gap-1 rounded-full bg-white/20 backdrop-blur-md px-2.5 py-1 text-sm font-semibold text-white">
+                USDT
+                <Image
+                  src="/Assets/Images/Logo/logo-coin/usdt-logo.svg"
+                  alt="USDT"
+                  width={16}
+                  height={16}
+                />
+              </div>
+            </div>
             <p className="mt-1 text-sm font-medium text-emerald-300">+2.30 (22.5%)</p>
           </div>
 

@@ -1,14 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
+import { EmojiAvatar, UsdtLabel } from "@/components/shared";
 import { MOCK_USERS } from "@/lib/mockUsers";
 
 const participants = [
-  { user: MOCK_USERS.sandra, stake: "0.50 USDm", side: "Yes" },
-  { user: MOCK_USERS.andero, stake: "1.00 USDm", side: "No" },
-  { user: MOCK_USERS.greg, stake: "0.25 USDm", side: "Yes" },
-  { user: MOCK_USERS.tommy, stake: "0.75 USDm", side: "Yes" },
+  { user: MOCK_USERS.sandra, stake: "0.50", side: "Yes" },
+  { user: MOCK_USERS.andero, stake: "1.00", side: "No" },
+  { user: MOCK_USERS.greg, stake: "0.25", side: "Yes" },
+  { user: MOCK_USERS.tommy, stake: "0.75", side: "Yes" },
 ];
 
 export default function ParticipantList() {
@@ -31,7 +31,9 @@ export default function ParticipantList() {
               <EmojiAvatar avatar={p.user.avatar} size={36} />
               <div>
                 <p className="text-sm font-semibold text-main-text">{p.user.name}</p>
-                <p className="text-xs text-muted">Staked {p.stake}</p>
+                <p className="text-xs text-muted inline-flex items-center gap-1">
+                  Staked {p.stake} <UsdtLabel size={12} />
+                </p>
               </div>
             </div>
             <span

@@ -1,9 +1,11 @@
 "use client";
 
+import { UsdtLabel } from "@/components/shared";
+
 const stats = [
-  { value: "128", label: "Members" },
-  { value: "24", label: "Active goals" },
-  { value: "82 USDm", label: "Total staked" },
+  { value: "128", label: "Members", usdt: false },
+  { value: "24", label: "Active goals", usdt: false },
+  { value: "82", label: "Total staked", usdt: true },
 ];
 
 export default function DetailsStats() {
@@ -15,7 +17,10 @@ export default function DetailsStats() {
             key={stat.label}
             className={`flex-1 text-center ${i !== stats.length - 1 ? "border-r border-gray-100" : ""}`}
           >
-            <p className="text-xl font-bold text-main-text">{stat.value}</p>
+            <p className="text-xl font-bold text-main-text inline-flex items-center gap-1">
+              {stat.value}
+              {stat.usdt && <UsdtLabel size={14} className="text-xs font-medium" />}
+            </p>
             <p className="mt-1 text-xs text-muted">{stat.label}</p>
           </div>
         ))}

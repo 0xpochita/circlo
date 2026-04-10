@@ -1,4 +1,4 @@
-import { ExploreHeader, SearchCircle, CategoryTabs, CircleList } from "@/components/pages/(explore)";
+import { ExploreHeader, SearchCircle, InviteCodeInput, CategoryTabs, CircleList } from "@/components/pages/(explore)";
 import { BottomTabBar, PageTransition } from "@/components/pages/(app)";
 
 export default function ExplorePage() {
@@ -11,6 +11,7 @@ export default function ExplorePage() {
           <p className="mt-1 text-sm text-muted">Join circles that match your interest</p>
         </div>
         <SearchCircle />
+        <InviteCodeInput />
         <CategoryTabs />
         <CircleList />
       </PageTransition>

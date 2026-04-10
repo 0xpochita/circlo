@@ -3,21 +3,21 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { HiOutlineClock, HiOutlineArrowRight } from "react-icons/hi2";
-import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
+import { EmojiAvatar, UsdtLabel } from "@/components/shared";
 import { MOCK_USERS } from "@/lib/mockUsers";
 
 const goals = [
   {
     title: "Will Sandra hit her savings target?",
     user: MOCK_USERS.sandra,
-    stake: "0.50 USDm",
+    stake: "0.50",
     participants: 12,
     deadline: "2d 4h",
   },
   {
     title: "Will Andero finish his book by May?",
     user: MOCK_USERS.andero,
-    stake: "1.00 USDm",
+    stake: "1.00",
     participants: 8,
     deadline: "5d 12h",
   },
@@ -53,7 +53,9 @@ export default function DetailsGoals() {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-main-text truncate">{g.title}</p>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-xs text-muted">{g.stake}</span>
+                  <span className="text-xs text-muted inline-flex items-center gap-1">
+                    {g.stake} <UsdtLabel size={12} />
+                  </span>
                   <span className="text-xs text-muted">·</span>
                   <span className="text-xs text-muted">{g.participants} joined</span>
                 </div>

@@ -1,37 +1,37 @@
 "use client";
 
-import Image from "next/image";
-import { IoFitnessOutline, IoGameControllerOutline } from "react-icons/io5";
-import type { ComponentType } from "react";
+import { EmojiAvatar, UsdtLabel } from "@/components/shared";
+import type { UserAvatar } from "@/types";
 
 type CircleItem = {
   name: string;
   staked: string;
   change: string;
   positive: boolean;
-} & ({ icon: ComponentType<{ className?: string }>; image?: never } | { image: string; icon?: never });
+  avatar: UserAvatar;
+};
 
 const circles: CircleItem[] = [
   {
     name: "Crypto",
-    staked: "5.20 USDm",
+    staked: "5.20",
     change: "+12.3%",
     positive: true,
-    image: "/Assets/Images/Logo/logo-coin/btc-logo.svg",
+    avatar: { emoji: "💎", color: "#60a5fa" },
   },
   {
     name: "Fitness",
-    staked: "3.80 USDm",
+    staked: "3.80",
     change: "-2.1%",
     positive: false,
-    icon: IoFitnessOutline,
+    avatar: { emoji: "⚡", color: "#f87171" },
   },
   {
     name: "Gaming",
-    staked: "3.50 USDm",
+    staked: "3.50",
     change: "+5.7%",
     positive: true,
-    icon: IoGameControllerOutline,
+    avatar: { emoji: "🎮", color: "#a78bfa" },
   },
 ];
 
@@ -52,16 +52,14 @@ export default function ActiveCircles() {
           >
             <div className="flex aspect-square flex-col justify-between rounded-2xl bg-gray-50 p-3">
               <div>
-                {c.image ? (
-                  <Image src={c.image} alt={c.name} width={28} height={28} />
-                ) : (
-                  c.icon && <c.icon className="w-6 h-6 text-brand" />
-                )}
+                <EmojiAvatar avatar={c.avatar} size={40} shape="square" />
               </div>
               <p className="text-sm text-muted">{c.name}</p>
             </div>
             <div className="flex items-center gap-1.5 px-2 py-2">
-              <p className="text-base font-bold text-main-text">{c.staked}</p>
+              <p className="text-base font-bold text-main-text inline-flex items-center gap-1">
+                {c.staked} <UsdtLabel size={12} />
+              </p>
               <p className={`text-xs font-medium ${c.positive ? "text-emerald-500" : "text-red-400"}`}>
                 {c.change}
               </p>

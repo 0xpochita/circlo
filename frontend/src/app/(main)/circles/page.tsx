@@ -1,4 +1,4 @@
-import { CirclesHeader, CirclesStats, CirclesList } from "@/components/pages/(circles)";
+import { CirclesHeader, CirclesStats, CirclesActions, CirclesList } from "@/components/pages/(circles)";
 import { BottomTabBar, PageTransition } from "@/components/pages/(app)";
 
 export default function CirclesPage() {
@@ -7,6 +7,7 @@ export default function CirclesPage() {
       <PageTransition>
         <CirclesHeader />
         <CirclesStats />
+        <CirclesActions />
         <CirclesList />
       </PageTransition>
       <BottomTabBar />

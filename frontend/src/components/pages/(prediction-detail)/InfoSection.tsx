@@ -1,12 +1,14 @@
 "use client";
 
-const info = [
+import { UsdtLabel } from "@/components/shared";
+
+const info: { label: string; value: string; usdt?: boolean }[] = [
   { label: "Goal owner", value: "Sandra Flavor" },
   { label: "Circle", value: "Friends 2026" },
   { label: "Start date", value: "Apr 9, 2026" },
   { label: "Deadline", value: "Dec 31, 2026" },
   { label: "Resolved by", value: "Circle vote" },
-  { label: "Minimum stake", value: "0.10 USDm" },
+  { label: "Minimum stake", value: "0.10", usdt: true },
 ];
 
 export default function InfoSection() {
@@ -17,7 +19,10 @@ export default function InfoSection() {
         {info.map((item) => (
           <div key={item.label} className="flex items-center justify-between px-4 py-3">
             <p className="text-sm text-muted">{item.label}</p>
-            <p className="text-sm font-medium text-main-text">{item.value}</p>
+            <p className="text-sm font-medium text-main-text inline-flex items-center gap-1">
+              {item.value}
+              {item.usdt && <UsdtLabel size={12} />}
+            </p>
           </div>
         ))}
       </div>

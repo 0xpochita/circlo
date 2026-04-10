@@ -6,9 +6,9 @@ import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
 import { MOCK_USERS } from "@/lib/mockUsers";
 
 const activities = [
-  { user: MOCK_USERS.emma, status: "Verified", earned: "1 USDm earned", time: "2h ago" },
-  { user: MOCK_USERS.james, status: "Pending", earned: "1 USDm earned", time: "2h ago" },
-  { user: MOCK_USERS.daniel, status: "Verified", earned: "1 USDm earned", time: "2h ago" },
+  { user: MOCK_USERS.emma, status: "Verified", earned: "1 USDT earned", time: "2h ago" },
+  { user: MOCK_USERS.james, status: "Pending", earned: "1 USDT earned", time: "2h ago" },
+  { user: MOCK_USERS.daniel, status: "Verified", earned: "1 USDT earned", time: "2h ago" },
 ];
 
 export default function RecentActivity() {

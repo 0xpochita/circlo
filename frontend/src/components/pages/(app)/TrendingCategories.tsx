@@ -1,17 +1,17 @@
 "use client";
 
-import Image from "next/image";
-import { IoFitnessOutline, IoGameControllerOutline } from "react-icons/io5";
-import type { ComponentType } from "react";
+import { EmojiAvatar } from "@/components/shared";
+import type { UserAvatar } from "@/types";
 
 type Category = {
   label: string;
-} & ({ icon: ComponentType<{ className?: string }>; image?: never } | { image: string; icon?: never });
+  avatar: UserAvatar;
+};
 
 const categories: Category[] = [
-  { image: "/Assets/Images/Logo/logo-coin/btc-logo.svg", label: "Crypto" },
-  { icon: IoFitnessOutline, label: "Fitness" },
-  { icon: IoGameControllerOutline, label: "Gaming" },
+  { label: "Crypto", avatar: { emoji: "💎", color: "#60a5fa" } },
+  { label: "Fitness", avatar: { emoji: "⚡", color: "#f87171" } },
+  { label: "Gaming", avatar: { emoji: "🎮", color: "#a78bfa" } },
 ];
 
 export default function TrendingCategories() {
@@ -22,17 +22,13 @@ export default function TrendingCategories() {
         {categories.map((cat) => (
           <div
             key={cat.label}
-            className="flex flex-col rounded-2xl bg-white p-1 cursor-pointer transition-all duration-200 active:scale-[0.97]"
+            className="flex flex-col rounded-2xl bg-white p-2 cursor-pointer transition-all duration-200 active:scale-[0.97]"
           >
-            <div className="flex aspect-square flex-col justify-between rounded-2xl bg-gray-50 p-3">
+            <div className="flex aspect-4/5 flex-col justify-between rounded-2xl bg-gray-50 p-4">
               <div>
-                {cat.image ? (
-                  <Image src={cat.image} alt={cat.label} width={28} height={28} />
-                ) : (
-                  cat.icon && <cat.icon className="w-6 h-6 text-brand" />
-                )}
+                <EmojiAvatar avatar={cat.avatar} size={36} shape="square" />
               </div>
-              <p className="text-sm font-medium text-main-text">{cat.label}</p>
+              <p className="text-base font-semibold text-main-text">{cat.label}</p>
             </div>
           </div>
         ))}

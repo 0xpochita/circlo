@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { HiOutlinePencil } from "react-icons/hi2";
@@ -135,7 +136,15 @@ export default function PredictionForm() {
             placeholder="0.00"
             className="flex-1 bg-transparent text-sm text-main-text placeholder:text-muted outline-none"
           />
-          <span className="text-sm font-medium text-muted">USDm</span>
+          <div className="flex items-center gap-1.5">
+            <Image
+              src="/Assets/Images/Logo/logo-coin/usdt-logo.svg"
+              alt="USDT"
+              width={18}
+              height={18}
+            />
+            <span className="text-sm font-medium text-main-text">USDT</span>
+          </div>
         </div>
         <div className="flex gap-2 mt-3">
           {["0.10", "0.50", "1.00", "5.00"].map((amount) => (

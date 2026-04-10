@@ -6,7 +6,7 @@ import { HiOutlineUserGroup, HiOutlineLockClosed, HiOutlineGlobeAlt } from "reac
 import { TbTargetArrow } from "react-icons/tb";
 import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
 import { MOCK_USERS } from "@/lib/mockUsers";
-import type { User } from "@/types";
+import type { User, UserAvatar } from "@/types";
 
 type Circle = {
   name: string;
@@ -14,6 +14,7 @@ type Circle = {
   members: number;
   activeGoals: number;
   privacy: "private" | "public";
+  avatar: UserAvatar;
   previewMembers: User[];
 };
 
@@ -24,6 +25,7 @@ const circles: Circle[] = [
     members: 12,
     activeGoals: 5,
     privacy: "private",
+    avatar: { emoji: "🌟", color: "#fbbf24" },
     previewMembers: [MOCK_USERS.sandra, MOCK_USERS.andero, MOCK_USERS.greg],
   },
   {
@@ -32,6 +34,7 @@ const circles: Circle[] = [
     members: 8,
     activeGoals: 3,
     privacy: "public",
+    avatar: { emoji: "⚡", color: "#f87171" },
     previewMembers: [MOCK_USERS.tommy, MOCK_USERS.natalie, MOCK_USERS.emma],
   },
   {
@@ -40,6 +43,7 @@ const circles: Circle[] = [
     members: 6,
     activeGoals: 4,
     privacy: "private",
+    avatar: { emoji: "🚀", color: "#60a5fa" },
     previewMembers: [MOCK_USERS.james, MOCK_USERS.daniel],
   },
 ];
@@ -81,22 +85,12 @@ export default function CirclesList() {
             className="flex flex-col rounded-2xl bg-white p-4 cursor-pointer transition-all duration-200 active:scale-[0.98]"
           >
             <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <div className="flex -space-x-2">
-                  {circle.previewMembers.map((member) => (
-                    <div
-                      key={`${circle.name}-${member.username}`}
-                      className="rounded-full border-2 border-white"
-                    >
-                      <EmojiAvatar avatar={member.avatar} size={34} />
-                    </div>
-                  ))}
+              <div className="flex items-center gap-3">
+                <EmojiAvatar avatar={circle.avatar} size={48} shape="square" />
+                <div>
+                  <p className="text-base font-bold text-main-text">{circle.name}</p>
+                  <p className="text-xs text-muted">{circle.description}</p>
                 </div>
-                {circle.members > circle.previewMembers.length && (
-                  <span className="text-xs text-muted">
-                    +{circle.members - circle.previewMembers.length}
-                  </span>
-                )}
               </div>
               <div className="flex items-center gap-1 rounded-full bg-gray-50 px-2.5 py-1">
                 {circle.privacy === "private" ? (
@@ -110,15 +104,23 @@ export default function CirclesList() {
               </div>
             </div>
 
-            <div className="mb-3">
-              <p className="text-base font-bold text-main-text">{circle.name}</p>
-              <p className="text-xs text-muted">{circle.description}</p>
-            </div>
-
-            <div className="flex items-center gap-4 border-t border-gray-50 pt-3">
-              <div className="flex items-center gap-1.5">
-                <HiOutlineUserGroup className="w-4 h-4 text-muted" />
-                <span className="text-xs text-muted">{circle.members} members</span>
+            <div className="flex items-center justify-between border-t border-gray-50 pt-3">
+              <div className="flex items-center gap-2">
+                <div className="flex -space-x-2">
+                  {circle.previewMembers.map((member) => (
+                    <div
+                      key={`${circle.name}-${member.username}`}
+                      className="rounded-full border-2 border-white"
+                    >
+                      <EmojiAvatar avatar={member.avatar} size={28} />
+                    </div>
+                  ))}
+                </div>
+                {circle.members > circle.previewMembers.length && (
+                  <span className="text-xs text-muted">
+                    +{circle.members - circle.previewMembers.length}
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-1.5">
                 <TbTargetArrow className="w-4 h-4 text-muted" />

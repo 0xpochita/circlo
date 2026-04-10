@@ -1,9 +1,11 @@
 "use client";
 
+import { UsdtLabel } from "@/components/shared";
+
 const stats = [
-  { value: "03", label: "Friends invited" },
-  { value: "02", label: "Friends verified" },
-  { value: "20 USDm", label: "Total earned" },
+  { value: "03", label: "Friends invited", usdt: false },
+  { value: "02", label: "Friends verified", usdt: false },
+  { value: "20", label: "Total earned", usdt: true },
 ];
 
 export default function RewardStats() {
@@ -24,7 +26,10 @@ export default function RewardStats() {
             key={stat.label}
             className={`flex-1 text-center ${i !== stats.length - 1 ? "border-r border-gray-100" : ""}`}
           >
-            <p className="text-xl font-bold text-main-text">{stat.value}</p>
+            <p className="text-xl font-bold text-main-text inline-flex items-center gap-1">
+              {stat.value}
+              {stat.usdt && <UsdtLabel size={14} className="text-xs font-medium" />}
+            </p>
             <p className="mt-1 text-xs text-muted">{stat.label}</p>
           </div>
         ))}

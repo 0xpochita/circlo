@@ -1,51 +1,49 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import {
-  HiOutlineUserGroup,
-  HiOutlineGlobeAlt,
-} from "react-icons/hi2";
-import { IoFitnessOutline, IoGameControllerOutline, IoMusicalNotesOutline } from "react-icons/io5";
-import { useState, type ComponentType } from "react";
+import { HiOutlineUserGroup } from "react-icons/hi2";
+import { useState } from "react";
+import { EmojiAvatar } from "@/components/shared";
+import type { UserAvatar } from "@/types";
 
-type CircleItem = {
+type Circle = {
   name: string;
   members: number;
   description: string;
-} & ({ icon: ComponentType<{ className?: string }>; image?: never } | { image: string; icon?: never });
+  avatar: UserAvatar;
+};
 
-const circles: CircleItem[] = [
+const circles: Circle[] = [
   {
     name: "Crypto Predictions",
     members: 128,
-    image: "/Assets/Images/Logo/logo-coin/btc-logo.svg",
     description: "Predict BTC, ETH & altcoin prices weekly",
+    avatar: { emoji: "💎", color: "#60a5fa" },
   },
   {
     name: "Fitness Goals",
     members: 64,
-    icon: IoFitnessOutline,
     description: "Challenge friends on workout streaks",
+    avatar: { emoji: "⚡", color: "#f87171" },
   },
   {
     name: "Gaming Arena",
     members: 256,
-    icon: IoGameControllerOutline,
     description: "Predict match results & tournament winners",
+    avatar: { emoji: "🎮", color: "#a78bfa" },
   },
   {
     name: "World Events",
     members: 89,
-    icon: HiOutlineGlobeAlt,
     description: "Predict news, elections & global trends",
+    avatar: { emoji: "🌈", color: "#34d399" },
   },
   {
     name: "Music Charts",
     members: 42,
-    icon: IoMusicalNotesOutline,
     description: "Guess next #1 hits & award winners",
+    avatar: { emoji: "🎧", color: "#fbbf24" },
   },
 ];
 
@@ -69,13 +67,7 @@ export default function CircleList() {
             href="/circle-details"
             className="flex items-center gap-3 rounded-2xl bg-white p-2 cursor-pointer transition-all duration-200 active:scale-[0.98]"
           >
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gray-50">
-              {circle.image ? (
-                <Image src={circle.image} alt={circle.name} width={30} height={28} />
-              ) : (
-                circle.icon && <circle.icon className="w-6 h-6 text-brand" />
-              )}
-            </div>
+            <EmojiAvatar avatar={circle.avatar} size={52} shape="square" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-main-text truncate">{circle.name}</p>
               <p className="text-xs text-muted truncate">{circle.description}</p>
@@ -85,7 +77,7 @@ export default function CircleList() {
               </div>
             </div>
             {joined[circle.name] ? (
-              <span className="shrink-0 rounded-full bg-brand-light px-4 py-1.5 text-xs text-muted">
+              <span className="shrink-0 rounded-full bg-gray-50 px-4 py-1.5 text-xs text-muted">
                 Joined
               </span>
             ) : (

@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { UsdtLabel } from "@/components/shared";
 
 const options = [
-  { label: "Yes", percentage: 67, pool: "4.02 USDm", color: "emerald" },
-  { label: "No", percentage: 33, pool: "1.98 USDm", color: "red" },
+  { label: "Yes", percentage: 67, pool: "4.02", color: "emerald" },
+  { label: "No", percentage: 33, pool: "1.98", color: "red" },
 ];
 
 export default function OddsCard() {
@@ -16,7 +17,9 @@ export default function OddsCard() {
       <div className="rounded-2xl bg-white p-4">
         <div className="flex items-center justify-between mb-3">
           <p className="text-sm font-semibold text-main-text">Current Odds</p>
-          <p className="text-xs text-muted">Total pool: 6.00 USDm</p>
+          <p className="text-xs text-muted inline-flex items-center gap-1">
+            Total pool: 6.00 <UsdtLabel size={11} />
+          </p>
         </div>
 
         <div className="flex gap-3">
@@ -45,8 +48,8 @@ export default function OddsCard() {
                   transition={{ duration: 0.6, ease: "easeOut" as const }}
                 />
               </div>
-              <p className={`text-xs ${selected === i ? "text-white/80" : "text-muted"}`}>
-                Pool: {opt.pool}
+              <p className={`text-xs inline-flex items-center gap-1 ${selected === i ? "text-white/80" : "text-muted"}`}>
+                Pool: {opt.pool} <UsdtLabel size={11} />
               </p>
             </button>
           ))}

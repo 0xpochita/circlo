@@ -4,14 +4,14 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { HiOutlineArrowRight, HiOutlineClock } from "react-icons/hi2";
 import { TbTargetArrow } from "react-icons/tb";
-import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
+import { EmojiAvatar, UsdtLabel } from "@/components/shared";
 import { MOCK_USERS } from "@/lib/mockUsers";
 
 const markets = [
   {
     title: "Will Sandra get a job in 2026?",
     user: MOCK_USERS.sandra,
-    stake: "0.50 USDm",
+    stake: "0.50",
     participants: 12,
     deadline: "2d 4h",
     status: "active",
@@ -19,7 +19,7 @@ const markets = [
   {
     title: "Will Andero run a marathon this year?",
     user: MOCK_USERS.andero,
-    stake: "1.00 USDm",
+    stake: "1.00",
     participants: 8,
     deadline: "5d 12h",
     status: "active",
@@ -27,7 +27,7 @@ const markets = [
   {
     title: "Will Greg learn Spanish in 3 months?",
     user: MOCK_USERS.greg,
-    stake: "0.25 USDm",
+    stake: "0.25",
     participants: 4,
     deadline: "1d 8h",
     status: "closing",
@@ -75,7 +75,9 @@ export default function PredictionMarketList() {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-main-text truncate">{m.title}</p>
                   <div className="flex items-center gap-3 mt-1">
-                    <span className="text-xs text-muted">{m.stake}</span>
+                    <span className="text-xs text-muted inline-flex items-center gap-1">
+                      {m.stake} <UsdtLabel size={12} />
+                    </span>
                     <span className="text-xs text-muted">·</span>
                     <span className="text-xs text-muted">{m.participants} joined</span>
                   </div>

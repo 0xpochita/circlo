@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { UsdtLabel } from "@/components/shared";
 
 const gridCells: { highlight?: "soft" | "active"; initials?: string }[] = [
   { highlight: "soft" }, {}, { highlight: "soft" }, {}, {}, { highlight: "soft" }, {},
@@ -13,8 +14,8 @@ export default function ReferralHero() {
     <div className="px-4 py-2">
       <div className="mb-6">
         <h1 className="text-2xl font-bold tracking-tight text-main-text">Referral Bonus</h1>
-        <p className="mt-1 text-sm text-muted">
-          Invite your friends and earn 1 USDm each when they sign up.
+        <p className="mt-1 text-sm text-muted inline-flex items-center gap-1 flex-wrap">
+          Invite your friends and earn 1 <UsdtLabel size={12} /> each when they sign up.
         </p>
       </div>
 

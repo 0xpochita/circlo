@@ -1,11 +1,12 @@
 "use client";
 
 import { HiOutlineArrowRight } from "react-icons/hi2";
+import { UsdtLabel } from "@/components/shared";
 
 const predictions = [
-  { title: "BTC above 70k", circle: "Crypto", result: "Won", amount: "+1.20 USDm" },
-  { title: "Run 5km streak", circle: "Fitness", result: "Lost", amount: "-0.50 USDm" },
-  { title: "Valorant Champions", circle: "Gaming", result: "Won", amount: "+0.80 USDm" },
+  { title: "BTC above 70k", circle: "Crypto", result: "Won", amount: "+1.20" },
+  { title: "Run 5km streak", circle: "Fitness", result: "Lost", amount: "-0.50" },
+  { title: "Valorant Champions", circle: "Gaming", result: "Won", amount: "+0.80" },
 ];
 
 export default function RecentPredictions() {
@@ -30,7 +31,9 @@ export default function RecentPredictions() {
               <p className="text-sm text-muted">{p.title}</p>
             </div>
             <div className="flex items-center gap-1.5 px-2 py-2">
-              <p className="text-base font-bold text-main-text">{p.amount}</p>
+              <p className="text-base font-bold text-main-text inline-flex items-center gap-1">
+                {p.amount} <UsdtLabel size={12} />
+              </p>
               <p className={`text-xs font-medium ${p.result === "Won" ? "text-emerald-500" : "text-red-400"}`}>
                 {p.result}
               </p>

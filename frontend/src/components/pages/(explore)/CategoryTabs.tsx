@@ -2,21 +2,14 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { HiOutlineSparkles } from "react-icons/hi2";
-import { IoFitnessOutline, IoGameControllerOutline } from "react-icons/io5";
-import {
-  HiOutlineArrowTrendingUp,
-  HiOutlineGlobeAlt,
-  HiOutlineMusicalNote,
-} from "react-icons/hi2";
 
 const tabs = [
-  { label: "All", icon: HiOutlineSparkles },
-  { label: "Crypto", icon: HiOutlineArrowTrendingUp },
-  { label: "Fitness", icon: IoFitnessOutline },
-  { label: "Gaming", icon: IoGameControllerOutline },
-  { label: "Global", icon: HiOutlineGlobeAlt },
-  { label: "Music", icon: HiOutlineMusicalNote },
+  { label: "All", emoji: "✨" },
+  { label: "Crypto", emoji: "💎" },
+  { label: "Fitness", emoji: "⚡" },
+  { label: "Gaming", emoji: "🎮" },
+  { label: "Global", emoji: "🌈" },
+  { label: "Music", emoji: "🎧" },
 ];
 
 export default function CategoryTabs() {
@@ -32,7 +25,7 @@ export default function CategoryTabs() {
           className={`relative flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium cursor-pointer transition-all duration-200 ${
             active === i
               ? "text-white"
-              : "bg-surface text-muted"
+              : "bg-gray-50 text-muted"
           }`}
         >
           {active === i && (
@@ -43,7 +36,7 @@ export default function CategoryTabs() {
             />
           )}
           <span className="relative z-10 flex items-center gap-1.5">
-            <tab.icon className="w-4 h-4" />
+            <span className="text-base leading-none">{tab.emoji}</span>
             {tab.label}
           </span>
         </button>

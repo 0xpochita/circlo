@@ -1,6 +1,7 @@
 "use client";
 
 import { HiOutlineArrowRight, HiOutlineGift } from "react-icons/hi2";
+import { UsdtLabel } from "@/components/shared";
 
 export default function RewardCard() {
   return (
@@ -11,7 +12,9 @@ export default function RewardCard() {
             <HiOutlineGift className="w-6 h-6 text-brand" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-main-text">Earn 1 USDm per Friend</p>
+            <p className="text-sm font-semibold text-main-text inline-flex items-center gap-1">
+              Earn 1 <UsdtLabel size={13} /> per Friend
+            </p>
             <p className="text-xs text-muted max-w-[220px]">
               You and your friend both get rewarded upon first prediction.
             </p>

@@ -2,18 +2,20 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { HiOutlineLockClosed, HiOutlineGlobeAlt, HiOutlineSparkles } from "react-icons/hi2";
 import {
-  HiOutlineArrowTrendingUp,
+  HiOutlineLockClosed,
+  HiOutlineGlobeAlt,
+  HiOutlinePencil,
 } from "react-icons/hi2";
-import { IoFitnessOutline, IoGameControllerOutline, IoMusicalNotesOutline } from "react-icons/io5";
+import { EmojiAvatar, EmojiPicker } from "@/components/shared";
+import type { UserAvatar } from "@/types";
 
 const categories = [
-  { icon: HiOutlineSparkles, label: "General" },
-  { icon: HiOutlineArrowTrendingUp, label: "Crypto" },
-  { icon: IoFitnessOutline, label: "Fitness" },
-  { icon: IoGameControllerOutline, label: "Gaming" },
-  { icon: IoMusicalNotesOutline, label: "Music" },
+  { emoji: "✨", label: "General" },
+  { emoji: "💎", label: "Crypto" },
+  { emoji: "⚡", label: "Fitness" },
+  { emoji: "🎮", label: "Gaming" },
+  { emoji: "🎧", label: "Music" },
 ];
 
 export default function CircleSetupForm() {
@@ -21,6 +23,11 @@ export default function CircleSetupForm() {
   const [description, setDescription] = useState("");
   const [privacy, setPrivacy] = useState<"public" | "private">("public");
   const [category, setCategory] = useState(0);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [circleAvatar, setCircleAvatar] = useState<UserAvatar>({
+    emoji: "🌟",
+    color: "#ec4899",
+  });
 
   return (
     <div className="px-4 py-2 flex flex-col gap-4">
@@ -28,6 +35,33 @@ export default function CircleSetupForm() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
+        className="rounded-2xl bg-white p-4"
+      >
+        <p className="text-sm font-medium text-main-text mb-3">Circle Logo</p>
+        <div className="flex items-center gap-4">
+          <button
+            type="button"
+            onClick={() => setPickerOpen(true)}
+            className="relative cursor-pointer transition-transform duration-200 active:scale-[0.95]"
+          >
+            <EmojiAvatar avatar={circleAvatar} size={72} />
+            <div className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-white border border-gray-100">
+              <HiOutlinePencil className="w-3.5 h-3.5 text-main-text" />
+            </div>
+          </button>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-main-text">Pick a vibe</p>
+            <p className="text-xs text-muted">
+              Choose an emoji and color that represent your circle
+            </p>
+          </div>
+        </div>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.08 }}
         className="rounded-2xl bg-white p-4"
       >
         <label className="text-sm font-medium text-main-text mb-2 block">
@@ -45,7 +79,7 @@ export default function CircleSetupForm() {
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.08 }}
+        transition={{ duration: 0.4, delay: 0.16 }}
         className="rounded-2xl bg-white p-4"
       >
         <label className="text-sm font-medium text-main-text mb-2 block">
@@ -63,7 +97,7 @@ export default function CircleSetupForm() {
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.16 }}
+        transition={{ duration: 0.4, delay: 0.24 }}
         className="rounded-2xl bg-white p-4"
       >
         <p className="text-sm font-medium text-main-text mb-3">Category</p>
@@ -79,7 +113,7 @@ export default function CircleSetupForm() {
                   : "bg-gray-50 text-muted"
               }`}
             >
-              <cat.icon className="w-4 h-4" />
+              <span className="text-base leading-none">{cat.emoji}</span>
               {cat.label}
             </button>
           ))}
@@ -89,7 +123,7 @@ export default function CircleSetupForm() {
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.24 }}
+        transition={{ duration: 0.4, delay: 0.32 }}
         className="rounded-2xl bg-white p-4"
       >
         <p className="text-sm font-medium text-main-text mb-3">Privacy</p>
@@ -126,6 +160,15 @@ export default function CircleSetupForm() {
           </button>
         </div>
       </motion.div>
+
+      <EmojiPicker
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        value={circleAvatar}
+        onSave={setCircleAvatar}
+        title="Pick a vibe for your circle"
+        subtitle="Choose an emoji and color that represent it"
+      />
     </div>
   );
 }
