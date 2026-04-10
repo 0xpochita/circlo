@@ -7,6 +7,8 @@ import { HiOutlineMagnifyingGlass, HiOutlineBell, HiOutlinePencil } from "react-
 import { useUserStore } from "@/stores/userStore";
 import { EmojiAvatar, EmojiPicker } from "@/components/shared";
 import NotificationSheet from "./NotificationSheet";
+import DepositSheet from "./DepositSheet";
+import WithdrawSheet from "./WithdrawSheet";
 
 export default function ProfileHero() {
   const router = useRouter();
@@ -15,6 +17,9 @@ export default function ProfileHero() {
   const setAvatar = useUserStore((s) => s.setAvatar);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [depositOpen, setDepositOpen] = useState(false);
+  const [withdrawOpen, setWithdrawOpen] = useState(false);
+  const balance = "12.50";
 
   const unreadCount = 3;
 
@@ -83,10 +88,18 @@ export default function ProfileHero() {
           </div>
 
           <div className="flex items-center gap-3">
-            <button type="button" className="flex-1 rounded-full bg-white py-3 text-sm font-semibold text-main-text cursor-pointer transition-all duration-200 active:scale-[0.97]">
+            <button
+              type="button"
+              onClick={() => setDepositOpen(true)}
+              className="flex-1 rounded-full bg-white py-3 text-sm font-semibold text-main-text cursor-pointer transition-all duration-200 active:scale-[0.97]"
+            >
               + Deposit
             </button>
-            <button type="button" className="flex-1 rounded-full bg-white py-3 text-sm font-semibold text-main-text cursor-pointer transition-all duration-200 active:scale-[0.97]">
+            <button
+              type="button"
+              onClick={() => setWithdrawOpen(true)}
+              className="flex-1 rounded-full bg-white py-3 text-sm font-semibold text-main-text cursor-pointer transition-all duration-200 active:scale-[0.97]"
+            >
               Withdraw
             </button>
           </div>
@@ -100,6 +113,8 @@ export default function ProfileHero() {
         onSave={setAvatar}
       />
       <NotificationSheet open={notifOpen} onClose={() => setNotifOpen(false)} />
+      <DepositSheet open={depositOpen} onClose={() => setDepositOpen(false)} />
+      <WithdrawSheet open={withdrawOpen} onClose={() => setWithdrawOpen(false)} balance={balance} />
     </>
   );
 }

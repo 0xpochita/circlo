@@ -1,4 +1,5 @@
 export { default as Header } from "./Header";
+export { default as HomeHero } from "./HomeHero";
 export { default as SearchBar } from "./SearchBar";
 export { default as ActivePredictionCard } from "./ActivePredictionCard";
 export { default as FeatureCards } from "./FeatureCards";

@@ -9,7 +9,7 @@ export default function Header() {
   const avatar = useUserStore((s) => s.avatar);
 
   return (
-    <div className="flex items-center justify-between px-4 pt-14 pb-2">
+    <div className="relative z-10 flex items-center justify-between px-4 pt-14 pb-2">
       <div className="flex items-center gap-3">
         <Image
           src="/Assets/Images/Logo/logo-brand/logo-brand.webp"
@@ -19,8 +19,8 @@ export default function Header() {
           className="rounded-xl"
         />
         <div>
-          <p className="text-sm text-muted">Welcome back</p>
-          <h1 className="text-2xl font-bold tracking-tight text-main-text">
+          <p className="text-sm text-white/80">Welcome back</p>
+          <h1 className="text-2xl font-bold tracking-tight text-white">
             Circlo
           </h1>
         </div>
