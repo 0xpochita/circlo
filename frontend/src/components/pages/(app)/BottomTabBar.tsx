@@ -1,13 +1,14 @@
 "use client";
 
-import { HiOutlineHome, HiOutlineMagnifyingGlass, HiOutlineCalendarDays, HiOutlineUser } from "react-icons/hi2";
+import { HiOutlineHome, HiOutlineMagnifyingGlass, HiOutlineUser } from "react-icons/hi2";
+import { TbTargetArrow } from "react-icons/tb";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 
 const tabs = [
   { icon: HiOutlineHome, label: "Home", href: "/" },
   { icon: HiOutlineMagnifyingGlass, label: "Search", href: "/explore" },
-  { icon: HiOutlineCalendarDays, label: "Events", href: "/" },
+  { icon: TbTargetArrow, label: "Predict", href: "/create-prediction" },
   { icon: HiOutlineUser, label: "Profile", href: "/profile" },
 ];
 
