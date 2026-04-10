@@ -22,16 +22,18 @@ export default function TrendingCategories() {
         {categories.map((cat) => (
           <div
             key={cat.label}
-            className="flex flex-col items-center gap-2 rounded-2xl bg-white py-5 cursor-pointer transition-all duration-200 active:scale-[0.97]"
+            className="flex flex-col rounded-2xl bg-white p-1 cursor-pointer transition-all duration-200 active:scale-[0.97]"
           >
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-light">
-              {cat.image ? (
-                <Image src={cat.image} alt={cat.label} width={28} height={28} />
-              ) : (
-                cat.icon && <cat.icon className="w-6 h-6 text-brand" />
-              )}
+            <div className="flex aspect-square flex-col justify-between rounded-2xl bg-gray-50 p-3">
+              <div>
+                {cat.image ? (
+                  <Image src={cat.image} alt={cat.label} width={28} height={28} />
+                ) : (
+                  cat.icon && <cat.icon className="w-6 h-6 text-brand" />
+                )}
+              </div>
+              <p className="text-sm font-medium text-main-text">{cat.label}</p>
             </div>
-            <p className="text-sm font-medium text-main-text">{cat.label}</p>
           </div>
         ))}
       </div>

@@ -50,7 +50,7 @@ export default function ActiveCircles() {
             key={c.name}
             className="flex min-w-[160px] flex-col rounded-2xl bg-white p-4 cursor-pointer transition-all duration-200 active:scale-[0.97]"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-light mb-8">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl mb-8">
               {c.image ? (
                 <Image src={c.image} alt={c.name} width={24} height={24} />
               ) : (

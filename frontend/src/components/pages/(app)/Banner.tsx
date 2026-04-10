@@ -10,8 +10,8 @@ export default function Banner() {
 
   return (
     <div className="px-4 py-2">
-      <div className="flex items-center gap-3 rounded-2xl bg-white p-4">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand-light">
+      <div className="flex items-center gap-3 rounded-2xl bg-white p-2">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gray-50">
           <HiOutlineTrophy className="w-6 h-6 text-brand" />
         </div>
         <div className="flex-1">

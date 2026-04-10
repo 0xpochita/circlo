@@ -63,9 +63,9 @@ export default function CircleList() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.08 * i }}
-          className="flex items-center gap-3 rounded-2xl bg-surface p-4"
+          className="flex items-center gap-3 rounded-2xl bg-white p-2"
         >
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-light">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gray-50">
             {circle.image ? (
               <Image src={circle.image} alt={circle.name} width={28} height={28} />
             ) : (
