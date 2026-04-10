@@ -1,31 +1,14 @@
 "use client";
 
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { HiOutlineAdjustmentsHorizontal } from "react-icons/hi2";
+import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
+import { MOCK_USERS } from "@/lib/mockUsers";
 
 const members = [
-  {
-    name: "Sandra Flavor",
-    avatar: "/Assets/Images/Avatar/avatar-2.jpeg",
-    status: "Joined",
-    role: "Member",
-    time: "just now",
-  },
-  {
-    name: "Andero Salem",
-    avatar: "/Assets/Images/Avatar/avatar-3.jpeg",
-    status: "Pending",
-    role: "Invited",
-    time: "just now",
-  },
-  {
-    name: "Greg Maxwell",
-    avatar: "/Assets/Images/Avatar/avatar-4.jpeg",
-    status: "Joined",
-    role: "Member",
-    time: "just now",
-  },
+  { user: MOCK_USERS.sandra, status: "Joined", role: "Member", time: "just now" },
+  { user: MOCK_USERS.andero, status: "Pending", role: "Invited", time: "just now" },
+  { user: MOCK_USERS.greg, status: "Joined", role: "Member", time: "just now" },
 ];
 
 export default function MemberActivity() {
@@ -44,22 +27,16 @@ export default function MemberActivity() {
       <div className="rounded-2xl bg-white divide-y divide-gray-50">
         {members.map((m, i) => (
           <motion.div
-            key={m.name}
+            key={m.user.username}
             initial={{ opacity: 0, x: -12 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.3, delay: 0.05 * i }}
             className="flex items-center justify-between px-4 py-3.5"
           >
             <div className="flex items-center gap-3">
-              <Image
-                src={m.avatar}
-                alt={m.name}
-                width={40}
-                height={40}
-                className="rounded-full object-cover"
-              />
+              <EmojiAvatar avatar={m.user.avatar} size={40} />
               <div>
-                <p className="text-sm font-semibold text-main-text">{m.name}</p>
+                <p className="text-sm font-semibold text-main-text">{m.user.name}</p>
                 <span
                   className={`inline-block rounded-md px-2 py-0.5 text-xs font-medium ${
                     m.status === "Joined"

@@ -1,31 +1,14 @@
 "use client";
 
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { HiOutlineAdjustmentsHorizontal } from "react-icons/hi2";
+import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
+import { MOCK_USERS } from "@/lib/mockUsers";
 
 const activities = [
-  {
-    name: "Emma Racheal",
-    avatar: "/Assets/Images/Avatar/avatar-2.jpeg",
-    status: "Verified",
-    earned: "1 USDm earned",
-    time: "2h ago",
-  },
-  {
-    name: "James Ken",
-    avatar: "/Assets/Images/Avatar/avatar-3.jpeg",
-    status: "Pending",
-    earned: "1 USDm earned",
-    time: "2h ago",
-  },
-  {
-    name: "Daniel Peter",
-    avatar: "/Assets/Images/Avatar/avatar-4.jpeg",
-    status: "Verified",
-    earned: "1 USDm earned",
-    time: "2h ago",
-  },
+  { user: MOCK_USERS.emma, status: "Verified", earned: "1 USDm earned", time: "2h ago" },
+  { user: MOCK_USERS.james, status: "Pending", earned: "1 USDm earned", time: "2h ago" },
+  { user: MOCK_USERS.daniel, status: "Verified", earned: "1 USDm earned", time: "2h ago" },
 ];
 
 export default function RecentActivity() {
@@ -44,22 +27,16 @@ export default function RecentActivity() {
       <div className="rounded-2xl bg-white divide-y divide-gray-50">
         {activities.map((a, i) => (
           <motion.div
-            key={a.name}
+            key={a.user.username}
             initial={{ opacity: 0, x: -12 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.3, delay: 0.05 * i }}
             className="flex items-center justify-between px-4 py-3.5"
           >
             <div className="flex items-center gap-3">
-              <Image
-                src={a.avatar}
-                alt={a.name}
-                width={40}
-                height={40}
-                className="rounded-full object-cover"
-              />
+              <EmojiAvatar avatar={a.user.avatar} size={40} />
               <div>
-                <p className="text-sm font-semibold text-main-text">{a.name}</p>
+                <p className="text-sm font-semibold text-main-text">{a.user.name}</p>
                 <span
                   className={`inline-block rounded-md px-2 py-0.5 text-xs font-medium ${
                     a.status === "Verified"

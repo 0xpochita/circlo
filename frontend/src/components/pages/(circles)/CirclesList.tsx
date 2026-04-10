@@ -1,46 +1,46 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { HiOutlineUserGroup, HiOutlineLockClosed, HiOutlineGlobeAlt } from "react-icons/hi2";
 import { TbTargetArrow } from "react-icons/tb";
+import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
+import { MOCK_USERS } from "@/lib/mockUsers";
+import type { User } from "@/types";
 
-const circles = [
+type Circle = {
+  name: string;
+  description: string;
+  members: number;
+  activeGoals: number;
+  privacy: "private" | "public";
+  previewMembers: User[];
+};
+
+const circles: Circle[] = [
   {
     name: "Friends 2026",
     description: "Goals with my closest friends",
     members: 12,
     activeGoals: 5,
-    privacy: "private" as const,
-    avatars: [
-      "/Assets/Images/Avatar/avatar-2.jpeg",
-      "/Assets/Images/Avatar/avatar-3.jpeg",
-      "/Assets/Images/Avatar/avatar-4.jpeg",
-    ],
+    privacy: "private",
+    previewMembers: [MOCK_USERS.sandra, MOCK_USERS.andero, MOCK_USERS.greg],
   },
   {
     name: "Fitness Squad",
     description: "Workout and health goals",
     members: 8,
     activeGoals: 3,
-    privacy: "public" as const,
-    avatars: [
-      "/Assets/Images/Avatar/avatar-5.jpeg",
-      "/Assets/Images/Avatar/avatar-6.jpeg",
-      "/Assets/Images/Avatar/avatar-7.jpeg",
-    ],
+    privacy: "public",
+    previewMembers: [MOCK_USERS.tommy, MOCK_USERS.natalie, MOCK_USERS.emma],
   },
   {
     name: "Career Growth",
     description: "Professional development circle",
     members: 6,
     activeGoals: 4,
-    privacy: "private" as const,
-    avatars: [
-      "/Assets/Images/Avatar/avatar-2.jpeg",
-      "/Assets/Images/Avatar/avatar-4.jpeg",
-    ],
+    privacy: "private",
+    previewMembers: [MOCK_USERS.james, MOCK_USERS.daniel],
   },
 ];
 
@@ -83,24 +83,18 @@ export default function CirclesList() {
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <div className="flex -space-x-2">
-                  {circle.avatars.map((av, idx) => (
+                  {circle.previewMembers.map((member) => (
                     <div
-                      key={`${circle.name}-${idx}`}
-                      className="h-9 w-9 overflow-hidden rounded-full border-2 border-white"
+                      key={`${circle.name}-${member.username}`}
+                      className="rounded-full border-2 border-white"
                     >
-                      <Image
-                        src={av}
-                        alt=""
-                        width={36}
-                        height={36}
-                        className="h-full w-full object-cover"
-                      />
+                      <EmojiAvatar avatar={member.avatar} size={34} />
                     </div>
                   ))}
                 </div>
-                {circle.members > circle.avatars.length && (
+                {circle.members > circle.previewMembers.length && (
                   <span className="text-xs text-muted">
-                    +{circle.members - circle.avatars.length}
+                    +{circle.members - circle.previewMembers.length}
                   </span>
                 )}
               </div>

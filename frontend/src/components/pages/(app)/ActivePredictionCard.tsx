@@ -1,10 +1,13 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { HiChevronRight } from "react-icons/hi2";
+import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
+import { MOCK_USERS } from "@/lib/mockUsers";
 
 export default function ActivePredictionCard() {
+  const sandra = MOCK_USERS.sandra;
+
   return (
     <div className="px-4 py-2">
       <Link
@@ -12,13 +15,7 @@ export default function ActivePredictionCard() {
         className="flex items-center justify-between rounded-2xl bg-white p-4 cursor-pointer transition-all duration-200 active:scale-[0.97]"
       >
         <div className="flex items-center gap-3">
-          <Image
-            src="/Assets/Images/Avatar/avatar-2.jpeg"
-            alt="Sandra"
-            width={44}
-            height={44}
-            className="rounded-full object-cover"
-          />
+          <EmojiAvatar avatar={sandra.avatar} size={44} />
           <div>
             <p className="text-base font-semibold text-main-text">Will Sandra get a job in 2026?</p>
             <p className="text-sm text-muted">Ends in 2 days · Friends 2026</p>

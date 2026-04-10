@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { HiCheck } from "react-icons/hi2";
+import { HiOutlineLockClosed } from "react-icons/hi2";
 import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
 import { MOCK_USERS } from "@/lib/mockUsers";
 
@@ -13,25 +13,22 @@ const positions = [
   { user: MOCK_USERS.natalie, x: 104, y: 68, size: 68 },
 ];
 
-export default function SuccessHero() {
+export default function DetailsHero() {
   return (
     <div className="px-4 py-2">
-      <div className="mb-4 flex items-center gap-2">
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: "spring" as const, stiffness: 300, damping: 20 }}
-          className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500"
-        >
-          <HiCheck className="w-4 h-4 text-white" />
-        </motion.div>
-        <p className="text-xs font-medium text-emerald-500 uppercase tracking-wide">Circle Created</p>
-      </div>
-
       <div className="mb-4">
-        <h1 className="text-2xl font-bold tracking-tight text-main-text">Crypto Circle</h1>
+        <div className="flex items-center gap-2 mb-2">
+          <span className="rounded-md bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-muted uppercase tracking-wide">
+            Crypto
+          </span>
+          <div className="flex items-center gap-1 rounded-md bg-gray-100 px-2 py-0.5">
+            <HiOutlineLockClosed className="w-3 h-3 text-muted" />
+            <span className="text-[10px] font-medium text-muted uppercase tracking-wide">Public</span>
+          </div>
+        </div>
+        <h1 className="text-2xl font-bold tracking-tight text-main-text">Crypto Predictions</h1>
         <p className="mt-1 text-sm text-muted">
-          Your circle is ready. Invite more friends to grow your community.
+          Weekly goals on BTC, ETH and altcoin moves. Stake small, track together, win together.
         </p>
       </div>
 
@@ -47,7 +44,7 @@ export default function SuccessHero() {
                   type: "spring" as const,
                   stiffness: 300,
                   damping: 20,
-                  delay: 0.15 * i,
+                  delay: 0.1 * i,
                 }}
                 className="absolute"
                 style={{

@@ -1,8 +1,13 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
+import { useUserStore } from "@/stores/userStore";
+import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
 
 export default function Header() {
+  const avatar = useUserStore((s) => s.avatar);
+
   return (
     <div className="flex items-center justify-between px-4 pt-14 pb-2">
       <div className="flex items-center gap-3">
@@ -20,13 +25,9 @@ export default function Header() {
           </h1>
         </div>
       </div>
-      <Image
-        src="/Assets/Images/Avatar/avatar_ios.jpeg"
-        alt="Profile"
-        width={44}
-        height={44}
-        className="rounded-full object-cover cursor-pointer"
-      />
+      <Link href="/profile" className="cursor-pointer">
+        <EmojiAvatar avatar={avatar} size={44} />
+      </Link>
     </div>
   );
 }

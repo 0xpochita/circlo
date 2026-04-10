@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   HiOutlineUserGroup,
@@ -63,36 +64,43 @@ export default function CircleList() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.08 * i }}
-          className="flex items-center gap-3 rounded-2xl bg-white p-2"
         >
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gray-50">
-            {circle.image ? (
-              <Image src={circle.image} alt={circle.name} width={30} height={28} />
-            ) : (
-              circle.icon && <circle.icon className="w-6 h-6 text-brand" />
-            )}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-main-text truncate">{circle.name}</p>
-            <p className="text-xs text-muted truncate">{circle.description}</p>
-            <div className="flex items-center gap-1 mt-1">
-              <HiOutlineUserGroup className="w-3.5 h-3.5 text-muted" />
-              <span className="text-xs text-muted">{circle.members} members</span>
+          <Link
+            href="/circle-details"
+            className="flex items-center gap-3 rounded-2xl bg-white p-2 cursor-pointer transition-all duration-200 active:scale-[0.98]"
+          >
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gray-50">
+              {circle.image ? (
+                <Image src={circle.image} alt={circle.name} width={30} height={28} />
+              ) : (
+                circle.icon && <circle.icon className="w-6 h-6 text-brand" />
+              )}
             </div>
-          </div>
-          {joined[circle.name] ? (
-            <span className="shrink-0 rounded-full bg-brand-light px-4 py-1.5 text-xs text-muted">
-              Joined
-            </span>
-          ) : (
-            <button
-              type="button"
-              onClick={() => handleJoin(circle.name)}
-              className="shrink-0 rounded-full bg-brand px-4 py-1.5 text-xs font-medium text-white cursor-pointer transition-all duration-200 active:scale-[0.95]"
-            >
-              Join
-            </button>
-          )}
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-main-text truncate">{circle.name}</p>
+              <p className="text-xs text-muted truncate">{circle.description}</p>
+              <div className="flex items-center gap-1 mt-1">
+                <HiOutlineUserGroup className="w-3.5 h-3.5 text-muted" />
+                <span className="text-xs text-muted">{circle.members} members</span>
+              </div>
+            </div>
+            {joined[circle.name] ? (
+              <span className="shrink-0 rounded-full bg-brand-light px-4 py-1.5 text-xs text-muted">
+                Joined
+              </span>
+            ) : (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleJoin(circle.name);
+                }}
+                className="shrink-0 rounded-full bg-brand px-4 py-1.5 text-xs font-medium text-white cursor-pointer transition-all duration-200 active:scale-[0.95]"
+              >
+                Join
+              </button>
+            )}
+          </Link>
         </motion.div>
       ))}
     </div>

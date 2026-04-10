@@ -1,14 +1,15 @@
 "use client";
 
-import Image from "next/image";
 import { motion } from "framer-motion";
+import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
+import { MOCK_USERS } from "@/lib/mockUsers";
 
-const avatars = [
-  { src: "/Assets/Images/Avatar/avatar-no-bg/avatar-1-no-bg.png", x: 0, y: 0, size: 80 },
-  { src: "/Assets/Images/Avatar/avatar-no-bg/avatar-2-no-bg.png", x: 84, y: -8, size: 80 },
-  { src: "/Assets/Images/Avatar/avatar-no-bg/avatar-3-no-bg.png", x: 168, y: 4, size: 80 },
-  { src: "/Assets/Images/Avatar/avatar-no-bg/avatar-4-no-bg.png", x: 30, y: 72, size: 74 },
-  { src: "/Assets/Images/Avatar/avatar-no-bg/avatar-7-no-bg.png", x: 112, y: 76, size: 100 },
+const positions = [
+  { user: MOCK_USERS.andero, x: 0, y: 0, size: 72 },
+  { user: MOCK_USERS.sandra, x: 78, y: -8, size: 72 },
+  { user: MOCK_USERS.greg, x: 156, y: 4, size: 72 },
+  { user: MOCK_USERS.tommy, x: 28, y: 64, size: 68 },
+  { user: MOCK_USERS.natalie, x: 104, y: 68, size: 68 },
 ];
 
 export default function CircleHero() {
@@ -16,10 +17,10 @@ export default function CircleHero() {
     <div className="flex flex-col items-center px-4 py-4">
       <div className="w-full rounded-2xl bg-white p-2">
         <div className="rounded-2xl bg-gray-50 py-10">
-          <div className="relative mx-auto h-40 w-64">
-            {avatars.map((av, i) => (
+          <div className="relative mx-auto h-40 w-60">
+            {positions.map((p, i) => (
               <motion.div
-                key={`avatar-${i}`}
+                key={p.user.username}
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{
@@ -28,21 +29,13 @@ export default function CircleHero() {
                   damping: 20,
                   delay: 0.15 * i,
                 }}
-                className="absolute overflow-hidden"
+                className="absolute"
                 style={{
-                  width: av.size,
-                  height: av.size,
-                  left: av.x,
-                  top: av.y,
+                  left: p.x,
+                  top: p.y,
                 }}
               >
-                <Image
-                  src={av.src}
-                  alt="Member"
-                  width={av.size}
-                  height={av.size}
-                  className="h-full w-full object-cover"
-                />
+                <EmojiAvatar avatar={p.user.avatar} size={p.size} className="border-4 border-white" />
               </motion.div>
             ))}
           </div>

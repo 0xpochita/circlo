@@ -1,15 +1,16 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { HiOutlineArrowRight, HiOutlineClock } from "react-icons/hi2";
 import { TbTargetArrow } from "react-icons/tb";
+import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
+import { MOCK_USERS } from "@/lib/mockUsers";
 
 const markets = [
   {
     title: "Will Sandra get a job in 2026?",
-    avatar: "/Assets/Images/Avatar/avatar-2.jpeg",
+    user: MOCK_USERS.sandra,
     stake: "0.50 USDm",
     participants: 12,
     deadline: "2d 4h",
@@ -17,7 +18,7 @@ const markets = [
   },
   {
     title: "Will Andero run a marathon this year?",
-    avatar: "/Assets/Images/Avatar/avatar-3.jpeg",
+    user: MOCK_USERS.andero,
     stake: "1.00 USDm",
     participants: 8,
     deadline: "5d 12h",
@@ -25,7 +26,7 @@ const markets = [
   },
   {
     title: "Will Greg learn Spanish in 3 months?",
-    avatar: "/Assets/Images/Avatar/avatar-4.jpeg",
+    user: MOCK_USERS.greg,
     stake: "0.25 USDm",
     participants: 4,
     deadline: "1d 8h",
@@ -70,9 +71,7 @@ export default function PredictionMarketList() {
                 href="/prediction-detail"
                 className="flex items-center gap-3 rounded-2xl bg-white p-3 cursor-pointer transition-all duration-200 active:scale-[0.98]"
               >
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gray-50 overflow-hidden">
-                  <Image src={m.avatar} alt="" width={48} height={48} className="object-cover" />
-                </div>
+                <EmojiAvatar avatar={m.user.avatar} size={48} />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-main-text truncate">{m.title}</p>
                   <div className="flex items-center gap-3 mt-1">

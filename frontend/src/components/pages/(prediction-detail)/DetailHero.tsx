@@ -1,10 +1,13 @@
 "use client";
 
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { HiOutlineClock, HiOutlineUserGroup } from "react-icons/hi2";
+import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
+import { MOCK_USERS } from "@/lib/mockUsers";
 
 export default function DetailHero() {
+  const sandra = MOCK_USERS.sandra;
+
   return (
     <div className="px-4 py-2">
       <div className="rounded-2xl bg-white p-2">
@@ -14,15 +17,9 @@ export default function DetailHero() {
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ type: "spring" as const, stiffness: 300, damping: 20 }}
-              className="flex h-16 w-16 items-center justify-center rounded-full overflow-hidden bg-white mb-4"
+              className="mb-4"
             >
-              <Image
-                src="/Assets/Images/Avatar/avatar-2.jpeg"
-                alt="Sandra"
-                width={64}
-                height={64}
-                className="object-cover"
-              />
+              <EmojiAvatar avatar={sandra.avatar} size={72} />
             </motion.div>
             <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-500 mb-2">
               Active Goal

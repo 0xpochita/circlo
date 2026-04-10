@@ -1,16 +1,17 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { HiOutlineMagnifyingGlass, HiOutlineUserPlus } from "react-icons/hi2";
+import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
+import { MOCK_USERS } from "@/lib/mockUsers";
 
 const allMembers = [
-  { name: "Sandra Flavor", username: "@sandi21", avatar: "/Assets/Images/Avatar/avatar-2.jpeg" },
-  { name: "Andero Salem", username: "@andysem#1", avatar: "/Assets/Images/Avatar/avatar-3.jpeg" },
-  { name: "Greg Maxwell", username: "@maxgreg!!6", avatar: "/Assets/Images/Avatar/avatar-4.jpeg" },
-  { name: "Tommy Sydney", username: "@tomsen8*1", avatar: "/Assets/Images/Avatar/avatar-5.jpeg" },
-  { name: "Natalie Chen", username: "@natchen", avatar: "/Assets/Images/Avatar/avatar-6.jpeg" },
+  MOCK_USERS.sandra,
+  MOCK_USERS.andero,
+  MOCK_USERS.greg,
+  MOCK_USERS.tommy,
+  MOCK_USERS.natalie,
 ];
 
 export default function MemberList() {
@@ -80,13 +81,7 @@ export default function MemberList() {
                   className="flex items-center justify-between px-4 py-3.5"
                 >
                   <div className="flex items-center gap-3">
-                    <Image
-                      src={member.avatar}
-                      alt={member.name}
-                      width={40}
-                      height={40}
-                      className="rounded-full object-cover"
-                    />
+                    <EmojiAvatar avatar={member.avatar} size={40} />
                     <div>
                       <p className="text-sm font-semibold text-main-text">{member.name}</p>
                       <p className="text-xs text-muted">{member.username}</p>
