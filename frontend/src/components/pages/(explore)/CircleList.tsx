@@ -67,7 +67,7 @@ export default function CircleList() {
         >
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gray-50">
             {circle.image ? (
-              <Image src={circle.image} alt={circle.name} width={28} height={28} />
+              <Image src={circle.image} alt={circle.name} width={30} height={28} />
             ) : (
               circle.icon && <circle.icon className="w-6 h-6 text-brand" />
             )}
