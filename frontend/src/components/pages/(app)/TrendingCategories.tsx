@@ -22,7 +22,7 @@ export default function TrendingCategories() {
         {categories.map((cat) => (
           <div
             key={cat.label}
-            className="flex flex-col items-center gap-2 rounded-2xl bg-surface py-5 cursor-pointer transition-all duration-200 active:scale-[0.97]"
+            className="flex flex-col items-center gap-2 rounded-2xl bg-white py-5 cursor-pointer transition-all duration-200 active:scale-[0.97]"
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-light">
               {cat.image ? (

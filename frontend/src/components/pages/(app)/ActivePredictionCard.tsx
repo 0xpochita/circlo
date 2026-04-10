@@ -6,7 +6,7 @@ import { HiChevronRight } from "react-icons/hi2";
 export default function ActivePredictionCard() {
   return (
     <div className="px-4 py-2">
-      <div className="flex items-center justify-between rounded-2xl bg-surface p-4 cursor-pointer transition-all duration-200 active:scale-[0.97]">
+      <div className="flex items-center justify-between rounded-2xl bg-white p-4 cursor-pointer transition-all duration-200 active:scale-[0.97]">
         <div className="flex items-center gap-3">
           <Image
             src="/Assets/Images/Logo/logo-coin/celo-logo.svg"
