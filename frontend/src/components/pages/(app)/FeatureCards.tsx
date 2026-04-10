@@ -12,7 +12,7 @@ export default function FeatureCards() {
       >
         <div
           className="flex aspect-4/5 flex-col justify-between rounded-2xl p-4"
-          style={{ backgroundColor: "#1e40d8" }}
+          style={{ backgroundColor: "#3a86ff" }}
         >
           <HiOutlineUserGroup className="w-6 h-6 text-white" />
           <div>
@@ -27,7 +27,7 @@ export default function FeatureCards() {
       >
         <div
           className="flex aspect-4/5 flex-col justify-between rounded-2xl p-4"
-          style={{ backgroundColor: "#1e40d8" }}
+          style={{ backgroundColor: "#3a86ff" }}
         >
           <HiOutlineGlobeAlt className="w-6 h-6 text-white" />
           <div>
