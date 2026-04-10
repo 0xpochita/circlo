@@ -1,14 +1,14 @@
 "use client";
 
 import { HiOutlineHome, HiOutlineMagnifyingGlass, HiOutlineCalendarDays, HiOutlineUser } from "react-icons/hi2";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 
 const tabs = [
-  { icon: HiOutlineHome, label: "Home" },
-  { icon: HiOutlineMagnifyingGlass, label: "Search" },
-  { icon: HiOutlineCalendarDays, label: "Events" },
-  { icon: HiOutlineUser, label: "Profile" },
+  { icon: HiOutlineHome, label: "Home", href: "/" },
+  { icon: HiOutlineMagnifyingGlass, label: "Search", href: "/explore" },
+  { icon: HiOutlineCalendarDays, label: "Events", href: "/" },
+  { icon: HiOutlineUser, label: "Profile", href: "/profile" },
 ];
 
 const labelVariants: Variants = {
@@ -17,7 +17,11 @@ const labelVariants: Variants = {
 };
 
 export default function BottomTabBar() {
-  const [active, setActive] = useState(0);
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const activeIndex = tabs.findIndex((tab) => tab.href === pathname);
+  const active = activeIndex === -1 ? 0 : activeIndex;
 
   return (
     <nav className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 w-[calc(100%-32px)] max-w-[calc(448px-32px)]">
@@ -31,7 +35,7 @@ export default function BottomTabBar() {
           <motion.button
             type="button"
             key={tab.label}
-            onClick={() => setActive(i)}
+            onClick={() => router.push(tab.href)}
             layout
             transition={{ type: "spring", stiffness: 400, damping: 30 }}
             className={`relative flex items-center gap-2 rounded-full px-4 py-2.5 cursor-pointer ${active === i ? "bg-white" : ""}`}
