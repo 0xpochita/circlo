@@ -10,11 +10,14 @@ export default function FeatureCards() {
         href="/circles"
         className="flex flex-col rounded-2xl bg-white p-2 cursor-pointer transition-all duration-200 active:scale-[0.97]"
       >
-        <div className="flex aspect-4/5 flex-col justify-between rounded-2xl bg-gray-50 p-4">
-          <HiOutlineUserGroup className="w-6 h-6 text-main-text" />
+        <div
+          className="flex aspect-4/5 flex-col justify-between rounded-2xl p-4"
+          style={{ backgroundColor: "#1e40d8" }}
+        >
+          <HiOutlineUserGroup className="w-6 h-6 text-white" />
           <div>
-            <p className="text-base font-semibold text-main-text">My Circles</p>
-            <p className="text-xs text-muted">View and manage</p>
+            <p className="text-base font-semibold text-white">My Circles</p>
+            <p className="text-xs text-white/70">View and manage</p>
           </div>
         </div>
       </Link>
@@ -22,11 +25,14 @@ export default function FeatureCards() {
         href="/explore"
         className="flex flex-col rounded-2xl bg-white p-2 cursor-pointer transition-all duration-200 active:scale-[0.97]"
       >
-        <div className="flex aspect-4/5 flex-col justify-between rounded-2xl bg-gray-50 p-4">
-          <HiOutlineGlobeAlt className="w-6 h-6 text-main-text" />
+        <div
+          className="flex aspect-4/5 flex-col justify-between rounded-2xl p-4"
+          style={{ backgroundColor: "#1e40d8" }}
+        >
+          <HiOutlineGlobeAlt className="w-6 h-6 text-white" />
           <div>
-            <p className="text-base font-semibold text-main-text">Explore</p>
-            <p className="text-xs text-muted">Find new circles</p>
+            <p className="text-base font-semibold text-white">Explore</p>
+            <p className="text-xs text-white/70">Find new circles</p>
           </div>
         </div>
       </Link>
