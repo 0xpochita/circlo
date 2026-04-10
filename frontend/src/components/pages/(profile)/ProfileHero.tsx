@@ -1,16 +1,22 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { HiOutlineMagnifyingGlass, HiOutlineBell, HiOutlinePencil } from "react-icons/hi2";
 import { useUserStore } from "@/stores/userStore";
 import { EmojiAvatar, EmojiPicker } from "@/components/shared";
+import NotificationSheet from "./NotificationSheet";
 
 export default function ProfileHero() {
+  const router = useRouter();
   const name = useUserStore((s) => s.name);
   const avatar = useUserStore((s) => s.avatar);
   const setAvatar = useUserStore((s) => s.setAvatar);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
+
+  const unreadCount = 3;
 
   return (
     <>
@@ -39,11 +45,22 @@ export default function ProfileHero() {
               <p className="text-base font-semibold text-white">Hi, {name}</p>
             </div>
             <div className="flex items-center gap-2">
-              <button type="button" className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-md cursor-pointer transition-all duration-200 active:scale-[0.95]">
+              <button
+                type="button"
+                onClick={() => router.push("/explore")}
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-md cursor-pointer transition-all duration-200 active:scale-[0.95]"
+              >
                 <HiOutlineMagnifyingGlass className="w-5 h-5 text-white" />
               </button>
-              <button type="button" className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-md cursor-pointer transition-all duration-200 active:scale-[0.95]">
+              <button
+                type="button"
+                onClick={() => setNotifOpen(true)}
+                className="relative flex h-10 w-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-md cursor-pointer transition-all duration-200 active:scale-[0.95]"
+              >
                 <HiOutlineBell className="w-5 h-5 text-white" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1.5 right-1.5 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white/30" />
+                )}
               </button>
             </div>
           </div>
@@ -82,6 +99,7 @@ export default function ProfileHero() {
         value={avatar}
         onSave={setAvatar}
       />
+      <NotificationSheet open={notifOpen} onClose={() => setNotifOpen(false)} />
     </>
   );
 }
