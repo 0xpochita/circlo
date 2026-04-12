@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import type { SocketStream } from "@fastify/websocket";
 import Redis from "ioredis";
 import { config } from "../config.js";
+import { parseRedisUrl } from "../lib/redis.js";
 import type { JwtPayload } from "../types/index.js";
 
 const userSockets = new Map<string, Set<any>>();
@@ -14,7 +15,8 @@ function getOrCreateSubscriber(userId: string): Redis {
     return userSubscriptions.get(userId)!;
   }
 
-  const sub = new Redis(config.redisUrl, {
+  const sub = new Redis({
+    ...parseRedisUrl(config.redisUrl),
     maxRetriesPerRequest: null,
     enableReadyCheck: true,
   });

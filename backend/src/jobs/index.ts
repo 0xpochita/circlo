@@ -1,12 +1,10 @@
 import "dotenv/config";
 import { Queue, Worker } from "bullmq";
 import { config } from "../config.js";
+import { parseRedisUrl } from "../lib/redis.js";
 import type { ProcessReferralJobData } from "../types/index.js";
 
-const connection = {
-  host: new URL(config.redisUrl).hostname,
-  port: parseInt(new URL(config.redisUrl).port || "6379", 10),
-};
+const connection = parseRedisUrl(config.redisUrl);
 
 export const goalJobQueue = new Queue("goal-jobs", {
   connection,
