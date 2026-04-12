@@ -1,3 +1,35 @@
-frontend/.env.local
-frontend/.env
-frontend/.env.*.local
+# Environment files
+.env
+.env.local
+.env.*.local
+**/.env
+**/.env.local
+**/.env.*.local
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Foundry build output
+sc/out/
+sc/cache/
+sc/.env
+
+# Backend build
+backend/dist/
+
+# Frontend build
+frontend/.next/
+frontend/out/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/settings.json
+sc/broadcast/
