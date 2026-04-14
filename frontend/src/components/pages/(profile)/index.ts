@@ -6,3 +6,4 @@ export { default as NotificationSheet } from "./NotificationSheet";
 export { default as DepositSheet } from "./DepositSheet";
 export { default as WithdrawSheet } from "./WithdrawSheet";
 export { default as DisconnectButton } from "./DisconnectButton";
+export { default as EditProfileSheet } from "./EditProfileSheet";

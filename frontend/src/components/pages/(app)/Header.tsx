@@ -12,6 +12,7 @@ import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
 
 export default function Header() {
   const avatar = useUserStore((s) => s.avatar);
+  const userName = useUserStore((s) => s.name);
   const { isConnected } = useAccount();
   const { connect } = useConnect();
   const { login } = useAuth();
@@ -41,7 +42,11 @@ export default function Header() {
           className="rounded-xl"
         />
         <div>
-          <p className="text-sm text-white/80">Welcome back</p>
+          <p className="text-sm text-white/80">
+            {isConnected && userName && userName !== "Player"
+              ? `Welcome back, ${userName}`
+              : "Welcome back"}
+          </p>
           <h1 className="text-2xl font-bold tracking-tight text-white">
             Circlo
           </h1>

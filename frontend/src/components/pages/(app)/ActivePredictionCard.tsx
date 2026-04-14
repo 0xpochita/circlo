@@ -24,20 +24,7 @@ export default function ActivePredictionCard() {
       .finally(() => setIsLoading(false));
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className="px-4 py-2">
-        <div className="animate-pulse rounded-2xl bg-white p-4 flex items-center gap-3">
-          <div className="h-11 w-11 rounded-full bg-gray-100 shrink-0" />
-          <div className="flex-1">
-            <div className="h-4 w-48 rounded-lg bg-gray-100 mb-2" />
-            <div className="h-3 w-32 rounded-lg bg-gray-100" />
-          </div>
-          <div className="h-5 w-5 rounded bg-gray-100 shrink-0" />
-        </div>
-      </div>
-    );
-  }
+  if (isLoading) return null;
 
   if (!goal) return null;
 

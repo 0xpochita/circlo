@@ -1,7 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { HiOutlineLockClosed } from "react-icons/hi2";
+import { useState } from "react";
+import { HiOutlineLockClosed, HiOutlineDocumentDuplicate, HiCheck } from "react-icons/hi2";
+import { toast } from "sonner";
 import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
 import type { CircleDetailResponse, MemberResponse } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
@@ -38,6 +40,17 @@ function buildPositions(members?: MemberResponse[]) {
 
 export default function DetailsHero({ circle }: DetailsHeroProps) {
   const positions = buildPositions(circle?.membersPreview);
+  const [copied, setCopied] = useState(false);
+
+  async function handleCopyCode() {
+    if (!circle?.inviteCode) return;
+    try {
+      await navigator.clipboard.writeText(circle.inviteCode);
+      setCopied(true);
+      toast("Invite code copied");
+      setTimeout(() => setCopied(false), 2000);
+    } catch {}
+  }
 
   return (
     <div className="px-4 py-2">
@@ -59,6 +72,26 @@ export default function DetailsHero({ circle }: DetailsHeroProps) {
         <p className="mt-1 text-sm text-muted">
           {circle?.description || "No description"}
         </p>
+
+        {circle?.inviteCode && (
+          <div className="mt-3 flex items-center justify-between rounded-xl bg-gray-50 px-4 py-3">
+            <div>
+              <p className="text-[10px] text-muted uppercase tracking-wide">Invite Code</p>
+              <p className="text-sm font-bold text-main-text tracking-wider">{circle.inviteCode}</p>
+            </div>
+            <button
+              type="button"
+              onClick={handleCopyCode}
+              className="flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-medium text-main-text cursor-pointer transition-all duration-200 active:scale-[0.95]"
+            >
+              {copied ? (
+                <><HiCheck className="w-3.5 h-3.5" /> Copied</>
+              ) : (
+                <><HiOutlineDocumentDuplicate className="w-3.5 h-3.5" /> Copy</>
+              )}
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="w-full rounded-2xl bg-white p-2">
