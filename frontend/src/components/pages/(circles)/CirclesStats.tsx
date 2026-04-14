@@ -1,14 +1,28 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { UsdtLabel } from "@/components/shared";
-
-const stats = [
-  { value: "03", label: "Circles", usdt: false },
-  { value: "12", label: "Active goals", usdt: false },
-  { value: "5.2", label: "Staked", usdt: true },
-];
+import { circlesApi } from "@/lib/api/endpoints";
 
 export default function CirclesStats() {
+  const [circleCount, setCircleCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    circlesApi
+      .list()
+      .then((res) => setCircleCount(res.items.length))
+      .catch((err) => toast.error(err.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const stats = [
+    { value: loading ? "--" : String(circleCount).padStart(2, "0"), label: "Circles", usdt: false },
+    { value: "--", label: "Active goals", usdt: false },
+    { value: "--", label: "Staked", usdt: true },
+  ];
+
   return (
     <div className="px-4 py-2">
       <div className="flex items-center rounded-2xl bg-white p-4">

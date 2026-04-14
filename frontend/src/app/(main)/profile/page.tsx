@@ -1,4 +1,4 @@
-import { ProfileHero, ReferralBanner, ActiveCircles, RecentPredictions } from "@/components/pages/(profile)";
+import { ProfileHero, ReferralBanner, ActiveCircles, RecentPredictions, DisconnectButton } from "@/components/pages/(profile)";
 import { BottomTabBar, PageTransition } from "@/components/pages/(app)";
 
 export default function ProfilePage() {
@@ -9,6 +9,7 @@ export default function ProfilePage() {
         <ReferralBanner />
         <ActiveCircles />
         <RecentPredictions />
+        <DisconnectButton />
       </PageTransition>
       <BottomTabBar />
     </div>

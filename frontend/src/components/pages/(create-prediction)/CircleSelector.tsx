@@ -1,28 +1,70 @@
 "use client";
 
-import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { HiChevronDown, HiCheck } from "react-icons/hi2";
-import { IoFitnessOutline, IoGameControllerOutline } from "react-icons/io5";
-import type { ComponentType } from "react";
+import { EmojiAvatar } from "@/components/shared";
+import { useCreateGoalStore } from "@/stores/createGoalStore";
+import { circlesApi } from "@/lib/api/endpoints";
+import { toAvatar } from "@/lib/utils";
+import type { UserAvatar } from "@/types";
 
-type Circle = {
+type CircleOption = {
+  id: string;
   name: string;
-  members: number;
-} & ({ image: string; icon?: never } | { icon: ComponentType<{ className?: string }>; image?: never });
-
-const circles: Circle[] = [
-  { name: "Crypto Circle", members: 128, image: "/Assets/Images/Logo/logo-coin/celo-logo.svg" },
-  { name: "Fitness Goals", members: 64, icon: IoFitnessOutline },
-  { name: "Gaming Arena", members: 256, icon: IoGameControllerOutline },
-];
+  memberCount: number;
+  avatar: UserAvatar;
+};
 
 export default function CircleSelector() {
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState(0);
+  const [circles, setCircles] = useState<CircleOption[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const store = useCreateGoalStore();
 
-  const current = circles[selected];
+  useEffect(() => {
+    circlesApi
+      .list()
+      .then((res) => {
+        setCircles(
+          res.items.map((c) => ({
+            id: c.id,
+            name: c.name || "Circle",
+            memberCount: c.memberCount || 0,
+            avatar: toAvatar(c.avatarEmoji, c.avatarColor),
+          }))
+        );
+      })
+      .catch(() => setCircles([]))
+      .finally(() => setIsLoading(false));
+  }, []);
+
+  const current = circles.find((c) => c.id === store.circleId);
+
+  function handleSelect(circle: CircleOption) {
+    store.setCircleId(circle.id);
+    setOpen(false);
+  }
+
+  if (isLoading) {
+    return (
+      <div className="px-4 py-2">
+        <p className="text-sm font-medium text-main-text mb-2">Select Circle</p>
+        <div className="animate-pulse rounded-2xl bg-gray-100 h-16" />
+      </div>
+    );
+  }
+
+  if (circles.length === 0) {
+    return (
+      <div className="px-4 py-2">
+        <p className="text-sm font-medium text-main-text mb-2">Select Circle</p>
+        <div className="rounded-2xl bg-white p-4 text-center">
+          <p className="text-sm text-muted">No circles found. Create or join a circle first.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-4 py-2">
@@ -33,16 +75,18 @@ export default function CircleSelector() {
         className="flex w-full items-center justify-between rounded-2xl bg-white p-4 cursor-pointer transition-all duration-200 active:scale-[0.98]"
       >
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50">
-            {current.image ? (
-              <Image src={current.image} alt={current.name} width={24} height={24} />
-            ) : (
-              current.icon && <current.icon className="w-5 h-5 text-brand" />
-            )}
-          </div>
+          <EmojiAvatar
+            avatar={current?.avatar ?? { emoji: "\u{1F518}", color: "#9ca3af" }}
+            size={40}
+            shape="square"
+          />
           <div className="text-left">
-            <p className="text-sm font-semibold text-main-text">{current.name}</p>
-            <p className="text-xs text-muted">{current.members} members</p>
+            <p className="text-sm font-semibold text-main-text">
+              {current?.name ?? "Choose a circle"}
+            </p>
+            {current && (
+              <p className="text-xs text-muted">{current.memberCount} members</p>
+            )}
           </div>
         </div>
         <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }}>
@@ -60,24 +104,21 @@ export default function CircleSelector() {
             className="overflow-hidden"
           >
             <div className="mt-2 rounded-2xl bg-white divide-y divide-gray-50">
-              {circles.map((circle, i) => (
+              {circles.map((circle) => (
                 <button
                   type="button"
-                  key={circle.name}
-                  onClick={() => { setSelected(i); setOpen(false); }}
+                  key={circle.id}
+                  onClick={() => handleSelect(circle)}
                   className="flex w-full items-center justify-between px-4 py-3 cursor-pointer transition-all duration-200"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-50">
-                      {circle.image ? (
-                        <Image src={circle.image} alt={circle.name} width={20} height={20} />
-                      ) : (
-                        circle.icon && <circle.icon className="w-4 h-4 text-brand" />
-                      )}
+                    <EmojiAvatar avatar={circle.avatar} size={36} shape="square" />
+                    <div className="text-left">
+                      <p className="text-sm text-main-text">{circle.name}</p>
+                      <p className="text-xs text-muted">{circle.memberCount} members</p>
                     </div>
-                    <p className="text-sm text-main-text">{circle.name}</p>
                   </div>
-                  {selected === i && <HiCheck className="w-5 h-5 text-brand" />}
+                  {store.circleId === circle.id && <HiCheck className="w-5 h-5 text-brand" />}
                 </button>
               ))}
             </div>

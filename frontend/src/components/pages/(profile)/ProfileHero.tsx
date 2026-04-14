@@ -4,7 +4,12 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { HiOutlineMagnifyingGlass, HiOutlineBell, HiOutlinePencil } from "react-icons/hi2";
+import { useAccount, useConnect } from "wagmi";
+import { injected } from "wagmi/connectors";
+import { toast } from "sonner";
 import { useUserStore } from "@/stores/userStore";
+import { useAuth } from "@/hooks/useAuth";
+import { useUSDTBalance } from "@/hooks/useUSDT";
 import { EmojiAvatar, EmojiPicker } from "@/components/shared";
 import NotificationSheet from "./NotificationSheet";
 import DepositSheet from "./DepositSheet";
@@ -19,9 +24,28 @@ export default function ProfileHero() {
   const [notifOpen, setNotifOpen] = useState(false);
   const [depositOpen, setDepositOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
-  const balance = "12.50";
+  const [isConnecting, setIsConnecting] = useState(false);
 
+  const { address, isConnected } = useAccount();
+  const { connect } = useConnect();
+  const { login } = useAuth();
+  const { formatted: usdtBalance, isLoading: isBalanceLoading } = useUSDTBalance(address);
+
+  const displayBalance = isBalanceLoading ? "..." : usdtBalance.toFixed(2);
   const unreadCount = 3;
+
+  async function handleConnect() {
+    setIsConnecting(true);
+    try {
+      connect({ connector: injected() });
+      await login();
+      toast.success("Wallet connected successfully");
+    } catch {
+      toast.error("Failed to connect wallet");
+    } finally {
+      setIsConnecting(false);
+    }
+  }
 
   return (
     <>
@@ -73,7 +97,7 @@ export default function ProfileHero() {
           <div className="mb-4">
             <p className="text-sm text-white/70">My Wallet</p>
             <div className="flex items-center gap-2">
-              <p className="text-3xl font-bold text-white">12.50</p>
+              <p className="text-3xl font-bold text-white">{displayBalance}</p>
               <div className="flex items-center gap-1 rounded-full bg-white/20 backdrop-blur-md px-2.5 py-1 text-sm font-semibold text-white">
                 USDT
                 <Image
@@ -84,24 +108,39 @@ export default function ProfileHero() {
                 />
               </div>
             </div>
-            <p className="mt-1 text-sm font-medium text-emerald-300">+2.30 (22.5%)</p>
+            {isConnected && (
+              <p className="mt-1 text-sm font-medium text-emerald-300">+2.30 (22.5%)</p>
+            )}
           </div>
 
           <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setDepositOpen(true)}
-              className="flex-1 rounded-full bg-white py-3 text-sm font-semibold text-main-text cursor-pointer transition-all duration-200 active:scale-[0.97]"
-            >
-              + Deposit
-            </button>
-            <button
-              type="button"
-              onClick={() => setWithdrawOpen(true)}
-              className="flex-1 rounded-full bg-white py-3 text-sm font-semibold text-main-text cursor-pointer transition-all duration-200 active:scale-[0.97]"
-            >
-              Withdraw
-            </button>
+            {isConnected ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setDepositOpen(true)}
+                  className="flex-1 rounded-full bg-white py-3 text-sm font-semibold text-main-text cursor-pointer transition-all duration-200 active:scale-[0.97]"
+                >
+                  + Deposit
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setWithdrawOpen(true)}
+                  className="flex-1 rounded-full bg-white py-3 text-sm font-semibold text-main-text cursor-pointer transition-all duration-200 active:scale-[0.97]"
+                >
+                  Withdraw
+                </button>
+              </>
+            ) : (
+              <button
+                type="button"
+                onClick={handleConnect}
+                disabled={isConnecting}
+                className="flex-1 rounded-full bg-white py-3 text-sm font-semibold text-main-text cursor-pointer transition-all duration-200 active:scale-[0.97] disabled:opacity-60"
+              >
+                {isConnecting ? "Connecting..." : "Connect Wallet"}
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -113,8 +152,12 @@ export default function ProfileHero() {
         onSave={setAvatar}
       />
       <NotificationSheet open={notifOpen} onClose={() => setNotifOpen(false)} />
-      <DepositSheet open={depositOpen} onClose={() => setDepositOpen(false)} />
-      <WithdrawSheet open={withdrawOpen} onClose={() => setWithdrawOpen(false)} balance={balance} />
+      <DepositSheet
+        open={depositOpen}
+        onClose={() => setDepositOpen(false)}
+        walletAddress={address ?? ""}
+      />
+      <WithdrawSheet open={withdrawOpen} onClose={() => setWithdrawOpen(false)} balance={displayBalance} />
     </>
   );
 }

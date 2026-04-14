@@ -1,69 +1,35 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { HiXMark, HiOutlineBellAlert } from "react-icons/hi2";
 import { EmojiAvatar } from "@/components/shared";
-import { MOCK_USERS } from "@/lib/mockUsers";
-import type { User } from "@/types";
+import { notificationsApi } from "@/lib/api/endpoints";
+import type { NotificationResponse } from "@/lib/api/endpoints";
+import { toast } from "sonner";
+import type { UserAvatar } from "@/types";
 
-type Notification = {
-  id: string;
-  type: "goal" | "invite" | "reward" | "resolve";
-  user: User;
-  title: string;
-  description: string;
-  time: string;
-  unread: boolean;
+const TYPE_AVATARS: Record<string, UserAvatar> = {
+  goal_created: { emoji: "\u{1F3AF}", color: "#60a5fa" },
+  goal_staked: { emoji: "\u{1F4B0}", color: "#fbbf24" },
+  goal_locked: { emoji: "\u{1F512}", color: "#a78bfa" },
+  goal_resolved: { emoji: "\u2705", color: "#34d399" },
+  goal_claimed: { emoji: "\u{1F389}", color: "#ec4899" },
+  circle_invite: { emoji: "\u{1F4E9}", color: "#60a5fa" },
+  member_joined: { emoji: "\u{1F91D}", color: "#34d399" },
+  referral_reward: { emoji: "\u{1F381}", color: "#f87171" },
 };
 
-const notifications: Notification[] = [
-  {
-    id: "1",
-    type: "goal",
-    user: MOCK_USERS.sandra,
-    title: "Sandra created a new goal",
-    description: "Will Sandra get a job in 2026?",
-    time: "2m ago",
-    unread: true,
-  },
-  {
-    id: "2",
-    type: "invite",
-    user: MOCK_USERS.andero,
-    title: "Andero invited you",
-    description: "Join the Fitness Squad circle",
-    time: "1h ago",
-    unread: true,
-  },
-  {
-    id: "3",
-    type: "reward",
-    user: MOCK_USERS.greg,
-    title: "You won 1.20 USDT",
-    description: "Your prediction on Greg's goal was correct",
-    time: "3h ago",
-    unread: true,
-  },
-  {
-    id: "4",
-    type: "resolve",
-    user: MOCK_USERS.tommy,
-    title: "Tommy resolved a goal",
-    description: "Valorant Champions — result: Yes",
-    time: "1d ago",
-    unread: false,
-  },
-  {
-    id: "5",
-    type: "goal",
-    user: MOCK_USERS.natalie,
-    title: "Natalie joined your circle",
-    description: "Natalie is now in Friends 2026",
-    time: "2d ago",
-    unread: false,
-  },
-];
+function formatTime(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const minutes = Math.floor(diff / 60000);
+  if (minutes < 1) return "just now";
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+}
 
 type NotificationSheetProps = {
   open: boolean;
@@ -71,9 +37,21 @@ type NotificationSheetProps = {
 };
 
 export default function NotificationSheet({ open, onClose }: NotificationSheetProps) {
+  const [notifications, setNotifications] = useState<NotificationResponse[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
     if (open) {
       document.body.style.overflow = "hidden";
+      setIsLoading(true);
+      notificationsApi
+        .list()
+        .then((res) => setNotifications(res.items))
+        .catch(() => {
+          toast.error("Failed to load notifications");
+          setNotifications([]);
+        })
+        .finally(() => setIsLoading(false));
     } else {
       document.body.style.overflow = "";
     }
@@ -122,7 +100,13 @@ export default function NotificationSheet({ open, onClose }: NotificationSheetPr
             </div>
 
             <div className="flex-1 overflow-y-auto px-4 pb-8">
-              {notifications.length === 0 ? (
+              {isLoading ? (
+                <div className="flex flex-col gap-2">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="animate-pulse rounded-2xl bg-gray-100 h-[80px]" />
+                  ))}
+                </div>
+              ) : notifications.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12">
                   <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-50 mb-4">
                     <HiOutlineBellAlert className="w-7 h-7 text-muted" />
@@ -142,7 +126,7 @@ export default function NotificationSheet({ open, onClose }: NotificationSheetPr
                         n.unread ? "bg-gray-50" : "bg-white"
                       }`}
                     >
-                      <EmojiAvatar avatar={n.user.avatar} size={44} />
+                      <EmojiAvatar avatar={TYPE_AVATARS[n.type] ?? { emoji: "\u{1F514}", color: "#94a3b8" }} size={44} />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-semibold text-main-text truncate">
@@ -152,9 +136,8 @@ export default function NotificationSheet({ open, onClose }: NotificationSheetPr
                             <span className="h-2 w-2 shrink-0 rounded-full bg-brand" />
                           )}
                         </div>
-                        <p className="text-[11px] text-muted">{n.user.username}</p>
                         <p className="text-xs text-muted truncate">{n.description}</p>
-                        <p className="mt-1 text-[11px] text-muted">{n.time}</p>
+                        <p className="mt-1 text-[11px] text-muted">{formatTime(n.createdAt)}</p>
                       </div>
                     </motion.div>
                   ))}

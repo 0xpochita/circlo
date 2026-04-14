@@ -1,35 +1,58 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { HiOutlineMagnifyingGlass, HiOutlineUserPlus } from "react-icons/hi2";
 import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
-import { MOCK_USERS } from "@/lib/mockUsers";
+import { usersApi } from "@/lib/api/endpoints";
+import { toAvatar } from "@/lib/utils";
+import { toast } from "sonner";
 
-const allMembers = [
-  MOCK_USERS.sandra,
-  MOCK_USERS.andero,
-  MOCK_USERS.greg,
-  MOCK_USERS.tommy,
-  MOCK_USERS.natalie,
-];
+type SearchUser = {
+  id: string;
+  walletAddress: string;
+  name: string | null;
+  username: string | null;
+  avatarEmoji: string | null;
+  avatarColor: string | null;
+  createdAt: string;
+};
 
 export default function MemberList() {
   const [search, setSearch] = useState("");
-  const [invited, setInvited] = useState<Record<string, boolean>>({
-    "@sandi21": true,
-    "@maxgreg!!6": true,
-    "@tomsen8*1": true,
-  });
+  const [users, setUsers] = useState<SearchUser[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [invited, setInvited] = useState<Record<string, boolean>>({});
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const filtered = allMembers.filter(
-    (m) =>
-      m.name.toLowerCase().includes(search.toLowerCase()) ||
-      m.username.toLowerCase().includes(search.toLowerCase())
-  );
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
 
-  function handleInvite(username: string) {
-    setInvited((prev) => ({ ...prev, [username]: true }));
+    if (!search.trim()) {
+      setUsers([]);
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    debounceRef.current = setTimeout(() => {
+      usersApi
+        .search(search.trim())
+        .then((res) => setUsers(res))
+        .catch(() => {
+          toast.error("Failed to search users");
+          setUsers([]);
+        })
+        .finally(() => setIsLoading(false));
+    }, 300);
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [search]);
+
+  function handleInvite(userId: string) {
+    setInvited((prev) => ({ ...prev, [userId]: true }));
   }
 
   return (
@@ -46,7 +69,19 @@ export default function MemberList() {
       </div>
 
       <AnimatePresence mode="wait">
-        {filtered.length === 0 ? (
+        {isLoading ? (
+          <motion.div
+            key="loading"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="flex flex-col gap-2"
+          >
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="animate-pulse rounded-2xl bg-gray-100 h-16" />
+            ))}
+          </motion.div>
+        ) : !search.trim() || users.length === 0 ? (
           <motion.div
             key="empty"
             initial={{ opacity: 0, y: 8 }}
@@ -70,21 +105,25 @@ export default function MemberList() {
             exit={{ opacity: 0 }}
             className="rounded-2xl bg-white divide-y divide-gray-50"
           >
-            {filtered.map((member, i) => {
-              const isInvited = invited[member.username];
+            {users.map((member, i) => {
+              const isInvited = invited[member.id];
               return (
                 <motion.div
-                  key={member.username}
+                  key={member.id}
                   initial={{ opacity: 0, x: -12 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.3, delay: 0.05 * i }}
                   className="flex items-center justify-between px-4 py-3.5"
                 >
                   <div className="flex items-center gap-3">
-                    <EmojiAvatar avatar={member.avatar} size={40} />
+                    <EmojiAvatar avatar={toAvatar(member.avatarEmoji, member.avatarColor)} size={40} />
                     <div>
-                      <p className="text-sm font-semibold text-main-text">{member.name}</p>
-                      <p className="text-xs text-muted">{member.username}</p>
+                      <p className="text-sm font-semibold text-main-text">
+                        {member.name ?? member.username ?? member.walletAddress.slice(0, 8)}
+                      </p>
+                      <p className="text-xs text-muted">
+                        {member.username ? `@${member.username}` : member.walletAddress.slice(0, 12)}
+                      </p>
                     </div>
                   </div>
                   {isInvited ? (
@@ -94,7 +133,7 @@ export default function MemberList() {
                   ) : (
                     <button
                       type="button"
-                      onClick={() => handleInvite(member.username)}
+                      onClick={() => handleInvite(member.id)}
                       className="rounded-full bg-brand px-4 py-1.5 text-xs font-medium text-white cursor-pointer transition-all duration-200 active:scale-[0.95]"
                     >
                       Invite

@@ -6,14 +6,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import QRCode from "react-qr-code";
 import { HiXMark, HiOutlineDocumentDuplicate, HiCheck, HiOutlineShieldCheck } from "react-icons/hi2";
 
-const MOCK_WALLET_ADDRESS = "0x3fd29ab7c5a0c4b0e2f1c8b9d7a6e5f4c3b2a1d0";
-
 type DepositSheetProps = {
   open: boolean;
   onClose: () => void;
+  walletAddress: string;
 };
 
-export default function DepositSheet({ open, onClose }: DepositSheetProps) {
+export default function DepositSheet({ open, onClose, walletAddress }: DepositSheetProps) {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -30,7 +29,7 @@ export default function DepositSheet({ open, onClose }: DepositSheetProps) {
 
   async function handleCopy() {
     try {
-      await navigator.clipboard.writeText(MOCK_WALLET_ADDRESS);
+      await navigator.clipboard.writeText(walletAddress);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
@@ -38,7 +37,9 @@ export default function DepositSheet({ open, onClose }: DepositSheetProps) {
     }
   }
 
-  const shortAddress = `${MOCK_WALLET_ADDRESS.slice(0, 6)}...${MOCK_WALLET_ADDRESS.slice(-4)}`;
+  const shortAddress = walletAddress
+    ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+    : "";
 
   return (
     <AnimatePresence>
@@ -74,87 +75,95 @@ export default function DepositSheet({ open, onClose }: DepositSheetProps) {
             </div>
 
             <div className="flex-1 overflow-y-auto px-6 pb-8">
-              <div className="flex items-center justify-center gap-2 mb-5">
-                <div className="flex items-center gap-2 rounded-full bg-gray-50 px-4 py-2">
-                  <Image
-                    src="/Assets/Images/Logo/logo-coin/usdt-logo.svg"
-                    alt="USDT"
-                    width={20}
-                    height={20}
-                  />
-                  <span className="text-sm font-semibold text-main-text">USDT</span>
+              {!walletAddress ? (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <p className="text-sm font-medium text-muted">Connect your wallet first</p>
                 </div>
-                <div className="flex items-center gap-2 rounded-full bg-gray-50 px-4 py-2">
-                  <Image
-                    src="/Assets/Images/Logo/logo-coin/celo-logo.svg"
-                    alt="Celo"
-                    width={20}
-                    height={20}
-                  />
-                  <span className="text-sm font-semibold text-main-text">Celo Mainnet</span>
-                </div>
-              </div>
-
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: "spring" as const, stiffness: 300, damping: 22 }}
-                className="mx-auto mb-5 flex items-center justify-center rounded-3xl bg-white p-5"
-                style={{ width: 232 }}
-              >
-                <div className="rounded-2xl bg-gray-50 p-4">
-                  <QRCode
-                    value={MOCK_WALLET_ADDRESS}
-                    size={168}
-                    bgColor="transparent"
-                    fgColor="#1a1a1a"
-                    viewBox="0 0 168 168"
-                  />
-                </div>
-              </motion.div>
-
-              <div className="mb-4 rounded-2xl bg-gray-50 p-4">
-                <p className="text-xs text-muted mb-1">Your wallet address</p>
-                <p className="text-sm font-mono font-semibold text-main-text break-all">
-                  {MOCK_WALLET_ADDRESS}
-                </p>
-                <p className="mt-1 text-xs text-muted">{shortAddress}</p>
-              </div>
-
-              <motion.button
-                type="button"
-                onClick={handleCopy}
-                whileTap={{ scale: 0.97 }}
-                className="mb-4 flex w-full items-center justify-center gap-2 rounded-full bg-main-text py-4 text-base font-semibold text-white cursor-pointer"
-              >
-                {copied ? (
-                  <>
-                    <HiCheck className="w-5 h-5" />
-                    Copied!
-                  </>
-                ) : (
-                  <>
-                    <HiOutlineDocumentDuplicate className="w-5 h-5" />
-                    Copy address
-                  </>
-                )}
-              </motion.button>
-
-              <div className="rounded-2xl bg-gray-50 p-4">
-                <div className="flex items-start gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white">
-                    <HiOutlineShieldCheck className="w-5 h-5 text-main-text" />
+              ) : (
+                <>
+                  <div className="flex items-center justify-center gap-2 mb-5">
+                    <div className="flex items-center gap-2 rounded-full bg-gray-50 px-4 py-2">
+                      <Image
+                        src="/Assets/Images/Logo/logo-coin/usdt-logo.svg"
+                        alt="USDT"
+                        width={20}
+                        height={20}
+                      />
+                      <span className="text-sm font-semibold text-main-text">USDT</span>
+                    </div>
+                    <div className="flex items-center gap-2 rounded-full bg-gray-50 px-4 py-2">
+                      <Image
+                        src="/Assets/Images/Logo/logo-coin/celo-logo.svg"
+                        alt="Celo"
+                        width={20}
+                        height={20}
+                      />
+                      <span className="text-sm font-semibold text-main-text">Celo Mainnet</span>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold text-main-text mb-1">
-                      Only send USDT on Celo
+
+                  <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ type: "spring" as const, stiffness: 300, damping: 22 }}
+                    className="mx-auto mb-5 flex items-center justify-center rounded-3xl bg-white p-5"
+                    style={{ width: 232 }}
+                  >
+                    <div className="rounded-2xl bg-gray-50 p-4">
+                      <QRCode
+                        value={walletAddress}
+                        size={168}
+                        bgColor="transparent"
+                        fgColor="#1a1a1a"
+                        viewBox="0 0 168 168"
+                      />
+                    </div>
+                  </motion.div>
+
+                  <div className="mb-4 rounded-2xl bg-gray-50 p-4">
+                    <p className="text-xs text-muted mb-1">Your wallet address</p>
+                    <p className="text-sm font-mono font-semibold text-main-text break-all">
+                      {walletAddress}
                     </p>
-                    <p className="text-xs text-muted">
-                      Sending any other token or using a different network will result in permanent loss of funds.
-                    </p>
+                    <p className="mt-1 text-xs text-muted">{shortAddress}</p>
                   </div>
-                </div>
-              </div>
+
+                  <motion.button
+                    type="button"
+                    onClick={handleCopy}
+                    whileTap={{ scale: 0.97 }}
+                    className="mb-4 flex w-full items-center justify-center gap-2 rounded-full bg-main-text py-4 text-base font-semibold text-white cursor-pointer"
+                  >
+                    {copied ? (
+                      <>
+                        <HiCheck className="w-5 h-5" />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <HiOutlineDocumentDuplicate className="w-5 h-5" />
+                        Copy address
+                      </>
+                    )}
+                  </motion.button>
+
+                  <div className="rounded-2xl bg-gray-50 p-4">
+                    <div className="flex items-start gap-3">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white">
+                        <HiOutlineShieldCheck className="w-5 h-5 text-main-text" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-main-text mb-1">
+                          Only send USDT on Celo
+                        </p>
+                        <p className="text-xs text-muted">
+                          Sending any other token or using a different network will result in permanent loss of funds.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </motion.div>
         </>

@@ -3,32 +3,61 @@
 import { motion } from "framer-motion";
 import { HiOutlineLockClosed } from "react-icons/hi2";
 import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
-import { MOCK_USERS } from "@/lib/mockUsers";
+import type { CircleDetailResponse, MemberResponse } from "@/lib/api/endpoints";
+import { toAvatar } from "@/lib/utils";
+import type { UserAvatar } from "@/types";
 
-const positions = [
-  { user: MOCK_USERS.andero, x: 0, y: 0, size: 72 },
-  { user: MOCK_USERS.sandra, x: 78, y: -8, size: 72 },
-  { user: MOCK_USERS.greg, x: 156, y: 4, size: 72 },
-  { user: MOCK_USERS.tommy, x: 28, y: 64, size: 68 },
-  { user: MOCK_USERS.natalie, x: 104, y: 68, size: 68 },
+type DetailsHeroProps = {
+  circle?: CircleDetailResponse;
+};
+
+const defaultPositions: { avatar: UserAvatar; x: number; y: number; size: number; key: string }[] = [
+  { avatar: { emoji: "\u{1F680}", color: "#6366f1" }, x: 0, y: 0, size: 72, key: "a" },
+  { avatar: { emoji: "\u{1F31F}", color: "#f59e0b" }, x: 78, y: -8, size: 72, key: "b" },
+  { avatar: { emoji: "\u{1F525}", color: "#ef4444" }, x: 156, y: 4, size: 72, key: "c" },
+  { avatar: { emoji: "\u{1F3AF}", color: "#10b981" }, x: 28, y: 64, size: 68, key: "d" },
+  { avatar: { emoji: "\u{1F4A1}", color: "#8b5cf6" }, x: 104, y: 68, size: 68, key: "e" },
 ];
 
-export default function DetailsHero() {
+const layoutCoords = [
+  { x: 0, y: 0, size: 72 },
+  { x: 78, y: -8, size: 72 },
+  { x: 156, y: 4, size: 72 },
+  { x: 28, y: 64, size: 68 },
+  { x: 104, y: 68, size: 68 },
+];
+
+function buildPositions(members?: MemberResponse[]) {
+  if (!members || members.length === 0) return defaultPositions;
+  return members.slice(0, 5).map((m, i) => ({
+    avatar: toAvatar(m.user.avatarEmoji, m.user.avatarColor),
+    ...layoutCoords[i % layoutCoords.length],
+    key: m.userId,
+  }));
+}
+
+export default function DetailsHero({ circle }: DetailsHeroProps) {
+  const positions = buildPositions(circle?.membersPreview);
+
   return (
     <div className="px-4 py-2">
       <div className="mb-4">
         <div className="flex items-center gap-2 mb-2">
           <span className="rounded-md bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-muted uppercase tracking-wide">
-            Crypto
+            {circle?.category || "General"}
           </span>
           <div className="flex items-center gap-1 rounded-md bg-gray-100 px-2 py-0.5">
             <HiOutlineLockClosed className="w-3 h-3 text-muted" />
-            <span className="text-[10px] font-medium text-muted uppercase tracking-wide">Public</span>
+            <span className="text-[10px] font-medium text-muted uppercase tracking-wide">
+              {circle?.privacy || "Public"}
+            </span>
           </div>
         </div>
-        <h1 className="text-2xl font-bold tracking-tight text-main-text">Crypto Predictions</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-main-text">
+          {circle?.name || "Circle"}
+        </h1>
         <p className="mt-1 text-sm text-muted">
-          Weekly goals on BTC, ETH and altcoin moves. Stake small, track together, win together.
+          {circle?.description || "No description"}
         </p>
       </div>
 
@@ -37,7 +66,7 @@ export default function DetailsHero() {
           <div className="relative mx-auto h-40 w-60">
             {positions.map((p, i) => (
               <motion.div
-                key={p.user.username}
+                key={p.key}
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{
@@ -52,7 +81,7 @@ export default function DetailsHero() {
                   top: p.y,
                 }}
               >
-                <EmojiAvatar avatar={p.user.avatar} size={p.size} className="border-4 border-white" />
+                <EmojiAvatar avatar={p.avatar} size={p.size} className="border-4 border-white" />
               </motion.div>
             ))}
           </div>

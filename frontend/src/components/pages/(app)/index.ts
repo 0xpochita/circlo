@@ -8,3 +8,5 @@ export { default as Banner } from "./Banner";
 export { default as BottomTabBar } from "./BottomTabBar";
 export { default as CreateCircleButton } from "./CreateCircleButton";
 export { default as PageTransition } from "./PageTransition";
+export { default as ConnectWalletButton } from "./ConnectWalletButton";
+export { default as OnboardingGuard } from "./OnboardingGuard";

@@ -1,33 +1,28 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   HiOutlineLockClosed,
   HiOutlineGlobeAlt,
   HiOutlinePencil,
 } from "react-icons/hi2";
+import { useState } from "react";
 import { EmojiAvatar, EmojiPicker } from "@/components/shared";
-import type { UserAvatar } from "@/types";
+import { useCreateCircleStore } from "@/stores/createCircleStore";
 
 const categories = [
-  { emoji: "✨", label: "General" },
-  { emoji: "💎", label: "Crypto" },
-  { emoji: "⚡", label: "Fitness" },
-  { emoji: "🎮", label: "Gaming" },
-  { emoji: "🎧", label: "Music" },
+  { emoji: "✨", label: "General", value: "general" },
+  { emoji: "💎", label: "Crypto", value: "crypto" },
+  { emoji: "⚡", label: "Fitness", value: "fitness" },
+  { emoji: "🎮", label: "Gaming", value: "gaming" },
+  { emoji: "🎧", label: "Music", value: "music" },
 ];
 
 export default function CircleSetupForm() {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [privacy, setPrivacy] = useState<"public" | "private">("public");
-  const [category, setCategory] = useState(0);
+  const store = useCreateCircleStore();
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [circleAvatar, setCircleAvatar] = useState<UserAvatar>({
-    emoji: "🌟",
-    color: "#ec4899",
-  });
+
+  const categoryIndex = categories.findIndex((c) => c.value === store.category);
 
   return (
     <div className="px-4 py-2 flex flex-col gap-4">
@@ -44,7 +39,7 @@ export default function CircleSetupForm() {
             onClick={() => setPickerOpen(true)}
             className="relative cursor-pointer transition-transform duration-200 active:scale-[0.95]"
           >
-            <EmojiAvatar avatar={circleAvatar} size={72} />
+            <EmojiAvatar avatar={store.avatar} size={72} />
             <div className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-white border border-gray-100">
               <HiOutlinePencil className="w-3.5 h-3.5 text-main-text" />
             </div>
@@ -69,8 +64,8 @@ export default function CircleSetupForm() {
         </label>
         <input
           type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={store.name}
+          onChange={(e) => store.setName(e.target.value)}
           placeholder="e.g. Crypto Circle"
           className="w-full rounded-xl bg-gray-50 px-4 py-3 text-sm text-main-text placeholder:text-muted outline-none transition-all duration-200 focus:ring-2 focus:ring-brand"
         />
@@ -86,8 +81,8 @@ export default function CircleSetupForm() {
           Description
         </label>
         <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          value={store.description}
+          onChange={(e) => store.setDescription(e.target.value)}
           placeholder="What's this circle about?"
           rows={3}
           className="w-full resize-none rounded-xl bg-gray-50 px-4 py-3 text-sm text-main-text placeholder:text-muted outline-none transition-all duration-200 focus:ring-2 focus:ring-brand"
@@ -102,13 +97,13 @@ export default function CircleSetupForm() {
       >
         <p className="text-sm font-medium text-main-text mb-3">Category</p>
         <div className="flex gap-2 overflow-x-auto scrollbar-none pb-1">
-          {categories.map((cat, i) => (
+          {categories.map((cat) => (
             <button
               type="button"
-              key={cat.label}
-              onClick={() => setCategory(i)}
+              key={cat.value}
+              onClick={() => store.setCategory(cat.value)}
               className={`flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-xs font-medium cursor-pointer transition-all duration-200 ${
-                category === i
+                store.category === cat.value
                   ? "bg-brand text-white"
                   : "bg-gray-50 text-muted"
               }`}
@@ -130,14 +125,14 @@ export default function CircleSetupForm() {
         <div className="flex gap-3">
           <button
             type="button"
-            onClick={() => setPrivacy("public")}
+            onClick={() => store.setPrivacy("public")}
             className={`flex-1 flex flex-col items-start gap-2 rounded-xl p-4 cursor-pointer transition-all duration-200 ${
-              privacy === "public" ? "bg-brand text-white" : "bg-gray-50 text-muted"
+              store.privacy === "public" ? "bg-brand text-white" : "bg-gray-50 text-muted"
             }`}
           >
             <HiOutlineGlobeAlt className="w-5 h-5" />
             <div className="text-left">
-              <p className={`text-sm font-semibold ${privacy === "public" ? "text-white" : "text-main-text"}`}>
+              <p className={`text-sm font-semibold ${store.privacy === "public" ? "text-white" : "text-main-text"}`}>
                 Public
               </p>
               <p className="text-xs">Anyone can join</p>
@@ -145,14 +140,14 @@ export default function CircleSetupForm() {
           </button>
           <button
             type="button"
-            onClick={() => setPrivacy("private")}
+            onClick={() => store.setPrivacy("private")}
             className={`flex-1 flex flex-col items-start gap-2 rounded-xl p-4 cursor-pointer transition-all duration-200 ${
-              privacy === "private" ? "bg-brand text-white" : "bg-gray-50 text-muted"
+              store.privacy === "private" ? "bg-brand text-white" : "bg-gray-50 text-muted"
             }`}
           >
             <HiOutlineLockClosed className="w-5 h-5" />
             <div className="text-left">
-              <p className={`text-sm font-semibold ${privacy === "private" ? "text-white" : "text-main-text"}`}>
+              <p className={`text-sm font-semibold ${store.privacy === "private" ? "text-white" : "text-main-text"}`}>
                 Private
               </p>
               <p className="text-xs">Invite only</p>
@@ -164,8 +159,8 @@ export default function CircleSetupForm() {
       <EmojiPicker
         open={pickerOpen}
         onClose={() => setPickerOpen(false)}
-        value={circleAvatar}
-        onSave={setCircleAvatar}
+        value={store.avatar}
+        onSave={store.setAvatar}
         title="Pick a vibe for your circle"
         subtitle="Choose an emoji and color that represent it"
       />
