@@ -371,6 +371,36 @@ export default async function goalRoutes(app: FastifyInstance) {
   );
 
   app.get(
+    "/:id/my-stake",
+    { preHandler: requireAuth },
+    async (req, reply) => {
+      const { id } = req.params as { id: string };
+
+      const participant = await prisma.goalParticipant.findUnique({
+        where: {
+          goal_id_user_id: {
+            goal_id: id,
+            user_id: req.jwtUser.sub,
+          },
+        },
+      });
+
+      if (!participant) {
+        return reply.send({ staked: false, data: null });
+      }
+
+      return reply.send({
+        staked: true,
+        data: {
+          side: participant.side,
+          amount: participant.staked.toString(),
+          claimedAmount: participant.claimed_amount?.toString() ?? null,
+        },
+      });
+    }
+  );
+
+  app.get(
     "/:id/participants",
     { preHandler: requireAuth },
     async (req, reply) => {

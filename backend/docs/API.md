@@ -1452,6 +1452,64 @@ Rate limited to **10 requests per IP per minute**.
 
 ---
 
+### GET /api/v1/goals/:id/my-stake
+
+**Auth required:** Yes  
+**Description:** Returns the current user's stake in a specific goal. Returns `staked: false` if the user has not participated.
+
+**Path Parameters:**
+| Param | Type | Required | Description |
+|---|---|---|---|
+| `id` | UUID | Yes | Goal ID |
+
+**Response 200 — user has not staked:**
+```json
+{
+  "staked": false,
+  "data": null
+}
+```
+
+**Response 200 — user has staked:**
+```json
+{
+  "staked": true,
+  "data": {
+    "side": 0,
+    "amount": "5.000000",
+    "claimedAmount": null
+  }
+}
+```
+
+**Response 200 — user has staked and claimed:**
+```json
+{
+  "staked": true,
+  "data": {
+    "side": 0,
+    "amount": "5.000000",
+    "claimedAmount": "9.800000"
+  }
+}
+```
+
+**Field notes:**
+- `side`: `0` = Yes, `1` = No (integer matching on-chain enum)
+- `amount`: User's staked USDT formatted as 6-decimal string
+- `claimedAmount`: Winnings claimed from smart contract; `null` if not yet claimed
+
+**Response 401:**
+```json
+{
+  "error": "Unauthorized",
+  "message": "Missing or invalid access token",
+  "statusCode": 401
+}
+```
+
+---
+
 ## NOTIFICATIONS
 
 ### Notification Object
