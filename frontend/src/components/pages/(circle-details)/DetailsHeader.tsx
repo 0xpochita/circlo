@@ -3,7 +3,11 @@
 import { HiChevronLeft, HiOutlineShare } from "react-icons/hi2";
 import { useRouter } from "next/navigation";
 
-export default function DetailsHeader() {
+type DetailsHeaderProps = {
+  onShare?: () => void;
+};
+
+export default function DetailsHeader({ onShare }: DetailsHeaderProps) {
   const router = useRouter();
 
   return (
@@ -18,6 +22,7 @@ export default function DetailsHeader() {
       <p className="text-base font-semibold text-main-text">Circle Details</p>
       <button
         type="button"
+        onClick={onShare}
         className="flex h-9 w-9 items-center justify-center rounded-full bg-white cursor-pointer transition-all duration-200 active:scale-[0.95]"
       >
         <HiOutlineShare className="w-5 h-5 text-main-text" />

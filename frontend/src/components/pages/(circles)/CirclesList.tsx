@@ -1,42 +1,52 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { HiOutlineUserGroup, HiOutlineLockClosed, HiOutlineGlobeAlt } from "react-icons/hi2";
 import { TbTargetArrow } from "react-icons/tb";
 import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
-import { useCircleStore } from "@/stores/circleStore";
-import { useFetchCircles } from "@/hooks/useCircles";
-import { parseAvatar } from "@/lib/utils";
-import { toast } from "sonner";
+import { circlesApi } from "@/lib/api/endpoints";
+import type { CircleResponse } from "@/lib/api/endpoints";
+import { toAvatar } from "@/lib/utils";
+
+type CircleWithCount = CircleResponse & { fetchedMemberCount?: number };
 
 export default function CirclesList() {
-  const { circles, isLoading, error } = useCircleStore();
-  const { fetchCircles } = useFetchCircles();
+  const [circles, setCircles] = useState<CircleWithCount[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchCircles().catch(() => {
-      
-    });
-  }, [fetchCircles]);
+    circlesApi
+      .list()
+      .then(async (res) => {
+        const items = res.items || [];
+        const withCounts = await Promise.all(
+          items.map(async (c) => {
+            let count = c.memberCount ?? 0;
+            if (!count) {
+              try {
+                const membersRes = await circlesApi.members(c.id);
+                count = membersRes.items?.length ?? 1;
+              } catch {
+                count = 1;
+              }
+            }
+            return { ...c, fetchedMemberCount: count };
+          })
+        );
+        setCircles(withCounts);
+      })
+      .catch(() => setCircles([]))
+      .finally(() => setIsLoading(false));
+  }, []);
 
   if (isLoading) {
     return (
       <div className="flex flex-col gap-3 px-4 py-2">
         {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="animate-pulse rounded-2xl bg-gray-100 h-[120px]" />
+          <div key={`skel-${i}`} className="animate-pulse rounded-2xl bg-gray-100 h-[120px]" />
         ))}
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="px-4 py-2">
-        <div className="flex flex-col items-center justify-center rounded-2xl bg-white py-12 px-4">
-          <p className="text-sm text-muted">Something went wrong</p>
-        </div>
       </div>
     );
   }
@@ -78,10 +88,10 @@ export default function CirclesList() {
           >
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-3">
-                <EmojiAvatar avatar={parseAvatar(circle.imageUrl)} size={48} shape="square" />
+                <EmojiAvatar avatar={toAvatar(circle.avatarEmoji, circle.avatarColor)} size={48} shape="square" />
                 <div>
                   <p className="text-base font-bold text-main-text">{circle.name}</p>
-                  <p className="text-xs text-muted">{circle.description}</p>
+                  <p className="text-xs text-muted">{circle.description || "No description"}</p>
                 </div>
               </div>
               <div className="flex items-center gap-1 rounded-full bg-gray-50 px-2.5 py-1">
@@ -97,11 +107,11 @@ export default function CirclesList() {
             </div>
 
             <div className="flex items-center justify-between border-t border-gray-50 pt-3">
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1.5">
-                  <HiOutlineUserGroup className="w-4 h-4 text-muted" />
-                  <span className="text-xs text-muted">{circle.memberCount} members</span>
-                </div>
+              <div className="flex items-center gap-1.5">
+                <HiOutlineUserGroup className="w-4 h-4 text-muted" />
+                <span className="text-xs text-muted">
+                  {circle.fetchedMemberCount ?? circle.memberCount ?? 1} members
+                </span>
               </div>
               <div className="flex items-center gap-1.5">
                 <TbTargetArrow className="w-4 h-4 text-muted" />
