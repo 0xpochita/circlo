@@ -1,16 +1,54 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { HiOutlineTicket } from "react-icons/hi2";
+import { useAccount } from "wagmi";
+import { toast } from "sonner";
+import { circlesApi } from "@/lib/api/endpoints";
 
 export default function InviteCodeInput() {
   const [code, setCode] = useState("");
+  const [isJoining, setIsJoining] = useState(false);
+  const { isConnected } = useAccount();
+  const router = useRouter();
 
-  function handleJoin(e: React.FormEvent) {
+  async function handleJoin(e: React.FormEvent) {
     e.preventDefault();
     if (!code.trim()) return;
-    setCode("");
+
+    if (!isConnected) {
+      toast("Connect your wallet first");
+      return;
+    }
+
+    setIsJoining(true);
+    try {
+      const parts = code.trim().split("-");
+      const circleId = parts.length > 1 ? parts[0] : "";
+      const inviteCode = parts.length > 1 ? parts.slice(1).join("-") : code.trim();
+
+      if (circleId) {
+        await circlesApi.join(circleId, inviteCode);
+        toast.success("Joined circle!");
+        setCode("");
+        router.push(`/circle-details?id=${circleId}`);
+      } else {
+        toast.error("Invalid invite code format");
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "";
+      if (message.includes("already")) {
+        toast("You're already a member");
+      } else if (message.includes("Invalid invite")) {
+        toast.error("Invalid invite code");
+      } else {
+        toast.error("Could not join with this code");
+      }
+    } finally {
+      setIsJoining(false);
+    }
   }
 
   return (
@@ -38,10 +76,10 @@ export default function InviteCodeInput() {
           <motion.button
             type="submit"
             whileTap={{ scale: 0.95 }}
-            disabled={!code.trim()}
+            disabled={!code.trim() || isJoining}
             className="rounded-xl bg-brand px-5 py-3 text-sm font-semibold text-white cursor-pointer transition-all duration-200 disabled:bg-gray-100 disabled:text-muted disabled:cursor-not-allowed"
           >
-            Join
+            {isJoining ? "..." : "Join"}
           </motion.button>
         </div>
       </form>

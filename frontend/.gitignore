@@ -41,3 +41,4 @@ yarn-error.log*
 next-env.d.ts
 rules.md
 frontend/rules
+frontend/integration

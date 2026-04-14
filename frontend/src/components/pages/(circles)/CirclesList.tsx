@@ -1,54 +1,68 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { HiOutlineUserGroup, HiOutlineLockClosed, HiOutlineGlobeAlt } from "react-icons/hi2";
 import { TbTargetArrow } from "react-icons/tb";
 import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
-import { MOCK_USERS } from "@/lib/mockUsers";
-import type { User, UserAvatar } from "@/types";
+import { circlesApi } from "@/lib/api/endpoints";
+import type { CircleResponse } from "@/lib/api/endpoints";
+import { toAvatar } from "@/lib/utils";
 
-type Circle = {
-  name: string;
-  description: string;
-  members: number;
-  activeGoals: number;
-  privacy: "private" | "public";
-  avatar: UserAvatar;
-  previewMembers: User[];
-};
-
-const circles: Circle[] = [
-  {
-    name: "Friends 2026",
-    description: "Goals with my closest friends",
-    members: 12,
-    activeGoals: 5,
-    privacy: "private",
-    avatar: { emoji: "🌟", color: "#fbbf24" },
-    previewMembers: [MOCK_USERS.sandra, MOCK_USERS.andero, MOCK_USERS.greg],
-  },
-  {
-    name: "Fitness Squad",
-    description: "Workout and health goals",
-    members: 8,
-    activeGoals: 3,
-    privacy: "public",
-    avatar: { emoji: "⚡", color: "#f87171" },
-    previewMembers: [MOCK_USERS.tommy, MOCK_USERS.natalie, MOCK_USERS.emma],
-  },
-  {
-    name: "Career Growth",
-    description: "Professional development circle",
-    members: 6,
-    activeGoals: 4,
-    privacy: "private",
-    avatar: { emoji: "🚀", color: "#60a5fa" },
-    previewMembers: [MOCK_USERS.james, MOCK_USERS.daniel],
-  },
-];
+type CircleWithCount = CircleResponse & { fetchedMemberCount?: number };
 
 export default function CirclesList() {
+  const [circles, setCircles] = useState<CircleWithCount[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    circlesApi
+      .list()
+      .then(async (res) => {
+        const items = res.items || [];
+        const withCounts = await Promise.all(
+          items.map(async (c) => {
+            let count = c.memberCount ?? 0;
+            if (!count) {
+              try {
+                const membersRes = await circlesApi.members(c.id);
+                count = membersRes.items?.length ?? 1;
+              } catch {
+                count = 1;
+              }
+            }
+            return { ...c, fetchedMemberCount: count };
+          })
+        );
+        setCircles(withCounts);
+      })
+      .catch(() => setCircles([]))
+      .finally(() => setIsLoading(false));
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-3 px-4 py-2">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={`skel-${i}`} className="animate-pulse rounded-2xl bg-white p-4">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="h-12 w-12 rounded-2xl bg-gray-100" />
+              <div className="flex-1">
+                <div className="h-4 w-32 rounded-lg bg-gray-100 mb-2" />
+                <div className="h-3 w-48 rounded-lg bg-gray-100" />
+              </div>
+            </div>
+            <div className="border-t border-gray-50 pt-3 flex justify-between">
+              <div className="h-3 w-24 rounded-lg bg-gray-100" />
+              <div className="h-3 w-16 rounded-lg bg-gray-100" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   if (circles.length === 0) {
     return (
       <div className="px-4 py-2">
@@ -75,21 +89,21 @@ export default function CirclesList() {
     <div className="flex flex-col gap-3 px-4 py-2">
       {circles.map((circle, i) => (
         <motion.div
-          key={circle.name}
+          key={circle.id}
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.08 * i }}
         >
           <Link
-            href="/circle-success"
+            href={`/circle-details?id=${circle.id}`}
             className="flex flex-col rounded-2xl bg-white p-4 cursor-pointer transition-all duration-200 active:scale-[0.98]"
           >
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-3">
-                <EmojiAvatar avatar={circle.avatar} size={48} shape="square" />
+                <EmojiAvatar avatar={toAvatar(circle.avatarEmoji, circle.avatarColor)} size={48} shape="square" />
                 <div>
                   <p className="text-base font-bold text-main-text">{circle.name}</p>
-                  <p className="text-xs text-muted">{circle.description}</p>
+                  <p className="text-xs text-muted">{circle.description || "No description"}</p>
                 </div>
               </div>
               <div className="flex items-center gap-1 rounded-full bg-gray-50 px-2.5 py-1">
@@ -105,26 +119,15 @@ export default function CirclesList() {
             </div>
 
             <div className="flex items-center justify-between border-t border-gray-50 pt-3">
-              <div className="flex items-center gap-2">
-                <div className="flex -space-x-2">
-                  {circle.previewMembers.map((member) => (
-                    <div
-                      key={`${circle.name}-${member.username}`}
-                      className="rounded-full border-2 border-white"
-                    >
-                      <EmojiAvatar avatar={member.avatar} size={28} />
-                    </div>
-                  ))}
-                </div>
-                {circle.members > circle.previewMembers.length && (
-                  <span className="text-xs text-muted">
-                    +{circle.members - circle.previewMembers.length}
-                  </span>
-                )}
+              <div className="flex items-center gap-1.5">
+                <HiOutlineUserGroup className="w-4 h-4 text-muted" />
+                <span className="text-xs text-muted">
+                  {circle.fetchedMemberCount ?? circle.memberCount ?? 1} members
+                </span>
               </div>
               <div className="flex items-center gap-1.5">
                 <TbTargetArrow className="w-4 h-4 text-muted" />
-                <span className="text-xs text-muted">{circle.activeGoals} active goals</span>
+                <span className="text-xs text-muted">{circle.category}</span>
               </div>
             </div>
           </Link>

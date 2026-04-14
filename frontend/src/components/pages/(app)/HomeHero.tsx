@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Header from "./Header";
-import SearchBar from "./SearchBar";
+import BalanceCard from "./BalanceCard";
 
 export default function HomeHero() {
   return (
@@ -18,7 +18,7 @@ export default function HomeHero() {
       <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-main-bg/60" />
       <div className="relative z-10 pb-4">
         <Header />
-        <SearchBar />
+        <BalanceCard />
       </div>
     </div>
   );

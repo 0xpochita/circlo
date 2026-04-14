@@ -5,7 +5,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { HiOutlinePencil } from "react-icons/hi2";
 import { EmojiAvatar, EmojiPicker } from "@/components/shared";
-import type { UserAvatar } from "@/types";
+import { useCreateGoalStore } from "@/stores/createGoalStore";
 
 const durations = [
   { label: "1D", full: "1 Day", hours: 24 },
@@ -15,16 +15,18 @@ const durations = [
   { label: "30D", full: "30 Days", hours: 720 },
 ];
 
-const outcomes = ["Yes / No", "Multiple Choice", "Numeric Range"];
+const outcomes = [
+  { label: "Yes / No", value: 0 },
+  { label: "Multiple Choice", value: 1 },
+  { label: "Numeric Range", value: 2 },
+];
 
 export default function PredictionForm() {
-  const [selectedDuration, setSelectedDuration] = useState(2);
-  const [selectedOutcome, setSelectedOutcome] = useState(0);
+  const store = useCreateGoalStore();
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [goalAvatar, setGoalAvatar] = useState<UserAvatar>({
-    emoji: "🎯",
-    color: "#ec4899",
-  });
+
+  const durationIndex = durations.findIndex((d) => d.hours === store.durationHours);
+  const selectedDuration = durationIndex >= 0 ? durationIndex : 2;
 
   return (
     <div className="px-4 py-2 flex flex-col gap-4">
@@ -36,7 +38,7 @@ export default function PredictionForm() {
             onClick={() => setPickerOpen(true)}
             className="relative cursor-pointer transition-transform duration-200 active:scale-[0.95]"
           >
-            <EmojiAvatar avatar={goalAvatar} size={72} />
+            <EmojiAvatar avatar={store.avatar} size={72} />
             <div className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-white border border-gray-100">
               <HiOutlinePencil className="w-3.5 h-3.5 text-main-text" />
             </div>
@@ -56,6 +58,8 @@ export default function PredictionForm() {
         </label>
         <input
           type="text"
+          value={store.title}
+          onChange={(e) => store.setTitle(e.target.value)}
           placeholder="e.g. Will Sandra get a job in 2026?"
           className="w-full rounded-xl bg-gray-50 px-4 py-3 text-sm text-main-text placeholder:text-muted outline-none transition-all duration-200 focus:ring-2 focus:ring-brand"
         />
@@ -66,6 +70,8 @@ export default function PredictionForm() {
           Description (optional)
         </label>
         <textarea
+          value={store.description}
+          onChange={(e) => store.setDescription(e.target.value)}
           placeholder="Add more context for this goal..."
           rows={3}
           className="w-full resize-none rounded-xl bg-gray-50 px-4 py-3 text-sm text-main-text placeholder:text-muted outline-none transition-all duration-200 focus:ring-2 focus:ring-brand"
@@ -75,18 +81,18 @@ export default function PredictionForm() {
       <div className="rounded-2xl bg-white p-4">
         <p className="text-sm font-medium text-main-text mb-3">Outcome Type</p>
         <div className="flex gap-2">
-          {outcomes.map((outcome, i) => (
+          {outcomes.map((outcome) => (
             <button
               type="button"
-              key={outcome}
-              onClick={() => setSelectedOutcome(i)}
+              key={outcome.label}
+              onClick={() => store.setOutcomeType(outcome.value)}
               className={`flex-1 rounded-xl py-2.5 text-xs font-medium cursor-pointer transition-all duration-200 ${
-                selectedOutcome === i
+                store.outcomeType === outcome.value
                   ? "bg-brand text-white"
                   : "bg-gray-50 text-muted"
               }`}
             >
-              {outcome}
+              {outcome.label}
             </button>
           ))}
         </div>
@@ -102,7 +108,7 @@ export default function PredictionForm() {
             <button
               type="button"
               key={d.label}
-              onClick={() => setSelectedDuration(i)}
+              onClick={() => store.setDurationHours(d.hours)}
               className={`flex-1 rounded-xl py-2.5 text-xs font-medium cursor-pointer transition-all duration-200 ${
                 selectedDuration === i
                   ? "bg-brand text-white"
@@ -128,11 +134,14 @@ export default function PredictionForm() {
 
       <div className="rounded-2xl bg-white p-4">
         <label className="text-sm font-medium text-main-text mb-2 block">
-          Stake Amount
+          Minimum Stake
         </label>
         <div className="flex items-center gap-2 rounded-xl bg-gray-50 px-4 py-3">
           <input
             type="text"
+            inputMode="decimal"
+            value={store.stakeAmount}
+            onChange={(e) => store.setStakeAmount(e.target.value.replace(/[^0-9.]/g, ""))}
             placeholder="0.00"
             className="flex-1 bg-transparent text-sm text-main-text placeholder:text-muted outline-none"
           />
@@ -151,7 +160,10 @@ export default function PredictionForm() {
             <button
               type="button"
               key={amount}
-              className="flex-1 rounded-lg bg-gray-50 py-2 text-xs font-medium text-muted cursor-pointer transition-all duration-200 active:scale-[0.95] hover:bg-gray-100"
+              onClick={() => store.setStakeAmount(amount)}
+              className={`flex-1 rounded-lg py-2 text-xs font-medium cursor-pointer transition-all duration-200 active:scale-[0.95] ${
+                store.stakeAmount === amount ? "bg-brand text-white" : "bg-gray-50 text-muted hover:bg-gray-100"
+              }`}
             >
               {amount}
             </button>
@@ -162,8 +174,8 @@ export default function PredictionForm() {
       <EmojiPicker
         open={pickerOpen}
         onClose={() => setPickerOpen(false)}
-        value={goalAvatar}
-        onSave={setGoalAvatar}
+        value={store.avatar}
+        onSave={store.setAvatar}
         title="Pick a vibe for your goal"
         subtitle="Choose an emoji and color that describe it"
       />

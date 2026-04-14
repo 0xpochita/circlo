@@ -1,53 +1,20 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { EmojiAvatar, UsdtLabel } from "@/components/shared";
-import { MOCK_USERS } from "@/lib/mockUsers";
-
-const participants = [
-  { user: MOCK_USERS.sandra, stake: "0.50", side: "Yes" },
-  { user: MOCK_USERS.andero, stake: "1.00", side: "No" },
-  { user: MOCK_USERS.greg, stake: "0.25", side: "Yes" },
-  { user: MOCK_USERS.tommy, stake: "0.75", side: "Yes" },
-];
+import { HiOutlineUserGroup } from "react-icons/hi2";
 
 export default function ParticipantList() {
   return (
     <div className="px-4 py-2">
       <div className="flex items-center justify-between mb-3">
         <p className="text-base font-bold text-main-text">Participants</p>
-        <span className="text-xs text-muted">{participants.length} joined</span>
+        <span className="text-xs text-muted">0 joined</span>
       </div>
-      <div className="rounded-2xl bg-white divide-y divide-gray-50">
-        {participants.map((p, i) => (
-          <motion.div
-            key={p.user.username}
-            initial={{ opacity: 0, x: -12 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3, delay: 0.05 * i }}
-            className="flex items-center justify-between px-4 py-3"
-          >
-            <div className="flex items-center gap-3">
-              <EmojiAvatar avatar={p.user.avatar} size={40} />
-              <div>
-                <p className="text-sm font-semibold text-main-text">{p.user.name}</p>
-                <p className="text-xs text-muted">{p.user.username}</p>
-                <p className="text-xs text-muted inline-flex items-center gap-1">
-                  Staked {p.stake} <UsdtLabel size={11} />
-                </p>
-              </div>
-            </div>
-            <span
-              className={`rounded-full px-3 py-1 text-xs font-medium ${
-                p.side === "Yes"
-                  ? "bg-emerald-50 text-emerald-500"
-                  : "bg-red-50 text-red-400"
-              }`}
-            >
-              {p.side}
-            </span>
-          </motion.div>
-        ))}
+      <div className="flex flex-col items-center justify-center rounded-2xl bg-white py-10 px-4">
+        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gray-50 mb-3">
+          <HiOutlineUserGroup className="w-6 h-6 text-muted" />
+        </div>
+        <p className="text-sm font-semibold text-main-text mb-1">No participants yet</p>
+        <p className="text-xs text-muted text-center">Participants will appear here</p>
       </div>
     </div>
   );

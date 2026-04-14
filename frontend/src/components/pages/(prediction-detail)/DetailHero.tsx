@@ -3,10 +3,34 @@
 import { motion } from "framer-motion";
 import { HiOutlineClock, HiOutlineUserGroup } from "react-icons/hi2";
 import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
-import { MOCK_USERS } from "@/lib/mockUsers";
+import { toAvatar, formatTimeLeft } from "@/lib/utils";
 
-export default function DetailHero() {
-  const sandra = MOCK_USERS.sandra;
+type DetailHeroProps = {
+  title?: string;
+  description?: string | null;
+  avatarEmoji?: string | null;
+  avatarColor?: string | null;
+  deadline?: string;
+  participantCount?: number;
+  status?: string;
+};
+
+export default function DetailHero({
+  title = "Goal",
+  description = null,
+  avatarEmoji = null,
+  avatarColor = null,
+  deadline = new Date().toISOString(),
+  participantCount = 0,
+  status = "active",
+}: DetailHeroProps) {
+  const statusLabel = status === "active" ? "Active Goal" : status.charAt(0).toUpperCase() + status.slice(1);
+  const statusClass =
+    status === "active"
+      ? "bg-emerald-50 text-emerald-500"
+      : status === "resolved"
+        ? "bg-blue-50 text-blue-500"
+        : "bg-gray-100 text-muted";
 
   return (
     <div className="px-4 py-2">
@@ -19,28 +43,24 @@ export default function DetailHero() {
               transition={{ type: "spring" as const, stiffness: 300, damping: 20 }}
               className="mb-4"
             >
-              <EmojiAvatar avatar={sandra.avatar} size={72} />
+              <EmojiAvatar avatar={toAvatar(avatarEmoji, avatarColor)} size={72} />
             </motion.div>
-            <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-500 mb-2">
-              Active Goal
+            <span className={`rounded-md px-2 py-0.5 text-[10px] font-medium mb-2 ${statusClass}`}>
+              {statusLabel}
             </span>
-            <h1 className="text-xl font-bold text-main-text mb-1">
-              Will Sandra get a job in 2026?
-            </h1>
-            <p className="text-sm text-muted max-w-xs">
-              Sandra is actively applying and interviewing. Circle members stake on whether she lands a role before Dec 31.
-            </p>
+            <h1 className="text-xl font-bold text-main-text mb-1">{title}</h1>
+            <p className="text-sm text-muted max-w-xs">{description || "No description provided"}</p>
           </div>
 
           <div className="mt-5 flex items-center justify-center gap-4">
             <div className="flex items-center gap-1.5">
               <HiOutlineClock className="w-4 h-4 text-muted" />
-              <span className="text-xs font-medium text-main-text">2d 4h left</span>
+              <span className="text-xs font-medium text-main-text">{formatTimeLeft(deadline)} left</span>
             </div>
             <div className="h-3 w-px bg-gray-200" />
             <div className="flex items-center gap-1.5">
               <HiOutlineUserGroup className="w-4 h-4 text-muted" />
-              <span className="text-xs font-medium text-main-text">12 joined</span>
+              <span className="text-xs font-medium text-main-text">{participantCount} joined</span>
             </div>
           </div>
         </div>

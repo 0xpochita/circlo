@@ -1,14 +1,31 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { UsdtLabel } from "@/components/shared";
+import { circlesApi } from "@/lib/api/endpoints";
+import type { CircleDetailResponse } from "@/lib/api/endpoints";
 
-const stats = [
-  { value: "128", label: "Members", usdt: false },
-  { value: "24", label: "Active goals", usdt: false },
-  { value: "82", label: "Total staked", usdt: true },
-];
+type DetailsStatsProps = {
+  circleId?: string;
+  circle?: CircleDetailResponse;
+};
 
-export default function DetailsStats() {
+export default function DetailsStats({ circleId, circle }: DetailsStatsProps) {
+  const [memberCount, setMemberCount] = useState(circle?.memberCount ?? 0);
+  const [goalCount, setGoalCount] = useState(0);
+
+  useEffect(() => {
+    if (!circleId) return;
+    circlesApi.members(circleId).then((res) => setMemberCount(res.items?.length ?? 0)).catch(() => {});
+    circlesApi.goals(circleId).then((res) => setGoalCount(res.items?.length ?? 0)).catch(() => {});
+  }, [circleId]);
+
+  const stats = [
+    { value: String(memberCount), label: "Members", usdt: false },
+    { value: String(goalCount), label: "Active goals", usdt: false },
+    { value: "0", label: "Total staked", usdt: true },
+  ];
+
   return (
     <div className="px-4 py-2">
       <div className="flex items-center rounded-2xl bg-white p-4">
