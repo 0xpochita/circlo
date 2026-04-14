@@ -45,7 +45,19 @@ export default function CirclesList() {
     return (
       <div className="flex flex-col gap-3 px-4 py-2">
         {Array.from({ length: 3 }).map((_, i) => (
-          <div key={`skel-${i}`} className="animate-pulse rounded-2xl bg-gray-100 h-[120px]" />
+          <div key={`skel-${i}`} className="animate-pulse rounded-2xl bg-white p-4">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="h-12 w-12 rounded-2xl bg-gray-100" />
+              <div className="flex-1">
+                <div className="h-4 w-32 rounded-lg bg-gray-100 mb-2" />
+                <div className="h-3 w-48 rounded-lg bg-gray-100" />
+              </div>
+            </div>
+            <div className="border-t border-gray-50 pt-3 flex justify-between">
+              <div className="h-3 w-24 rounded-lg bg-gray-100" />
+              <div className="h-3 w-16 rounded-lg bg-gray-100" />
+            </div>
+          </div>
         ))}
       </div>
     );

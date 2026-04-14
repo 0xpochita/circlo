@@ -29,8 +29,57 @@ function CircleDetailsContent() {
 
   if (isLoading) {
     return (
-      <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-main-bg items-center justify-center">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand border-t-transparent" />
+      <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-main-bg">
+        <div className="flex items-center justify-between px-4 pt-14 pb-2">
+          <div className="h-9 w-9 rounded-full bg-gray-100 animate-pulse" />
+          <div className="h-4 w-24 rounded-lg bg-gray-100 animate-pulse" />
+          <div className="h-9 w-9 rounded-full bg-gray-100 animate-pulse" />
+        </div>
+        <div className="px-4 py-2 animate-pulse">
+          <div className="flex gap-2 mb-3">
+            <div className="h-5 w-16 rounded-md bg-gray-100" />
+            <div className="h-5 w-16 rounded-md bg-gray-100" />
+          </div>
+          <div className="h-7 w-48 rounded-lg bg-gray-100 mb-2" />
+          <div className="h-4 w-64 rounded-lg bg-gray-100 mb-4" />
+          <div className="rounded-2xl bg-white p-2">
+            <div className="rounded-2xl bg-gray-50 h-48" />
+          </div>
+        </div>
+        <div className="px-4 py-2 animate-pulse">
+          <div className="flex rounded-2xl bg-white p-4 gap-4">
+            <div className="flex-1 flex flex-col items-center gap-1">
+              <div className="h-6 w-8 rounded-lg bg-gray-100" />
+              <div className="h-3 w-14 rounded-lg bg-gray-100" />
+            </div>
+            <div className="flex-1 flex flex-col items-center gap-1">
+              <div className="h-6 w-8 rounded-lg bg-gray-100" />
+              <div className="h-3 w-16 rounded-lg bg-gray-100" />
+            </div>
+            <div className="flex-1 flex flex-col items-center gap-1">
+              <div className="h-6 w-12 rounded-lg bg-gray-100" />
+              <div className="h-3 w-16 rounded-lg bg-gray-100" />
+            </div>
+          </div>
+        </div>
+        <div className="px-4 py-2 animate-pulse">
+          <div className="h-5 w-24 rounded-lg bg-gray-100 mb-3" />
+          <div className="rounded-2xl bg-white p-4 h-24" />
+        </div>
+        <div className="px-4 py-2 animate-pulse">
+          <div className="h-5 w-20 rounded-lg bg-gray-100 mb-3" />
+          <div className="rounded-2xl bg-white divide-y divide-gray-50">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={`mskel-${i}`} className="flex items-center gap-3 px-4 py-3">
+                <div className="h-10 w-10 rounded-full bg-gray-100" />
+                <div className="flex-1">
+                  <div className="h-4 w-28 rounded-lg bg-gray-100 mb-1" />
+                  <div className="h-3 w-20 rounded-lg bg-gray-100" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }

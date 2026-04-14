@@ -41,7 +41,16 @@ export default function RecentPredictions() {
         </div>
         <div className="flex gap-3 overflow-x-auto scrollbar-none pb-1">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="animate-pulse min-w-[160px] rounded-2xl bg-gray-100 h-[180px]" />
+            <div key={`skel-${i}`} className="animate-pulse min-w-[160px] rounded-2xl bg-white p-1">
+              <div className="aspect-square rounded-2xl bg-gray-50 p-3 flex flex-col justify-between">
+                <div className="h-6 w-6 rounded-lg bg-gray-100" />
+                <div className="h-3 w-20 rounded-lg bg-gray-100" />
+              </div>
+              <div className="px-2 py-2 flex items-center gap-1.5">
+                <div className="h-4 w-16 rounded-lg bg-gray-100" />
+                <div className="h-3 w-10 rounded-lg bg-gray-100" />
+              </div>
+            </div>
           ))}
         </div>
       </div>
