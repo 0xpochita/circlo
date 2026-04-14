@@ -29,7 +29,7 @@ export default function BottomTabBar() {
         initial={{ y: 80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 300, damping: 30, delay: 0.3 }}
-        className="flex items-center justify-between rounded-full bg-white/70 backdrop-blur-xl px-2 py-2"
+        className="flex items-center justify-between rounded-full bg-white/95 shadow-lg px-2 py-2"
       >
         {tabs.map((tab, i) => (
           <motion.button

@@ -1,7 +1,22 @@
+"use client";
+
+import { useSearchParams } from "next/navigation";
+import { useEffect, Suspense } from "react";
 import { PredictionHeader, CircleSelector, PredictionForm, ResolverPicker, PredictionSummary, ConfirmButton } from "@/components/pages/(create-prediction)";
 import { PageTransition } from "@/components/pages/(app)";
+import { useCreateGoalStore } from "@/stores/createGoalStore";
 
-export default function CreatePredictionPage() {
+function CreatePredictionContent() {
+  const searchParams = useSearchParams();
+  const presetCircleId = searchParams.get("circleId");
+  const setCircleId = useCreateGoalStore((s) => s.setCircleId);
+
+  useEffect(() => {
+    if (presetCircleId) {
+      setCircleId(presetCircleId);
+    }
+  }, [presetCircleId, setCircleId]);
+
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-main-bg">
       <PredictionHeader />
@@ -15,5 +30,17 @@ export default function CreatePredictionPage() {
       </PageTransition>
       <ConfirmButton />
     </div>
+  );
+}
+
+export default function CreatePredictionPage() {
+  return (
+    <Suspense fallback={
+      <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-main-bg items-center justify-center">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand border-t-transparent" />
+      </div>
+    }>
+      <CreatePredictionContent />
+    </Suspense>
   );
 }

@@ -2,6 +2,8 @@
 
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect, useMemo, Suspense } from "react";
+import Link from "next/link";
+import { TbTargetArrow } from "react-icons/tb";
 import { useAuthStore } from "@/stores/authStore";
 import { DetailsHeader, DetailsHero, DetailsStats, DetailsGoals, DetailsMembers, JoinButton } from "@/components/pages/(circle-details)";
 import { PageTransition } from "@/components/pages/(app)";
@@ -98,6 +100,17 @@ function CircleDetailsContent() {
       <PageTransition>
         <DetailsHero circle={circle ?? undefined} />
         <DetailsStats circleId={circleId || undefined} circle={circle ?? undefined} />
+        {isMember && (
+          <div className="px-4 py-2">
+            <Link
+              href={`/create-prediction?circleId=${circleId}`}
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-brand py-4 text-base font-semibold text-white cursor-pointer transition-all duration-200 active:scale-[0.97]"
+            >
+              <TbTargetArrow className="w-5 h-5" />
+              Create Goal
+            </Link>
+          </div>
+        )}
         <DetailsGoals circleId={circleId || undefined} />
         <DetailsMembers circleId={circleId || undefined} />
       </PageTransition>
