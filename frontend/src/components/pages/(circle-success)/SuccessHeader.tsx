@@ -21,7 +21,7 @@ export default function SuccessHeader() {
       </div>
       <button
         type="button"
-        onClick={() => router.back()}
+        onClick={() => router.push("/circles")}
         className="flex h-9 w-9 items-center justify-center rounded-full bg-white cursor-pointer transition-all duration-200 active:scale-[0.95]"
       >
         <HiXMark className="w-5 h-5 text-main-text" />

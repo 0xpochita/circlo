@@ -1,7 +1,8 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useMemo, Suspense } from "react";
+import { useAuthStore } from "@/stores/authStore";
 import { DetailsHeader, DetailsHero, DetailsStats, DetailsGoals, DetailsMembers, JoinButton } from "@/components/pages/(circle-details)";
 import { PageTransition } from "@/components/pages/(app)";
 import { ShareSheet } from "@/components/shared";
@@ -14,6 +15,13 @@ function CircleDetailsContent() {
   const [circle, setCircle] = useState<CircleDetailResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [shareOpen, setShareOpen] = useState(false);
+  const userId = useAuthStore((s) => s.user?.id);
+
+  const isMember = useMemo(() => {
+    if (!circle || !userId) return false;
+    if (circle.ownerId === userId) return true;
+    return circle.membersPreview?.some((m) => m.userId === userId) ?? false;
+  }, [circle, userId]);
 
   useEffect(() => {
     if (!circleId) {
@@ -93,7 +101,9 @@ function CircleDetailsContent() {
         <DetailsGoals circleId={circleId || undefined} />
         <DetailsMembers circleId={circleId || undefined} />
       </PageTransition>
-      <JoinButton circleId={circle?.chainId ? Number(circle.chainId) : 1} circleBackendId={circleId || undefined} />
+      {!isMember && (
+        <JoinButton circleId={circle?.chainId ? Number(circle.chainId) : 1} circleBackendId={circleId || undefined} />
+      )}
       <ShareSheet
         open={shareOpen}
         onClose={() => setShareOpen(false)}
