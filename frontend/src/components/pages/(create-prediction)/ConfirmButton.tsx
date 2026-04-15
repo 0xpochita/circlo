@@ -1,14 +1,19 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useAccount, useWriteContract, usePublicClient } from "wagmi";
+import { HiXMark, HiCheck } from "react-icons/hi2";
 import { toast } from "sonner";
+import { EmojiAvatar, UsdtLabel } from "@/components/shared";
 import { useCreateGoalStore } from "@/stores/createGoalStore";
 import { predictionPoolContract } from "@/lib/web3/contracts";
 import { toUSDT } from "@/lib/web3/usdt";
 import { goalsApi, circlesApi } from "@/lib/api/endpoints";
+
+type StepStatus = "pending" | "active" | "done" | "error";
+type Step = { label: string; status: StepStatus };
 
 export default function ConfirmButton() {
   const router = useRouter();
@@ -16,41 +21,92 @@ export default function ConfirmButton() {
   const store = useCreateGoalStore();
   const { writeContractAsync } = useWriteContract();
   const publicClient = usePublicClient();
+  const [sheetOpen, setSheetOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
-  const [statusText, setStatusText] = useState("Confirm Prediction");
+  const [steps, setSteps] = useState<Step[]>([]);
 
-  async function handleConfirm() {
+  useEffect(() => {
+    if (sheetOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [sheetOpen]);
+
+  function getDeadlineDisplay(): string {
+    if (store.customDeadline) {
+      return new Date(store.customDeadline).toLocaleDateString("en-US", {
+        month: "short", day: "numeric", year: "numeric",
+      });
+    }
+    const deadline = new Date(Date.now() + store.durationHours * 3600000);
+    return deadline.toLocaleDateString("en-US", {
+      month: "short", day: "numeric", year: "numeric",
+    });
+  }
+
+  function getOutcomeLabel(): string {
+    if (store.outcomeType === 0) return "Yes / No";
+    if (store.outcomeType === 1) return "Multiple Choice";
+    return "Numeric Range";
+  }
+
+  async function handleOpenSheet() {
     if (!isConnected) {
       toast("Connect your wallet first");
       return;
     }
-
     if (!store.title.trim()) {
       toast("Please enter a goal title");
       return;
     }
-
     if (!store.circleId) {
       toast("Please select a circle");
       return;
     }
-
     if (store.resolvers.length === 0) {
       toast("Please select at least one resolver");
       return;
     }
 
+    if (!store.circleName && store.circleId) {
+      try {
+        const detail = await circlesApi.detail(store.circleId);
+        store.setCircleName(detail.name || "Circle");
+      } catch {}
+    }
+
+    setSteps([]);
+    setSheetOpen(true);
+  }
+
+  function updateStep(index: number, s: StepStatus) {
+    setSteps((prev) => prev.map((step, i) => i === index ? { ...step, status: s } : step));
+  }
+
+  async function handleConfirm() {
     setIsCreating(true);
 
-    try {
-      setStatusText("Creating goal...");
+    const stepsToRun: Step[] = [
+      { label: "Creating goal", status: "pending" },
+      { label: "Preparing resolvers", status: "pending" },
+      { label: "Sending transaction", status: "pending" },
+      { label: "Confirming on-chain", status: "pending" },
+    ];
+    setSteps(stepsToRun);
 
-      const deadlineTimestamp = BigInt(
-        Math.floor(Date.now() / 1000) + store.durationHours * 3600
-      );
+    let stepIdx = 0;
+
+    try {
+      updateStep(stepIdx, "active");
+
+      const deadlineTimestamp = store.customDeadline
+        ? BigInt(Math.floor(new Date(store.customDeadline).getTime() / 1000))
+        : BigInt(Math.floor(Date.now() / 1000) + store.durationHours * 3600);
       const minStake = store.stakeAmount
         ? toUSDT(parseFloat(store.stakeAmount))
-        : toUSDT(0.1);
+        : toUSDT(1);
 
       const metadataURI = JSON.stringify({
         title: store.title,
@@ -70,19 +126,24 @@ export default function ConfirmButton() {
           avatarColor: store.avatar.color,
           outcomeType: store.outcomeType === 0 ? "binary" : store.outcomeType === 1 ? "multi" : "numeric",
           deadline: new Date(Number(deadlineTimestamp) * 1000).toISOString(),
-          minStake: store.stakeAmount || "0.10",
+          minStake: store.stakeAmount || "1",
           resolverIds: store.resolvers,
         });
         const res = created as unknown as { id?: string; metadataUri?: string };
         backendGoalId = res.id || "";
         backendMetadataUri = res.metadataUri || metadataURI;
       } catch (err) {
+        updateStep(stepIdx, "error");
         const message = err instanceof Error ? err.message : "";
         toast.error(message.length > 100 ? "Failed to create goal" : message);
         setIsCreating(false);
-        setStatusText("Confirm Prediction");
         return;
       }
+
+      updateStep(stepIdx, "done");
+      stepIdx++;
+
+      updateStep(stepIdx, "active");
 
       let onChainId = store.circleChainId;
       if (!onChainId) {
@@ -92,27 +153,28 @@ export default function ConfirmButton() {
         } catch {}
       }
 
+      let resolverAddresses: `0x${string}`[] = [];
+      if (store.circleId && store.resolvers.length > 0) {
+        try {
+          const membersRes = await circlesApi.members(store.circleId);
+          resolverAddresses = store.resolvers
+            .map((rid) => {
+              const m = membersRes.items?.find((item) => item.userId === rid);
+              return m?.user?.walletAddress as `0x${string}` | undefined;
+            })
+            .filter(Boolean) as `0x${string}`[];
+        } catch {}
+      }
+
+      if (resolverAddresses.length === 0 && address) {
+        resolverAddresses = [address as `0x${string}`];
+      }
+
+      updateStep(stepIdx, "done");
+      stepIdx++;
+
       if (onChainId) {
-        setStatusText("Preparing resolvers...");
-
-        let resolverAddresses: `0x${string}`[] = [];
-        if (store.circleId && store.resolvers.length > 0) {
-          try {
-            const membersRes = await circlesApi.members(store.circleId);
-            resolverAddresses = store.resolvers
-              .map((rid) => {
-                const m = membersRes.items?.find((item) => item.userId === rid);
-                return m?.user?.walletAddress as `0x${string}` | undefined;
-              })
-              .filter(Boolean) as `0x${string}`[];
-          } catch {}
-        }
-
-        if (resolverAddresses.length === 0 && address) {
-          resolverAddresses = [address as `0x${string}`];
-        }
-
-        setStatusText("Sending transaction...");
+        updateStep(stepIdx, "active");
 
         try {
           let nextId = 0;
@@ -141,7 +203,10 @@ export default function ConfirmButton() {
             ],
           });
 
-          setStatusText("Confirming on-chain...");
+          updateStep(stepIdx, "done");
+          stepIdx++;
+
+          updateStep(stepIdx, "active");
 
           const onChainGoalId = nextId > 0 ? nextId : 0;
 
@@ -156,18 +221,28 @@ export default function ConfirmButton() {
               await goalsApi.confirm(backendGoalId, onChainGoalId, txHash);
             } catch {}
           }
+
+          updateStep(stepIdx, "done");
         } catch (err) {
+          updateStep(stepIdx, "error");
           const message = err instanceof Error ? err.message : "";
           if (message.includes("User rejected") || message.includes("denied")) {
             toast("Transaction cancelled. Goal saved as draft.");
           }
         }
+      } else {
+        updateStep(stepIdx, "done");
+        stepIdx++;
+        updateStep(stepIdx, "done");
       }
 
       const circleIdForRedirect = store.circleId;
       store.reset();
       toast.success("Goal created!");
-      router.push(`/circle-details?id=${circleIdForRedirect}`);
+      setTimeout(() => {
+        setSheetOpen(false);
+        router.push(`/circle-details?id=${circleIdForRedirect}`);
+      }, 1200);
     } catch (err) {
       const message = err instanceof Error ? err.message : "";
       if (message.includes("chain") || message.includes("Chain")) {
@@ -177,24 +252,165 @@ export default function ConfirmButton() {
       }
     } finally {
       setIsCreating(false);
-      setStatusText("Confirm Prediction");
     }
   }
 
+  const summaryRows = [
+    { label: "Circle", value: store.circleName || "—" },
+    { label: "Outcome type", value: getOutcomeLabel() },
+    { label: "Deadline", value: getDeadlineDisplay() },
+    { label: "Minimum stake", value: `${store.stakeAmount || "1"} USDT` },
+    { label: "Resolvers", value: store.resolverNames.length > 0 ? store.resolverNames.join(", ") : `${store.resolvers.length} selected` },
+  ];
+
   return (
-    <div className="px-4 pb-10 pt-4 mt-auto">
-      <motion.button
-        type="button"
-        onClick={handleConfirm}
-        disabled={isCreating}
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.5 }}
-        whileTap={isCreating ? {} : { scale: 0.97 }}
-        className="w-full rounded-full bg-brand py-4 text-base font-semibold text-white cursor-pointer disabled:bg-gray-200 disabled:text-muted disabled:cursor-not-allowed"
-      >
-        {isCreating ? statusText : "Confirm Prediction"}
-      </motion.button>
-    </div>
+    <>
+      <div className="px-4 pb-10 pt-4 mt-auto">
+        <motion.button
+          type="button"
+          onClick={handleOpenSheet}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.5 }}
+          whileTap={{ scale: 0.97 }}
+          className="w-full rounded-full bg-gray-900 py-4 text-base font-semibold text-white cursor-pointer"
+        >
+          Confirm Prediction
+        </motion.button>
+      </div>
+
+      <AnimatePresence>
+        {sheetOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => !isCreating && setSheetOpen(false)}
+              className="fixed inset-0 z-100 bg-black/50 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring" as const, stiffness: 300, damping: 32 }}
+              className="fixed bottom-0 left-1/2 z-101 w-full max-w-md -translate-x-1/2 rounded-t-3xl bg-white"
+              style={{ maxHeight: "90dvh" }}
+            >
+              <div className="flex items-start justify-between px-6 pt-6 pb-4">
+                <div>
+                  <h2 className="text-xl font-bold text-main-text">
+                    {steps.length > 0 ? "Creating Prediction" : "Confirm Prediction"}
+                  </h2>
+                  <p className="mt-1 text-sm text-muted">
+                    {steps.length > 0 ? "Confirm each step in your wallet" : "Review your prediction details"}
+                  </p>
+                </div>
+                {!isCreating && (
+                  <button
+                    type="button"
+                    onClick={() => setSheetOpen(false)}
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gray-50 cursor-pointer transition-all duration-200 active:scale-95"
+                  >
+                    <HiXMark className="w-5 h-5 text-main-text" />
+                  </button>
+                )}
+              </div>
+
+              <div className="overflow-y-auto px-6 pb-8">
+                {steps.length > 0 ? (
+                  <div className="flex flex-col gap-4 py-4">
+                    {steps.map((step, i) => (
+                      <motion.div
+                        key={`step-${i}`}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.1 * i }}
+                        className="flex items-center gap-3"
+                      >
+                        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-all duration-300 ${
+                          step.status === "done" ? "bg-emerald-500" :
+                          step.status === "active" ? "bg-gray-900" :
+                          step.status === "error" ? "bg-red-400" :
+                          "bg-gray-100"
+                        }`}>
+                          {step.status === "done" ? (
+                            <HiCheck className="w-4 h-4 text-white" />
+                          ) : step.status === "active" ? (
+                            <div className="h-3 w-3 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                          ) : step.status === "error" ? (
+                            <HiXMark className="w-4 h-4 text-white" />
+                          ) : (
+                            <div className="h-2 w-2 rounded-full bg-gray-300" />
+                          )}
+                        </div>
+                        <p className={`text-sm font-medium ${
+                          step.status === "done" ? "text-emerald-500" :
+                          step.status === "active" ? "text-main-text" :
+                          step.status === "error" ? "text-red-400" :
+                          "text-muted"
+                        }`}>
+                          {step.label}
+                          {step.status === "active" && "..."}
+                        </p>
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex items-center gap-3 mb-5">
+                      <EmojiAvatar avatar={store.avatar} size={48} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-base font-bold text-main-text truncate">{store.title}</p>
+                        {store.description && (
+                          <p className="text-xs text-muted truncate">{store.description}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="rounded-2xl bg-gray-50 p-4 mb-5">
+                      <div className="divide-y divide-gray-100">
+                        {summaryRows.map((row) => (
+                          <div key={row.label} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
+                            <p className="text-sm text-muted">{row.label}</p>
+                            <p className="text-sm font-medium text-main-text text-right max-w-[60%] truncate">
+                              {row.label === "Minimum stake" ? (
+                                <span className="inline-flex items-center gap-1">
+                                  {store.stakeAmount || "1"} <UsdtLabel size={12} />
+                                </span>
+                              ) : (
+                                row.value
+                              )}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <motion.button
+                      type="button"
+                      onClick={handleConfirm}
+                      disabled={isCreating}
+                      whileTap={isCreating ? {} : { scale: 0.97 }}
+                      className="w-full rounded-full bg-gray-900 py-4 text-base font-semibold text-white cursor-pointer disabled:bg-gray-200 disabled:text-muted disabled:cursor-not-allowed"
+                    >
+                      Create Prediction
+                    </motion.button>
+
+                    <button
+                      type="button"
+                      onClick={() => setSheetOpen(false)}
+                      className="w-full mt-3 text-sm font-medium text-muted cursor-pointer text-center"
+                    >
+                      Go back and edit
+                    </button>
+                  </>
+                )}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

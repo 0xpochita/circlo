@@ -49,6 +49,15 @@ export default function CircleSelector() {
           })
         );
         setCircles(withCounts);
+
+        const state = useCreateGoalStore.getState();
+        if (state.circleId) {
+          const match = withCounts.find((c) => c.id === state.circleId);
+          if (match) {
+            useCreateGoalStore.getState().setCircleName(match.name);
+            useCreateGoalStore.getState().setCircleChainId(match.chainId);
+          }
+        }
       })
       .catch(() => setCircles([]))
       .finally(() => setIsLoading(false));
@@ -59,6 +68,7 @@ export default function CircleSelector() {
   function handleSelect(circle: CircleOption) {
     store.setCircleId(circle.id);
     store.setCircleChainId(circle.chainId);
+    store.setCircleName(circle.name);
     setOpen(false);
   }
 

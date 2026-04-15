@@ -45,6 +45,10 @@ export default function ResolverPicker() {
       ? store.resolvers.filter((w) => w !== userId)
       : [...store.resolvers, userId];
     store.setResolvers(next);
+
+    const nextNames = next
+      .map((id) => members.find((m) => m.userId === id)?.displayName ?? "Member")
+    store.setResolverNames(nextNames);
   }
 
   if (isLoading) {
