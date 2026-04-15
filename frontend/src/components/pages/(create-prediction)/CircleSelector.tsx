@@ -11,6 +11,7 @@ import type { UserAvatar } from "@/types";
 
 type CircleOption = {
   id: string;
+  chainId: string;
   name: string;
   memberCount: number;
   avatar: UserAvatar;
@@ -25,15 +26,29 @@ export default function CircleSelector() {
   useEffect(() => {
     circlesApi
       .list()
-      .then((res) => {
-        setCircles(
-          res.items.map((c) => ({
-            id: c.id,
-            name: c.name || "Circle",
-            memberCount: c.memberCount || 0,
-            avatar: toAvatar(c.avatarEmoji, c.avatarColor),
-          }))
+      .then(async (res) => {
+        const items = res.items || [];
+        const withCounts = await Promise.all(
+          items.map(async (c) => {
+            let count = c.memberCount ?? 0;
+            if (!count) {
+              try {
+                const m = await circlesApi.members(c.id);
+                count = m.items?.length ?? 1;
+              } catch {
+                count = 1;
+              }
+            }
+            return {
+              id: c.id,
+              chainId: c.chainId || "",
+              name: c.name || "Circle",
+              memberCount: count,
+              avatar: toAvatar(c.avatarEmoji, c.avatarColor),
+            };
+          })
         );
+        setCircles(withCounts);
       })
       .catch(() => setCircles([]))
       .finally(() => setIsLoading(false));
@@ -43,6 +58,7 @@ export default function CircleSelector() {
 
   function handleSelect(circle: CircleOption) {
     store.setCircleId(circle.id);
+    store.setCircleChainId(circle.chainId);
     setOpen(false);
   }
 

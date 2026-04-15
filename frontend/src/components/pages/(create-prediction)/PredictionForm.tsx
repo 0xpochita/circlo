@@ -141,7 +141,7 @@ export default function PredictionForm() {
             type="text"
             inputMode="decimal"
             value={store.stakeAmount}
-            onChange={(e) => store.setStakeAmount(e.target.value.replace(/[^0-9.]/g, ""))}
+            onChange={(e) => store.setStakeAmount(e.target.value.replace(/,/g, ".").replace(/[^0-9.]/g, ""))}
             placeholder="0.00"
             className="flex-1 bg-transparent text-sm text-main-text placeholder:text-muted outline-none"
           />

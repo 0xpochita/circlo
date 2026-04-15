@@ -3,6 +3,7 @@ import type { UserAvatar } from "@/types";
 
 type CreateGoalState = {
   circleId: string;
+  circleChainId: string;
   title: string;
   description: string;
   outcomeType: number;
@@ -11,6 +12,7 @@ type CreateGoalState = {
   avatar: UserAvatar;
   resolvers: string[];
   setCircleId: (id: string) => void;
+  setCircleChainId: (chainId: string) => void;
   setTitle: (title: string) => void;
   setDescription: (desc: string) => void;
   setOutcomeType: (type: number) => void;
@@ -23,6 +25,7 @@ type CreateGoalState = {
 
 const initialState = {
   circleId: "",
+  circleChainId: "",
   title: "",
   description: "",
   outcomeType: 0,
@@ -35,6 +38,7 @@ const initialState = {
 export const useCreateGoalStore = create<CreateGoalState>((set) => ({
   ...initialState,
   setCircleId: (circleId) => set({ circleId }),
+  setCircleChainId: (circleChainId) => set({ circleChainId }),
   setTitle: (title) => set({ title }),
   setDescription: (description) => set({ description }),
   setOutcomeType: (outcomeType) => set({ outcomeType }),

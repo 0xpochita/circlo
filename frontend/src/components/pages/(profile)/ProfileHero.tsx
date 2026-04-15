@@ -18,6 +18,7 @@ import WithdrawSheet from "./WithdrawSheet";
 export default function ProfileHero() {
   const router = useRouter();
   const name = useUserStore((s) => s.name);
+  const username = useUserStore((s) => s.username);
   const avatar = useUserStore((s) => s.avatar);
   const setAvatar = useUserStore((s) => s.setAvatar);
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -71,7 +72,12 @@ export default function ProfileHero() {
                   <HiOutlinePencil className="w-3 h-3 text-main-text" />
                 </div>
               </button>
-              <p className="text-base font-semibold text-white">Hi, {name}</p>
+              <div>
+                <p className="text-base font-semibold text-white">Hi, {name}</p>
+                {username && (
+                  <p className="text-xs text-white/60">@{username.replace(/^@/, "")}</p>
+                )}
+              </div>
             </div>
             <div className="flex items-center gap-2">
               <button

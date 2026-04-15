@@ -34,10 +34,10 @@ export function useCreateGoal() {
   );
 
   const confirmGoal = useCallback(
-    async (goalId: string, hash: string) => {
+    async (goalId: string, chainId: number, hash: string) => {
       setIsApiLoading(true);
       try {
-        return await goalsApi.confirm(goalId, hash);
+        return await goalsApi.confirm(goalId, chainId, hash);
       } finally {
         setIsApiLoading(false);
       }

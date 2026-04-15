@@ -17,8 +17,10 @@ type EditProfileSheetProps = {
 
 export default function EditProfileSheet({ open, onClose }: EditProfileSheetProps) {
   const storeName = useUserStore((s) => s.name);
+  const storeUsername = useUserStore((s) => s.username);
   const storeAvatar = useUserStore((s) => s.avatar);
   const setName = useUserStore((s) => s.setName);
+  const setUsername = useUserStore((s) => s.setUsername);
   const setAvatar = useUserStore((s) => s.setAvatar);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
@@ -31,6 +33,7 @@ export default function EditProfileSheet({ open, onClose }: EditProfileSheetProp
   useEffect(() => {
     if (open) {
       setNameLocal(storeName);
+      setUsernameLocal(storeUsername.replace(/^@/, ""));
       setAvatarLocal(storeAvatar);
       if (isAuthenticated) {
         usersApi.me().then((user) => {
@@ -57,6 +60,7 @@ export default function EditProfileSheet({ open, onClose }: EditProfileSheetProp
 
     setName(trimmedName);
     setAvatar(avatar);
+    if (trimmedUsername) setUsername(trimmedUsername);
 
     if (isAuthenticated) {
       try {
