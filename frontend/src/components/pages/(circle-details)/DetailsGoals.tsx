@@ -94,8 +94,17 @@ export default function DetailsGoals({ circleId }: DetailsGoalsProps) {
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center rounded-2xl bg-white py-10">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-200 border-t-brand" />
+          <div className="flex flex-col gap-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={`skel-${i}`} className="flex items-center gap-3 rounded-2xl bg-white p-3 animate-pulse">
+                <div className="h-12 w-12 rounded-full bg-gray-100" />
+                <div className="flex-1">
+                  <div className="h-4 w-32 rounded-lg bg-gray-100 mb-2" />
+                  <div className="h-3 w-24 rounded-lg bg-gray-100" />
+                </div>
+                <div className="h-4 w-12 rounded-lg bg-gray-100" />
+              </div>
+            ))}
           </div>
         ) : goals.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-2xl bg-white py-10 px-4">
