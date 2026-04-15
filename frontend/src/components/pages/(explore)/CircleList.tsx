@@ -10,6 +10,7 @@ import { EmojiAvatar } from "@/components/shared";
 import type { CircleResponse } from "@/lib/api/endpoints";
 import { circlesApi } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
+import { useDataCache } from "@/stores/dataCache";
 
 type CircleListProps = {
   search?: string;
@@ -20,8 +21,17 @@ export default function CircleList({
   search = "",
   category = "",
 }: CircleListProps) {
-  const [circles, setCircles] = useState<CircleResponse[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const cached = useDataCache((s) => s.publicCircles);
+  const isStale = useDataCache((s) => s.isStale);
+  const setPublicCircles = useDataCache((s) => s.setPublicCircles);
+
+  const isDefault = !search.trim() && !category;
+  const hasCached = isDefault && cached.length > 0;
+
+  const [circles, setCircles] = useState<CircleResponse[]>(
+    hasCached ? cached : [],
+  );
+  const [isLoading, setIsLoading] = useState(!hasCached);
   const [joined, setJoined] = useState<Record<string, boolean>>({});
   const [joiningId, setJoiningId] = useState<string | null>(null);
   const { isConnected } = useAccount();
@@ -30,13 +40,26 @@ export default function CircleList({
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
-    setIsLoading(true);
+    if (isDefault && !isStale("publicCircles") && hasCached) {
+      setCircles(cached);
+      setIsLoading(false);
+      return;
+    }
+
+    if (!hasCached) setIsLoading(true);
+
     debounceRef.current = setTimeout(
       () => {
         circlesApi
           .public(category || undefined, search.trim() || undefined)
-          .then((res) => setCircles(res.items || []))
-          .catch(() => setCircles([]))
+          .then((res) => {
+            const items = res.items || [];
+            setCircles(items);
+            if (isDefault) setPublicCircles(items);
+          })
+          .catch(() => {
+            if (!hasCached) setCircles([]);
+          })
           .finally(() => setIsLoading(false));
       },
       search ? 300 : 0,
@@ -84,10 +107,7 @@ export default function CircleList({
             key={`skel-${i}`}
             className="animate-pulse rounded-2xl bg-white p-2 flex items-center gap-3"
           >
-            <div
-              className="h-13 w-13 rounded-2xl bg-gray-100 shrink-0"
-              style={{ width: 52, height: 52 }}
-            />
+            <div className="h-13 w-13 rounded-2xl bg-gray-100 shrink-0" />
             <div className="flex-1">
               <div className="h-4 w-32 rounded-lg bg-gray-100 mb-2" />
               <div className="h-3 w-48 rounded-lg bg-gray-100 mb-1.5" />
@@ -165,7 +185,7 @@ export default function CircleList({
                   type="button"
                   disabled={isJoining}
                   onClick={(e) => handleJoin(e, circle.id)}
-                  className="shrink-0 rounded-full bg-brand px-4 py-1.5 text-xs font-medium text-white cursor-pointer transition-all duration-200 active:scale-[0.95] disabled:bg-gray-200 disabled:text-muted"
+                  className="shrink-0 rounded-full bg-gray-900 px-4 py-1.5 text-xs font-medium text-white cursor-pointer transition-all duration-200 active:scale-95 disabled:bg-gray-200 disabled:text-muted"
                 >
                   {isJoining ? "..." : "Join"}
                 </button>
