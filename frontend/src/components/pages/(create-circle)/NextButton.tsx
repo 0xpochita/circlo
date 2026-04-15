@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useAccount, useWriteContract, usePublicClient } from "wagmi";
-import { decodeEventLog } from "viem";
+import { useState } from "react";
 import { toast } from "sonner";
-import { useCreateCircleStore } from "@/stores/createCircleStore";
-import { circleFactoryContract } from "@/lib/web3/contracts";
+import { decodeEventLog } from "viem";
+import { useAccount, usePublicClient, useWriteContract } from "wagmi";
 import { circlesApi } from "@/lib/api/endpoints";
+import { circleFactoryContract } from "@/lib/web3/contracts";
+import { useCreateCircleStore } from "@/stores/createCircleStore";
 
 export default function NextButton() {
   const router = useRouter();
@@ -63,7 +63,9 @@ export default function NextButton() {
 
       if (publicClient) {
         try {
-          const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
+          const receipt = await publicClient.waitForTransactionReceipt({
+            hash: txHash,
+          });
           for (const log of receipt.logs) {
             try {
               const decoded = decodeEventLog({
@@ -114,7 +116,11 @@ export default function NextButton() {
       } else if (message.includes("chain") || message.includes("Chain")) {
         toast("Please switch to Celo Sepolia network");
       } else {
-        toast.error(message.length > 120 ? "Failed to create circle. Please try again." : message);
+        toast.error(
+          message.length > 120
+            ? "Failed to create circle. Please try again."
+            : message,
+        );
       }
     } finally {
       setIsCreating(false);

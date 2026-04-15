@@ -1,16 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useAccount, useWriteContract, usePublicClient } from "wagmi";
-import { HiXMark, HiCheck } from "react-icons/hi2";
+import { useState } from "react";
+import { HiCheck, HiXMark } from "react-icons/hi2";
 import { toast } from "sonner";
+import { useAccount, usePublicClient, useWriteContract } from "wagmi";
 import { EmojiAvatar, UsdtLabel } from "@/components/shared";
-import { useCreateGoalStore } from "@/stores/createGoalStore";
+import { useSheetOverflow } from "@/hooks";
+import { circlesApi, goalsApi } from "@/lib/api/endpoints";
 import { predictionPoolContract } from "@/lib/web3/contracts";
 import { toUSDT } from "@/lib/web3/usdt";
-import { goalsApi, circlesApi } from "@/lib/api/endpoints";
+import { useCreateGoalStore } from "@/stores/createGoalStore";
 
 type StepStatus = "pending" | "active" | "done" | "error";
 type Step = { label: string; status: StepStatus };
@@ -25,24 +26,21 @@ export default function ConfirmButton() {
   const [isCreating, setIsCreating] = useState(false);
   const [steps, setSteps] = useState<Step[]>([]);
 
-  useEffect(() => {
-    if (sheetOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => { document.body.style.overflow = ""; };
-  }, [sheetOpen]);
+  useSheetOverflow(sheetOpen);
 
   function getDeadlineDisplay(): string {
     if (store.customDeadline) {
       return new Date(store.customDeadline).toLocaleDateString("en-US", {
-        month: "short", day: "numeric", year: "numeric",
+        month: "short",
+        day: "numeric",
+        year: "numeric",
       });
     }
     const deadline = new Date(Date.now() + store.durationHours * 3600000);
     return deadline.toLocaleDateString("en-US", {
-      month: "short", day: "numeric", year: "numeric",
+      month: "short",
+      day: "numeric",
+      year: "numeric",
     });
   }
 
@@ -82,7 +80,9 @@ export default function ConfirmButton() {
   }
 
   function updateStep(index: number, s: StepStatus) {
-    setSteps((prev) => prev.map((step, i) => i === index ? { ...step, status: s } : step));
+    setSteps((prev) =>
+      prev.map((step, i) => (i === index ? { ...step, status: s } : step)),
+    );
   }
 
   async function handleConfirm() {
@@ -124,7 +124,12 @@ export default function ConfirmButton() {
           description: store.description,
           avatarEmoji: store.avatar.emoji,
           avatarColor: store.avatar.color,
-          outcomeType: store.outcomeType === 0 ? "binary" : store.outcomeType === 1 ? "multi" : "numeric",
+          outcomeType:
+            store.outcomeType === 0
+              ? "binary"
+              : store.outcomeType === 1
+                ? "multi"
+                : "numeric",
           deadline: new Date(Number(deadlineTimestamp) * 1000).toISOString(),
           minStake: store.stakeAmount || "1",
           resolverIds: store.resolvers,
@@ -260,7 +265,13 @@ export default function ConfirmButton() {
     { label: "Outcome type", value: getOutcomeLabel() },
     { label: "Deadline", value: getDeadlineDisplay() },
     { label: "Minimum stake", value: `${store.stakeAmount || "1"} USDT` },
-    { label: "Resolvers", value: store.resolverNames.length > 0 ? store.resolverNames.join(", ") : `${store.resolvers.length} selected` },
+    {
+      label: "Resolvers",
+      value:
+        store.resolverNames.length > 0
+          ? store.resolverNames.join(", ")
+          : `${store.resolvers.length} selected`,
+    },
   ];
 
   return (
@@ -293,17 +304,25 @@ export default function ConfirmButton() {
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
-              transition={{ type: "spring" as const, stiffness: 300, damping: 32 }}
+              transition={{
+                type: "spring" as const,
+                stiffness: 300,
+                damping: 32,
+              }}
               className="fixed bottom-0 left-1/2 z-101 w-full max-w-md -translate-x-1/2 rounded-t-3xl bg-white"
               style={{ maxHeight: "90dvh" }}
             >
               <div className="flex items-start justify-between px-6 pt-6 pb-4">
                 <div>
                   <h2 className="text-xl font-bold text-main-text">
-                    {steps.length > 0 ? "Creating Prediction" : "Confirm Prediction"}
+                    {steps.length > 0
+                      ? "Creating Prediction"
+                      : "Confirm Prediction"}
                   </h2>
                   <p className="mt-1 text-sm text-muted">
-                    {steps.length > 0 ? "Confirm each step in your wallet" : "Review your prediction details"}
+                    {steps.length > 0
+                      ? "Confirm each step in your wallet"
+                      : "Review your prediction details"}
                   </p>
                 </div>
                 {!isCreating && (
@@ -328,12 +347,17 @@ export default function ConfirmButton() {
                         transition={{ delay: 0.1 * i }}
                         className="flex items-center gap-3"
                       >
-                        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-all duration-300 ${
-                          step.status === "done" ? "bg-emerald-500" :
-                          step.status === "active" ? "bg-gray-900" :
-                          step.status === "error" ? "bg-red-400" :
-                          "bg-gray-100"
-                        }`}>
+                        <div
+                          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-all duration-300 ${
+                            step.status === "done"
+                              ? "bg-emerald-500"
+                              : step.status === "active"
+                                ? "bg-gray-900"
+                                : step.status === "error"
+                                  ? "bg-red-400"
+                                  : "bg-gray-100"
+                          }`}
+                        >
                           {step.status === "done" ? (
                             <HiCheck className="w-4 h-4 text-white" />
                           ) : step.status === "active" ? (
@@ -344,12 +368,17 @@ export default function ConfirmButton() {
                             <div className="h-2 w-2 rounded-full bg-gray-300" />
                           )}
                         </div>
-                        <p className={`text-sm font-medium ${
-                          step.status === "done" ? "text-emerald-500" :
-                          step.status === "active" ? "text-main-text" :
-                          step.status === "error" ? "text-red-400" :
-                          "text-muted"
-                        }`}>
+                        <p
+                          className={`text-sm font-medium ${
+                            step.status === "done"
+                              ? "text-emerald-500"
+                              : step.status === "active"
+                                ? "text-main-text"
+                                : step.status === "error"
+                                  ? "text-red-400"
+                                  : "text-muted"
+                          }`}
+                        >
                           {step.label}
                           {step.status === "active" && "..."}
                         </p>
@@ -361,9 +390,13 @@ export default function ConfirmButton() {
                     <div className="flex items-center gap-3 mb-5">
                       <EmojiAvatar avatar={store.avatar} size={48} />
                       <div className="flex-1 min-w-0">
-                        <p className="text-base font-bold text-main-text truncate">{store.title}</p>
+                        <p className="text-base font-bold text-main-text truncate">
+                          {store.title}
+                        </p>
                         {store.description && (
-                          <p className="text-xs text-muted truncate">{store.description}</p>
+                          <p className="text-xs text-muted truncate">
+                            {store.description}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -371,12 +404,16 @@ export default function ConfirmButton() {
                     <div className="rounded-2xl bg-gray-50 p-4 mb-5">
                       <div className="divide-y divide-gray-100">
                         {summaryRows.map((row) => (
-                          <div key={row.label} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
+                          <div
+                            key={row.label}
+                            className="flex items-center justify-between py-3 first:pt-0 last:pb-0"
+                          >
                             <p className="text-sm text-muted">{row.label}</p>
                             <p className="text-sm font-medium text-main-text text-right max-w-[60%] truncate">
                               {row.label === "Minimum stake" ? (
                                 <span className="inline-flex items-center gap-1">
-                                  {store.stakeAmount || "1"} <UsdtLabel size={12} />
+                                  {store.stakeAmount || "1"}{" "}
+                                  <UsdtLabel size={12} />
                                 </span>
                               ) : (
                                 row.value

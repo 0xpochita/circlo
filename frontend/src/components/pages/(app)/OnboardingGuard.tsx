@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-export default function OnboardingGuard({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function OnboardingGuard({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   const router = useRouter();
   const [checked, setChecked] = useState(false);
 
@@ -14,7 +16,7 @@ export default function OnboardingGuard({ children }: Readonly<{ children: React
     } else {
       setChecked(true);
     }
-  }, [router]);
+  }, [router.replace]);
 
   if (!checked) {
     return (

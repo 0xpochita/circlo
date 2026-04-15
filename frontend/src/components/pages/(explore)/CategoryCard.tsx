@@ -1,19 +1,20 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { memo } from "react";
 import {
   HiOutlineArrowTrendingUp,
-  HiOutlineBolt,
-  HiOutlineTrophy,
-  HiOutlineGlobeAlt,
-  HiOutlineStar,
-  HiOutlineSparkles,
-  HiOutlineRocketLaunch,
-  HiOutlineFire,
-  HiOutlineCube,
   HiOutlineBeaker,
-  HiOutlinePuzzlePiece,
+  HiOutlineBolt,
+  HiOutlineCube,
+  HiOutlineFire,
+  HiOutlineGlobeAlt,
   HiOutlineHandRaised,
+  HiOutlinePuzzlePiece,
+  HiOutlineRocketLaunch,
+  HiOutlineSparkles,
+  HiOutlineStar,
+  HiOutlineTrophy,
 } from "react-icons/hi2";
 
 const icons = [
@@ -52,7 +53,7 @@ interface CategoryCardProps {
   color: string;
 }
 
-export default function CategoryCard({ title, difficulty, color }: CategoryCardProps) {
+function CategoryCard({ title, difficulty, color }: CategoryCardProps) {
   const lightColor = `${color}30`;
 
   return (
@@ -115,3 +116,5 @@ export default function CategoryCard({ title, difficulty, color }: CategoryCardP
     </motion.div>
   );
 }
+
+export default memo(CategoryCard);

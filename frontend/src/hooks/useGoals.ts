@@ -4,16 +4,22 @@ import { useCallback, useState } from "react";
 import { useAccount } from "wagmi";
 import { goalsApi } from "@/lib/api/endpoints";
 import {
+  mockUSDTContract,
   predictionPoolContract,
   resolutionModuleContract,
-  mockUSDTContract,
 } from "@/lib/web3/contracts";
+import { toUSDT } from "@/lib/web3/usdt";
 import { useContract } from "./useContract";
 import { useUSDTAllowance } from "./useUSDT";
-import { toUSDT } from "@/lib/web3/usdt";
 
 export function useCreateGoal() {
-  const { write, isLoading: isTxLoading, isSuccess, error, txHash } = useContract();
+  const {
+    write,
+    isLoading: isTxLoading,
+    isSuccess,
+    error,
+    txHash,
+  } = useContract();
   const [isApiLoading, setIsApiLoading] = useState(false);
 
   const createGoal = useCallback(
@@ -27,10 +33,15 @@ export function useCreateGoal() {
         address: predictionPoolContract.address,
         abi: predictionPoolContract.abi,
         functionName: "createGoal",
-        args: [params.circleAddress, params.title, params.deadline, params.stakeAmount],
+        args: [
+          params.circleAddress,
+          params.title,
+          params.deadline,
+          params.stakeAmount,
+        ],
       });
     },
-    [write]
+    [write],
   );
 
   const confirmGoal = useCallback(
@@ -42,7 +53,7 @@ export function useCreateGoal() {
         setIsApiLoading(false);
       }
     },
-    []
+    [],
   );
 
   return {
@@ -73,7 +84,7 @@ export function useStake() {
   } = useContract();
   const { allowance, refetch: refetchAllowance } = useUSDTAllowance(
     address,
-    predictionPoolContract.address
+    predictionPoolContract.address,
   );
   const [step, setStep] = useState<"idle" | "approving" | "staking">("idle");
 
@@ -103,7 +114,7 @@ export function useStake() {
         args: [goalId, side, amountBigInt],
       });
     },
-    [allowance, refetchAllowance, writeApprove, writeStake]
+    [allowance, refetchAllowance, writeApprove, writeStake],
   );
 
   const continueStake = useCallback(
@@ -116,7 +127,7 @@ export function useStake() {
         args: [goalId, side, toUSDT(amount)],
       });
     },
-    [writeStake]
+    [writeStake],
   );
 
   return {
@@ -144,7 +155,7 @@ export function useLockGoal() {
         args: [goalId],
       });
     },
-    [write]
+    [write],
   );
 
   return { lockGoal, isLoading, isSuccess, error, txHash };
@@ -162,7 +173,7 @@ export function useClaim() {
         args: [goalId],
       });
     },
-    [write]
+    [write],
   );
 
   return { claim, isLoading, isSuccess, error, txHash };
@@ -180,7 +191,7 @@ export function useSubmitVote() {
         args: [goalId, outcome],
       });
     },
-    [write]
+    [write],
   );
 
   return { submitVote, isLoading, isSuccess, error, txHash };

@@ -1,10 +1,10 @@
 "use client";
 
-import { useReadContract } from "wagmi";
 import type { Address } from "viem";
+import { useReadContract } from "wagmi";
 import { mockUSDTContract, predictionPoolContract } from "@/lib/web3/contracts";
-import { useContract } from "./useContract";
 import { fromUSDT } from "@/lib/web3/usdt";
+import { useContract } from "./useContract";
 
 export function useUSDTBalance(address: Address | undefined) {
   const { data, isLoading, refetch } = useReadContract({
@@ -24,7 +24,7 @@ export function useUSDTBalance(address: Address | undefined) {
 
 export function useUSDTAllowance(
   owner: Address | undefined,
-  spender: Address | undefined
+  spender: Address | undefined,
 ) {
   const { data, isLoading, refetch } = useReadContract({
     ...mockUSDTContract,

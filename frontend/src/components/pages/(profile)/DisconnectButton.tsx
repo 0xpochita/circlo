@@ -1,10 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useDisconnect } from "wagmi";
-import { toast } from "sonner";
-import { useAuthStore } from "@/stores/authStore";
 import { HiOutlineArrowRightOnRectangle } from "react-icons/hi2";
+import { toast } from "sonner";
+import { useDisconnect } from "wagmi";
+import { useAuthStore } from "@/stores/authStore";
 
 export default function DisconnectButton() {
   const router = useRouter();

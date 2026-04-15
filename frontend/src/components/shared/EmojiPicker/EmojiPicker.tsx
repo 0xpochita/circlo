@@ -1,10 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { HiXMark, HiCheck } from "react-icons/hi2";
-import { EMOJI_OPTIONS, COLOR_OPTIONS, getRandomAvatar } from "@/lib/emojiOptions";
-import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
+import { AnimatePresence, motion } from "framer-motion";
+import { memo, useCallback, useEffect, useState } from "react";
+import { HiCheck, HiXMark } from "react-icons/hi2";
+import { EmojiAvatar } from "@/components/shared";
+import { useSheetOverflow } from "@/hooks";
+import {
+  COLOR_OPTIONS,
+  EMOJI_OPTIONS,
+  getRandomAvatar,
+} from "@/lib/emojiOptions";
 import type { UserAvatar } from "@/types";
 
 type EmojiPickerProps = {
@@ -16,7 +21,7 @@ type EmojiPickerProps = {
   subtitle?: string;
 };
 
-export default function EmojiPicker({
+function EmojiPicker({
   open,
   onClose,
   value,
@@ -34,27 +39,18 @@ export default function EmojiPicker({
     }
   }, [open, value]);
 
-  useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [open]);
+  useSheetOverflow(open);
 
-  function handleSurprise() {
+  const handleSurprise = useCallback(() => {
     const random = getRandomAvatar();
     setEmoji(random.emoji);
     setColor(random.color);
-  }
+  }, []);
 
-  function handleSave() {
+  const handleSave = useCallback(() => {
     onSave({ emoji, color });
     onClose();
-  }
+  }, [emoji, color, onSave, onClose]);
 
   return (
     <AnimatePresence>
@@ -71,7 +67,11 @@ export default function EmojiPicker({
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
-            transition={{ type: "spring" as const, stiffness: 300, damping: 32 }}
+            transition={{
+              type: "spring" as const,
+              stiffness: 300,
+              damping: 32,
+            }}
             className="fixed bottom-0 left-1/2 z-101 w-full max-w-md -translate-x-1/2 flex flex-col rounded-t-3xl bg-white"
             style={{ maxHeight: "90dvh" }}
           >
@@ -95,7 +95,11 @@ export default function EmojiPicker({
                   key={`${emoji}-${color}`}
                   initial={{ scale: 0.85, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
-                  transition={{ type: "spring" as const, stiffness: 300, damping: 20 }}
+                  transition={{
+                    type: "spring" as const,
+                    stiffness: 300,
+                    damping: 20,
+                  }}
                 >
                   <EmojiAvatar avatar={{ emoji, color }} size={108} />
                 </motion.div>
@@ -120,7 +124,9 @@ export default function EmojiPicker({
                       key={c}
                       onClick={() => setColor(c)}
                       className={`relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full cursor-pointer transition-transform duration-200 ${
-                        color === c ? "scale-110" : "scale-100 active:scale-[0.92]"
+                        color === c
+                          ? "scale-110"
+                          : "scale-100 active:scale-[0.92]"
                       }`}
                       style={{ backgroundColor: c }}
                     >
@@ -128,7 +134,11 @@ export default function EmojiPicker({
                         <motion.div
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
-                          transition={{ type: "spring" as const, stiffness: 400, damping: 25 }}
+                          transition={{
+                            type: "spring" as const,
+                            stiffness: 400,
+                            damping: 25,
+                          }}
                           className="flex h-5 w-5 items-center justify-center rounded-full bg-white"
                         >
                           <HiCheck className="w-3.5 h-3.5 text-main-text" />
@@ -146,7 +156,9 @@ export default function EmojiPicker({
                     key={e}
                     onClick={() => setEmoji(e)}
                     className={`flex aspect-square items-center justify-center rounded-xl text-2xl cursor-pointer transition-all duration-200 active:scale-[0.92] ${
-                      emoji === e ? "bg-gray-200 ring-2 ring-main-text" : "bg-gray-50"
+                      emoji === e
+                        ? "bg-gray-200 ring-2 ring-main-text"
+                        : "bg-gray-50"
                     }`}
                   >
                     {e}
@@ -172,3 +184,5 @@ export default function EmojiPicker({
     </AnimatePresence>
   );
 }
+
+export default memo(EmojiPicker);

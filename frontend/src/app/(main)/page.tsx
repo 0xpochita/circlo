@@ -1,6 +1,13 @@
-import { HomeHero, ActivePredictionCard, FeatureCards, TrendingCategories } from "@/components/pages/(app)";
-import { Banner, CreateCircleButton } from "@/components/pages/(app)";
-import { BottomTabBar, PageTransition } from "@/components/pages/(app)";
+import {
+  ActivePredictionCard,
+  Banner,
+  BottomTabBar,
+  CreateCircleButton,
+  FeatureCards,
+  HomeHero,
+  PageTransition,
+  TrendingCategories,
+} from "@/components/pages/(app)";
 
 export default function Home() {
   return (

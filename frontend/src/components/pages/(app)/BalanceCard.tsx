@@ -1,15 +1,26 @@
 "use client";
 
+import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
-import { useState, useEffect } from "react";
-import { useAccount, useReadContract, useWriteContract } from "wagmi";
-import { motion, AnimatePresence } from "framer-motion";
-import { HiOutlineArrowDownTray, HiOutlinePaperAirplane, HiOutlineBeaker, HiXMark } from "react-icons/hi2";
+import { useState } from "react";
+import {
+  HiOutlineArrowDownTray,
+  HiOutlineBeaker,
+  HiOutlinePaperAirplane,
+  HiXMark,
+} from "react-icons/hi2";
 import { toast } from "sonner";
+import {
+  useAccount,
+  usePublicClient,
+  useReadContract,
+  useWriteContract,
+} from "wagmi";
+import { DepositSheet, WithdrawSheet } from "@/components/pages/(profile)";
+import { UsdtLabel } from "@/components/shared";
+import { useSheetOverflow } from "@/hooks";
 import { mockUSDTContract } from "@/lib/web3/contracts";
 import { fromUSDT } from "@/lib/web3/usdt";
-import { UsdtLabel } from "@/components/shared";
-import { DepositSheet, WithdrawSheet } from "@/components/pages/(profile)";
 
 export default function BalanceCard() {
   const { address, isConnected } = useAccount();
@@ -20,25 +31,15 @@ export default function BalanceCard() {
 
   const anySheetOpen = faucetOpen || depositOpen || withdrawOpen;
 
-  useEffect(() => {
-    if (anySheetOpen) {
-      document.body.style.overflow = "hidden";
-      const nav = document.querySelector("nav.fixed");
-      if (nav) (nav as HTMLElement).style.display = "none";
-    } else {
-      document.body.style.overflow = "";
-      const nav = document.querySelector("nav.fixed");
-      if (nav) (nav as HTMLElement).style.display = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-      const nav = document.querySelector("nav.fixed");
-      if (nav) (nav as HTMLElement).style.display = "";
-    };
-  }, [anySheetOpen]);
+  useSheetOverflow(anySheetOpen);
   const { writeContractAsync } = useWriteContract();
+  const publicClient = usePublicClient();
 
-  const { data: rawBalance, isLoading, refetch } = useReadContract({
+  const {
+    data: rawBalance,
+    isLoading,
+    refetch,
+  } = useReadContract({
     ...mockUSDTContract,
     functionName: "balanceOf",
     args: address ? [address] : undefined,
@@ -54,20 +55,40 @@ export default function BalanceCard() {
     }
     setIsFauceting(true);
     try {
-      await writeContractAsync({
+      const txHash = await writeContractAsync({
         address: mockUSDTContract.address,
         abi: mockUSDTContract.abi,
         functionName: "faucet",
         args: [],
+        gas: BigInt(200_000),
       });
+      if (publicClient) {
+        const receipt = await publicClient.waitForTransactionReceipt({
+          hash: txHash,
+        });
+        if (receipt.status === "reverted") {
+          toast.error("Faucet transaction reverted on-chain");
+          setIsFauceting(false);
+          return;
+        }
+      }
       toast.success("100 USDT received!");
       refetch();
     } catch (err) {
-      const message = err instanceof Error ? err.message : "";
+      const message = err instanceof Error ? err.message : String(err);
       if (message.includes("User rejected") || message.includes("denied")) {
         toast("Transaction cancelled");
+      } else if (
+        message.includes("insufficient") ||
+        message.includes("funds")
+      ) {
+        toast.error("Not enough CELO for gas fees");
+      } else if (message.includes("revert")) {
+        toast.error(
+          "Faucet transaction reverted. You may have already claimed recently.",
+        );
       } else {
-        toast.error("Faucet failed. Try again.");
+        toast.error("Faucet failed. Please try again.");
       }
     } finally {
       setIsFauceting(false);
@@ -97,7 +118,9 @@ export default function BalanceCard() {
                 {isLoading ? (
                   <div className="h-7 w-20 rounded-lg bg-white/20 animate-pulse" />
                 ) : (
-                  <p className="text-2xl font-bold text-white">{balance.toFixed(2)}</p>
+                  <p className="text-2xl font-bold text-white">
+                    {balance.toFixed(2)}
+                  </p>
                 )}
                 <div className="flex items-center gap-1 rounded-full bg-white/30 px-2 py-0.5">
                   <Image
@@ -172,14 +195,22 @@ export default function BalanceCard() {
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
-              transition={{ type: "spring" as const, stiffness: 300, damping: 32 }}
+              transition={{
+                type: "spring" as const,
+                stiffness: 300,
+                damping: 32,
+              }}
               className="fixed bottom-0 left-1/2 z-101 w-full max-w-md -translate-x-1/2 rounded-t-3xl bg-white px-6 pt-6 pb-12"
               style={{ maxHeight: "85dvh" }}
             >
               <div className="flex items-start justify-between mb-6">
                 <div>
-                  <h2 className="text-xl font-bold text-main-text">Test Faucet</h2>
-                  <p className="mt-1 text-sm text-muted">Get free USDT for testing on Celo Sepolia</p>
+                  <h2 className="text-xl font-bold text-main-text">
+                    Test Faucet
+                  </h2>
+                  <p className="mt-1 text-sm text-muted">
+                    Get free USDT for testing on Celo Sepolia
+                  </p>
                 </div>
                 <button
                   type="button"
@@ -194,24 +225,31 @@ export default function BalanceCard() {
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-50 mb-3">
                   <HiOutlineBeaker className="w-8 h-8 text-brand" />
                 </div>
-                <p className="text-3xl font-bold text-main-text mb-1">
-                  100 <UsdtLabel size={18} />
+                <p className="text-3xl font-bold text-main-text mb-1">100</p>
+                <UsdtLabel size={18} />
+                <p className="text-sm text-muted">
+                  will be sent to your wallet
                 </p>
-                <p className="text-sm text-muted">will be sent to your wallet</p>
               </div>
 
               <div className="rounded-2xl bg-gray-50 p-4 mb-6">
                 <div className="flex items-center justify-between py-1">
                   <p className="text-xs text-muted">Network</p>
-                  <p className="text-xs font-medium text-main-text">Celo Sepolia (Testnet)</p>
+                  <p className="text-xs font-medium text-main-text">
+                    Celo Sepolia (Testnet)
+                  </p>
                 </div>
                 <div className="flex items-center justify-between py-1">
                   <p className="text-xs text-muted">Token</p>
-                  <p className="text-xs font-medium text-main-text">Mock USDT</p>
+                  <p className="text-xs font-medium text-main-text">
+                    Mock USDT
+                  </p>
                 </div>
                 <div className="flex items-center justify-between py-1">
                   <p className="text-xs text-muted">Current balance</p>
-                  <p className="text-xs font-medium text-main-text">{balance.toFixed(2)} USDT</p>
+                  <p className="text-xs font-medium text-main-text">
+                    {balance.toFixed(2)} USDT
+                  </p>
                 </div>
               </div>
 

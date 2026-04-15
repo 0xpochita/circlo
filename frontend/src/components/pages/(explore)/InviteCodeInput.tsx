@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { HiOutlineTicket } from "react-icons/hi2";
-import { useAccount } from "wagmi";
 import { toast } from "sonner";
+import { useAccount } from "wagmi";
 import { circlesApi } from "@/lib/api/endpoints";
 
 export default function InviteCodeInput() {
@@ -27,7 +27,8 @@ export default function InviteCodeInput() {
     try {
       const parts = code.trim().split("-");
       const circleId = parts.length > 1 ? parts[0] : "";
-      const inviteCode = parts.length > 1 ? parts.slice(1).join("-") : code.trim();
+      const inviteCode =
+        parts.length > 1 ? parts.slice(1).join("-") : code.trim();
 
       if (circleId) {
         await circlesApi.join(circleId, inviteCode);
@@ -59,7 +60,9 @@ export default function InviteCodeInput() {
             <HiOutlineTicket className="w-5 h-5 text-brand" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-main-text">Have an invite code?</p>
+            <p className="text-sm font-semibold text-main-text">
+              Have an invite code?
+            </p>
             <p className="text-xs text-muted mt-0.5">
               Paste it below to join a private circle
             </p>

@@ -1,55 +1,30 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import { EmojiAvatar } from "@/components/shared";
-import { circlesApi } from "@/lib/api/endpoints";
-import type { CircleResponse } from "@/lib/api/endpoints";
-import { toAvatar } from "@/lib/utils";
-
-type CircleWithCount = CircleResponse & { fetchedMemberCount?: number };
+import { useMyCircles } from "@/hooks";
 
 export default function ActiveCircles() {
-  const [circles, setCircles] = useState<CircleWithCount[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    circlesApi
-      .list()
-      .then(async (res) => {
-        const items = res.items || [];
-        const withCounts = await Promise.all(
-          items.map(async (c) => {
-            let count = c.memberCount ?? 0;
-            if (!count) {
-              try {
-                const membersRes = await circlesApi.members(c.id);
-                count = membersRes.items?.length ?? 1;
-              } catch {
-                count = 1;
-              }
-            }
-            return { ...c, fetchedMemberCount: count };
-          })
-        );
-        setCircles(withCounts);
-      })
-      .catch(() => setCircles([]))
-      .finally(() => setIsLoading(false));
-  }, []);
+  const { circles, isLoading } = useMyCircles();
 
   if (isLoading) {
     return (
       <div className="px-4 py-2">
         <div className="flex items-center justify-between mb-3">
           <p className="text-base font-bold text-main-text">Your circles</p>
-          <Link href="/create-circle" className="text-sm font-medium text-muted cursor-pointer">
+          <Link
+            href="/create-circle"
+            className="text-sm font-medium text-muted cursor-pointer"
+          >
             + New circle
           </Link>
         </div>
         <div className="flex gap-3 overflow-x-auto scrollbar-none pb-1">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={`skel-${i}`} className="animate-pulse min-w-[160px] rounded-2xl bg-white p-1">
+            <div
+              key={`skel-${i}`}
+              className="animate-pulse min-w-[160px] rounded-2xl bg-white p-1"
+            >
               <div className="aspect-square rounded-2xl bg-gray-50 p-3 flex flex-col justify-between">
                 <div className="h-10 w-10 rounded-2xl bg-gray-100" />
                 <div className="h-3 w-16 rounded-lg bg-gray-100" />
@@ -69,7 +44,10 @@ export default function ActiveCircles() {
       <div className="px-4 py-2">
         <div className="flex items-center justify-between mb-3">
           <p className="text-base font-bold text-main-text">Your circles</p>
-          <Link href="/create-circle" className="text-sm font-medium text-muted cursor-pointer">
+          <Link
+            href="/create-circle"
+            className="text-sm font-medium text-muted cursor-pointer"
+          >
             + New circle
           </Link>
         </div>
@@ -84,7 +62,10 @@ export default function ActiveCircles() {
     <div className="px-4 py-2">
       <div className="flex items-center justify-between mb-3">
         <p className="text-base font-bold text-main-text">Your circles</p>
-        <Link href="/create-circle" className="text-sm font-medium text-muted cursor-pointer">
+        <Link
+          href="/create-circle"
+          className="text-sm font-medium text-muted cursor-pointer"
+        >
           + New circle
         </Link>
       </div>
@@ -97,13 +78,14 @@ export default function ActiveCircles() {
           >
             <div className="flex aspect-square flex-col justify-between rounded-2xl bg-gray-50 p-3">
               <div>
-                <EmojiAvatar avatar={toAvatar(c.avatarEmoji, c.avatarColor)} size={40} shape="square" />
+                <EmojiAvatar avatar={c.avatar} size={40} shape="square" />
               </div>
               <p className="text-sm text-muted">{c.name}</p>
             </div>
             <div className="flex items-center gap-1.5 px-2 py-2">
               <p className="text-base font-bold text-main-text inline-flex items-center gap-1">
-                {c.fetchedMemberCount ?? c.memberCount ?? 1} <span className="text-xs font-normal text-muted">members</span>
+                {c.memberCount}{" "}
+                <span className="text-xs font-normal text-muted">members</span>
               </p>
             </div>
           </Link>

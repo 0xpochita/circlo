@@ -1,14 +1,14 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import { HiOutlineUserGroup } from "react-icons/hi2";
-import { useState, useEffect, useRef } from "react";
-import { useAccount } from "wagmi";
 import { toast } from "sonner";
+import { useAccount } from "wagmi";
 import { EmojiAvatar } from "@/components/shared";
-import { circlesApi } from "@/lib/api/endpoints";
 import type { CircleResponse } from "@/lib/api/endpoints";
+import { circlesApi } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
 
 type CircleListProps = {
@@ -16,7 +16,10 @@ type CircleListProps = {
   category?: string;
 };
 
-export default function CircleList({ search = "", category = "" }: CircleListProps) {
+export default function CircleList({
+  search = "",
+  category = "",
+}: CircleListProps) {
   const [circles, setCircles] = useState<CircleResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [joined, setJoined] = useState<Record<string, boolean>>({});
@@ -28,16 +31,16 @@ export default function CircleList({ search = "", category = "" }: CircleListPro
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
     setIsLoading(true);
-    debounceRef.current = setTimeout(() => {
-      circlesApi
-        .public(
-          category || undefined,
-          search.trim() || undefined
-        )
-        .then((res) => setCircles(res.items || []))
-        .catch(() => setCircles([]))
-        .finally(() => setIsLoading(false));
-    }, search ? 300 : 0);
+    debounceRef.current = setTimeout(
+      () => {
+        circlesApi
+          .public(category || undefined, search.trim() || undefined)
+          .then((res) => setCircles(res.items || []))
+          .catch(() => setCircles([]))
+          .finally(() => setIsLoading(false));
+      },
+      search ? 300 : 0,
+    );
 
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -77,8 +80,14 @@ export default function CircleList({ search = "", category = "" }: CircleListPro
     return (
       <div className="flex flex-col gap-3 px-4 py-2">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={`skel-${i}`} className="animate-pulse rounded-2xl bg-white p-2 flex items-center gap-3">
-            <div className="h-13 w-13 rounded-2xl bg-gray-100 shrink-0" style={{ width: 52, height: 52 }} />
+          <div
+            key={`skel-${i}`}
+            className="animate-pulse rounded-2xl bg-white p-2 flex items-center gap-3"
+          >
+            <div
+              className="h-13 w-13 rounded-2xl bg-gray-100 shrink-0"
+              style={{ width: 52, height: 52 }}
+            />
             <div className="flex-1">
               <div className="h-4 w-32 rounded-lg bg-gray-100 mb-2" />
               <div className="h-3 w-48 rounded-lg bg-gray-100 mb-1.5" />
@@ -102,7 +111,9 @@ export default function CircleList({ search = "", category = "" }: CircleListPro
             {search ? "No circles found" : "No circles to explore"}
           </p>
           <p className="text-sm text-muted text-center">
-            {search ? "Try a different search term" : "Check back later for new public circles"}
+            {search
+              ? "Try a different search term"
+              : "Check back later for new public circles"}
           </p>
         </div>
       </div>
@@ -126,13 +137,23 @@ export default function CircleList({ search = "", category = "" }: CircleListPro
               href={`/circle-details?id=${circle.id}`}
               className="flex items-center gap-3 rounded-2xl bg-white p-2 cursor-pointer transition-all duration-200 active:scale-[0.98]"
             >
-              <EmojiAvatar avatar={toAvatar(circle.avatarEmoji, circle.avatarColor)} size={52} shape="square" />
+              <EmojiAvatar
+                avatar={toAvatar(circle.avatarEmoji, circle.avatarColor)}
+                size={52}
+                shape="square"
+              />
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-main-text truncate">{circle.name}</p>
-                <p className="text-xs text-muted truncate">{circle.description || "No description"}</p>
+                <p className="text-sm font-semibold text-main-text truncate">
+                  {circle.name}
+                </p>
+                <p className="text-xs text-muted truncate">
+                  {circle.description || "No description"}
+                </p>
                 <div className="flex items-center gap-1 mt-1">
                   <HiOutlineUserGroup className="w-3.5 h-3.5 text-muted" />
-                  <span className="text-xs text-muted">{circle.memberCount || 0} members</span>
+                  <span className="text-xs text-muted">
+                    {circle.memberCount || 0} members
+                  </span>
                 </div>
               </div>
               {isJoined ? (

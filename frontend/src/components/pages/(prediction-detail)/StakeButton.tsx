@@ -1,16 +1,22 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useAccount, useWriteContract, usePublicClient } from "wagmi";
-import { HiXMark, HiCheck } from "react-icons/hi2";
+import { useEffect, useRef, useState } from "react";
+import { HiCheck, HiXMark } from "react-icons/hi2";
 import { toast } from "sonner";
-import { useAuthStore } from "@/stores/authStore";
+import { useAccount, usePublicClient, useWriteContract } from "wagmi";
 import { UsdtLabel } from "@/components/shared";
-import { mockUSDTContract, predictionPoolContract, circleFactoryContract, resolutionModuleContract } from "@/lib/web3/contracts";
-import { toUSDT, fromUSDT } from "@/lib/web3/usdt";
-import { goalsApi, circlesApi } from "@/lib/api/endpoints";
+import { useSheetOverflow } from "@/hooks";
+import { circlesApi, goalsApi } from "@/lib/api/endpoints";
+import {
+  circleFactoryContract,
+  mockUSDTContract,
+  predictionPoolContract,
+  resolutionModuleContract,
+} from "@/lib/web3/contracts";
+import { fromUSDT, toUSDT } from "@/lib/web3/usdt";
+import { useAuthStore } from "@/stores/authStore";
 
 type ResolverInfo = {
   userId: string;
@@ -35,7 +41,15 @@ type Step = {
   status: StepStatus;
 };
 
-export default function StakeButton({ goalId, goalChainId, status, winningSide, deadline, resolvers, onStaked }: StakeButtonProps) {
+export default function StakeButton({
+  goalId,
+  goalChainId,
+  status,
+  winningSide,
+  deadline,
+  resolvers,
+  onStaked,
+}: StakeButtonProps) {
   const router = useRouter();
   const { address, isConnected } = useAccount();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -48,35 +62,66 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
   const [amount, setAmount] = useState("");
   const [selectedSide, setSelectedSide] = useState<number | null>(null);
   const [isStaking, setIsStaking] = useState(false);
-  const [myStake, setMyStake] = useState<{ side: number; amount: string; claimedAmount: string | null } | null>(null);
+  const [myStake, setMyStake] = useState<{
+    side: number;
+    amount: string;
+    claimedAmount: string | null;
+  } | null>(null);
   const [steps, setSteps] = useState<Step[]>([]);
   const { writeContractAsync } = useWriteContract();
   const publicClient = usePublicClient();
 
+  const timeoutRefs = useRef<NodeJS.Timeout[]>([]);
+
+  useEffect(() => () => timeoutRefs.current.forEach(clearTimeout), []);
+
   const isOpen = !status || status === "open";
   const isResolved = status === "resolved" || status === "paidout";
-  const isResolver = resolvers?.some(
-    (r) => r.user?.walletAddress?.toLowerCase() === address?.toLowerCase() || r.userId === address
-  ) ?? false;
-  const hasVoted = resolvers?.some(
-    (r) => (r.user?.walletAddress?.toLowerCase() === address?.toLowerCase() || r.userId === address) && r.vote !== null
-  ) ?? false;
-  const deadlinePassed = deadline ? new Date(deadline).getTime() < Date.now() : false;
-  const canResolve = isResolver && !hasVoted && deadlinePassed;
+  const isResolver =
+    resolvers?.some(
+      (r) =>
+        r.user?.walletAddress?.toLowerCase() === address?.toLowerCase() ||
+        r.userId === address,
+    ) ?? false;
+  const hasVoted =
+    resolvers?.some(
+      (r) =>
+        (r.user?.walletAddress?.toLowerCase() === address?.toLowerCase() ||
+          r.userId === address) &&
+        r.vote !== null,
+    ) ?? false;
+  const deadlinePassed = deadline
+    ? new Date(deadline).getTime() < Date.now()
+    : false;
   const hasStaked = myStake !== null;
 
-  const winningSideNum = winningSide !== null && winningSide !== undefined ? parseInt(winningSide) : null;
-  const isWinner = hasStaked && winningSideNum !== null && !isNaN(winningSideNum) && myStake.side === winningSideNum;
-  const canClaim = isWinner && isResolved && !hasClaimed && !myStake.claimedAmount;
+  const winningSideNum =
+    winningSide !== null && winningSide !== undefined
+      ? parseInt(winningSide, 10)
+      : null;
+  const isWinner =
+    hasStaked &&
+    winningSideNum !== null &&
+    !Number.isNaN(winningSideNum) &&
+    myStake.side === winningSideNum;
+  const canClaim =
+    isWinner && isResolved && !hasClaimed && !myStake.claimedAmount;
 
   useEffect(() => {
     if (!goalId || !isConnected || !address) return;
 
+    let cancelled = false;
+
     goalsApi
       .myStake(goalId)
       .then((res) => {
+        if (cancelled) return;
         if (res.staked && res.data) {
-          setMyStake({ side: res.data.side, amount: res.data.amount, claimedAmount: res.data.claimedAmount });
+          setMyStake({
+            side: res.data.side,
+            amount: res.data.amount,
+            claimedAmount: res.data.claimedAmount,
+          });
           if (res.data.claimedAmount) setHasClaimed(true);
         }
       })
@@ -99,34 +144,38 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
         }),
       ])
         .then(([yesStake, noStake]) => {
+          if (cancelled) return;
           const yesAmount = fromUSDT(yesStake as bigint);
           const noAmount = fromUSDT(noStake as bigint);
           if (yesAmount > 0) {
-            setMyStake((prev) => prev ?? { side: 0, amount: String(yesAmount), claimedAmount: null });
+            setMyStake(
+              (prev) =>
+                prev ?? {
+                  side: 0,
+                  amount: String(yesAmount),
+                  claimedAmount: null,
+                },
+            );
           } else if (noAmount > 0) {
-            setMyStake((prev) => prev ?? { side: 1, amount: String(noAmount), claimedAmount: null });
+            setMyStake(
+              (prev) =>
+                prev ?? {
+                  side: 1,
+                  amount: String(noAmount),
+                  claimedAmount: null,
+                },
+            );
           }
         })
         .catch(() => {});
     }
+
+    return () => {
+      cancelled = true;
+    };
   }, [goalId, goalChainId, isConnected, address, publicClient]);
 
-  useEffect(() => {
-    if (sheetOpen) {
-      document.body.style.overflow = "hidden";
-      const nav = document.querySelector("nav.fixed");
-      if (nav) (nav as HTMLElement).style.display = "none";
-    } else {
-      document.body.style.overflow = "";
-      const nav = document.querySelector("nav.fixed");
-      if (nav) (nav as HTMLElement).style.display = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-      const nav = document.querySelector("nav.fixed");
-      if (nav) (nav as HTMLElement).style.display = "";
-    };
-  }, [sheetOpen]);
+  useSheetOverflow(sheetOpen);
 
   function handleOpen() {
     if (!isConnected || !isAuthenticated) {
@@ -134,19 +183,30 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
       router.push("/welcome");
       return;
     }
-    if (!isOpen) { toast("Staking is closed for this goal"); return; }
+    if (!isOpen) {
+      toast("Staking is closed for this goal");
+      return;
+    }
     setSteps([]);
     setSheetOpen(true);
   }
 
   function updateStep(index: number, s: StepStatus) {
-    setSteps((prev) => prev.map((step, i) => i === index ? { ...step, status: s } : step));
+    setSteps((prev) =>
+      prev.map((step, i) => (i === index ? { ...step, status: s } : step)),
+    );
   }
 
   async function handleConfirmStake() {
-    if (selectedSide === null) { toast("Pick Yes or No"); return; }
+    if (selectedSide === null) {
+      toast("Pick Yes or No");
+      return;
+    }
     const parsed = parseFloat(amount);
-    if (isNaN(parsed) || parsed <= 0) { toast("Enter a valid amount"); return; }
+    if (Number.isNaN(parsed) || parsed <= 0) {
+      toast("Enter a valid amount");
+      return;
+    }
 
     let chainId = goalChainId;
     if (!chainId && goalId) {
@@ -175,7 +235,13 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
         updateStep(stepIdx, "active");
 
         const goalDetail = await goalsApi.detail(goalId);
-        const gd = goalDetail as unknown as { circleId: string; deadline: string; minStake: string; metadataUri?: string; title: string };
+        const gd = goalDetail as unknown as {
+          circleId: string;
+          deadline: string;
+          minStake: string;
+          metadataUri?: string;
+          title: string;
+        };
 
         let circleChainId = "";
         try {
@@ -184,16 +250,24 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
         } catch {}
 
         if (!circleChainId && publicClient) {
-          const nextCircle = Number(await publicClient.readContract({
-            address: circleFactoryContract.address,
-            abi: circleFactoryContract.abi,
-            functionName: "nextCircleId",
-          }).catch(() => BigInt(0)));
+          const nextCircle = Number(
+            await publicClient
+              .readContract({
+                address: circleFactoryContract.address,
+                abi: circleFactoryContract.abi,
+                functionName: "nextCircleId",
+              })
+              .catch(() => BigInt(0)),
+          );
 
           if (nextCircle > 0) {
             let circleName = "Circle";
             let circlePrivacy = false;
-            try { const cd = await circlesApi.detail(gd.circleId); circleName = cd.name || "Circle"; circlePrivacy = cd.privacy === "private"; } catch {}
+            try {
+              const cd = await circlesApi.detail(gd.circleId);
+              circleName = cd.name || "Circle";
+              circlePrivacy = cd.privacy === "private";
+            } catch {}
 
             await writeContractAsync({
               address: circleFactoryContract.address,
@@ -205,29 +279,53 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
           }
         }
 
-        if (!circleChainId) { updateStep(stepIdx, "error"); toast.error("Could not deploy circle"); setIsStaking(false); return; }
+        if (!circleChainId) {
+          updateStep(stepIdx, "error");
+          toast.error("Could not deploy circle");
+          setIsStaking(false);
+          return;
+        }
 
-        const nextGoal = publicClient ? Number(await publicClient.readContract({
-          address: predictionPoolContract.address,
-          abi: predictionPoolContract.abi,
-          functionName: "nextGoalId",
-        }).catch(() => BigInt(0))) : 0;
+        const nextGoal = publicClient
+          ? Number(
+              await publicClient
+                .readContract({
+                  address: predictionPoolContract.address,
+                  abi: predictionPoolContract.abi,
+                  functionName: "nextGoalId",
+                })
+                .catch(() => BigInt(0)),
+            )
+          : 0;
 
-        const deadline = BigInt(Math.floor(new Date(gd.deadline).getTime() / 1000));
+        const deadline = BigInt(
+          Math.floor(new Date(gd.deadline).getTime() / 1000),
+        );
         const minStake = toUSDT(parseFloat(gd.minStake || "0.1"));
-        const metadataURI = gd.metadataUri || JSON.stringify({ title: gd.title });
+        const metadataURI =
+          gd.metadataUri || JSON.stringify({ title: gd.title });
 
         const gTx = await writeContractAsync({
           address: predictionPoolContract.address,
           abi: predictionPoolContract.abi,
           functionName: "createGoal",
-          args: [BigInt(circleChainId), 0, deadline, minStake, [address as `0x${string}`], metadataURI],
+          args: [
+            BigInt(circleChainId),
+            0,
+            deadline,
+            minStake,
+            [address as `0x${string}`],
+            metadataURI,
+          ],
         });
 
-        if (publicClient) await publicClient.waitForTransactionReceipt({ hash: gTx });
+        if (publicClient)
+          await publicClient.waitForTransactionReceipt({ hash: gTx });
         if (nextGoal > 0) {
           chainId = String(nextGoal);
-          try { await goalsApi.confirm(goalId, nextGoal, gTx); } catch {}
+          try {
+            await goalsApi.confirm(goalId, nextGoal, gTx);
+          } catch {}
         }
 
         updateStep(stepIdx, "done");
@@ -245,12 +343,12 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
       updateStep(stepIdx, "active");
 
       if (publicClient && address) {
-        const goalData = await publicClient.readContract({
+        const goalData = (await publicClient.readContract({
           address: predictionPoolContract.address,
           abi: predictionPoolContract.abi,
           functionName: "goals",
           args: [goalOnChainId],
-        }) as unknown[];
+        })) as unknown[];
         const onChainCircleId = goalData[0] as bigint;
 
         const isMember = await publicClient.readContract({
@@ -267,7 +365,8 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
             functionName: "joinCircle",
             args: [onChainCircleId],
           });
-          if (publicClient) await publicClient.waitForTransactionReceipt({ hash: joinTx });
+          if (publicClient)
+            await publicClient.waitForTransactionReceipt({ hash: joinTx });
         }
       }
 
@@ -283,7 +382,8 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
         functionName: "approve",
         args: [predictionPoolContract.address, usdtAmount],
       });
-      if (publicClient) await publicClient.waitForTransactionReceipt({ hash: approveTx });
+      if (publicClient)
+        await publicClient.waitForTransactionReceipt({ hash: approveTx });
 
       updateStep(stepIdx, "done");
       stepIdx++;
@@ -298,7 +398,9 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
       });
 
       if (publicClient) {
-        const receipt = await publicClient.waitForTransactionReceipt({ hash: stakeTx });
+        const receipt = await publicClient.waitForTransactionReceipt({
+          hash: stakeTx,
+        });
         if (receipt.status === "reverted") {
           updateStep(stepIdx, "error");
           toast.error("Stake reverted on-chain");
@@ -309,15 +411,23 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
 
       updateStep(stepIdx, "done");
 
-      setMyStake({ side: selectedSide, amount: String(parsed), claimedAmount: null });
+      setMyStake({
+        side: selectedSide,
+        amount: String(parsed),
+        claimedAmount: null,
+      });
       toast.success("Stake placed!");
-      setTimeout(() => {
+      const t1 = setTimeout(() => {
         setSheetOpen(false);
         setAmount("");
         setSelectedSide(null);
         setSteps([]);
-        if (onStaked) setTimeout(onStaked, 1000);
+        if (onStaked) {
+          const t2 = setTimeout(onStaked, 1000);
+          timeoutRefs.current.push(t2);
+        }
       }, 1500);
+      timeoutRefs.current.push(t1);
     } catch (err) {
       const message = err instanceof Error ? err.message : "";
       if (message.includes("User rejected") || message.includes("denied")) {
@@ -325,15 +435,25 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
       } else {
         toast.error("Failed to stake. Try again.");
       }
-      setSteps((prev) => prev.map((s) => s.status === "active" ? { ...s, status: "error" } : s));
+      setSteps((prev) =>
+        prev.map((s) =>
+          s.status === "active" ? { ...s, status: "error" } : s,
+        ),
+      );
     } finally {
       setIsStaking(false);
     }
   }
 
   async function handleResolve() {
-    if (resolveChoice === null) { toast("Pick Yes or No"); return; }
-    if (!goalChainId) { toast.error("Goal not on-chain"); return; }
+    if (resolveChoice === null) {
+      toast("Pick Yes or No");
+      return;
+    }
+    if (!goalChainId) {
+      toast.error("Goal not on-chain");
+      return;
+    }
 
     setIsResolving(true);
     try {
@@ -344,7 +464,9 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
         args: [BigInt(goalChainId), resolveChoice],
       });
       if (publicClient) {
-        const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
+        const receipt = await publicClient.waitForTransactionReceipt({
+          hash: txHash,
+        });
         if (receipt.status === "reverted") {
           toast.error("Vote failed on-chain");
           setIsResolving(false);
@@ -353,7 +475,10 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
       }
       toast.success("Vote submitted!");
       setResolveSheetOpen(false);
-      if (onStaked) setTimeout(onStaked, 1000);
+      if (onStaked) {
+        const t = setTimeout(onStaked, 1000);
+        timeoutRefs.current.push(t);
+      }
     } catch (err) {
       const msg = err instanceof Error ? err.message : "";
       if (msg.includes("User rejected") || msg.includes("denied")) {
@@ -367,7 +492,10 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
   }
 
   async function handleClaim() {
-    if (!goalChainId) { toast.error("Goal not on-chain"); return; }
+    if (!goalChainId) {
+      toast.error("Goal not on-chain");
+      return;
+    }
 
     setIsClaiming(true);
     try {
@@ -378,7 +506,9 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
         args: [BigInt(goalChainId)],
       });
       if (publicClient) {
-        const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
+        const receipt = await publicClient.waitForTransactionReceipt({
+          hash: txHash,
+        });
         if (receipt.status === "reverted") {
           toast.error("Claim failed on-chain");
           setIsClaiming(false);
@@ -387,7 +517,10 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
       }
       setHasClaimed(true);
       toast.success("Reward claimed!");
-      if (onStaked) setTimeout(onStaked, 1000);
+      if (onStaked) {
+        const t = setTimeout(onStaked, 1000);
+        timeoutRefs.current.push(t);
+      }
     } catch (err) {
       const msg = err instanceof Error ? err.message : "";
       if (msg.includes("User rejected") || msg.includes("denied")) {
@@ -414,12 +547,17 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
   function StepIndicator({ step }: { step: Step }) {
     return (
       <div className="flex items-center gap-3">
-        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-all duration-300 ${
-          step.status === "done" ? "bg-emerald-500" :
-          step.status === "active" ? "bg-brand" :
-          step.status === "error" ? "bg-red-400" :
-          "bg-gray-100"
-        }`}>
+        <div
+          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-all duration-300 ${
+            step.status === "done"
+              ? "bg-emerald-500"
+              : step.status === "active"
+                ? "bg-brand"
+                : step.status === "error"
+                  ? "bg-red-400"
+                  : "bg-gray-100"
+          }`}
+        >
           {step.status === "done" ? (
             <HiCheck className="w-4 h-4 text-white" />
           ) : step.status === "active" ? (
@@ -430,12 +568,17 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
             <div className="h-2 w-2 rounded-full bg-gray-300" />
           )}
         </div>
-        <p className={`text-sm font-medium ${
-          step.status === "done" ? "text-emerald-500" :
-          step.status === "active" ? "text-main-text" :
-          step.status === "error" ? "text-red-400" :
-          "text-muted"
-        }`}>
+        <p
+          className={`text-sm font-medium ${
+            step.status === "done"
+              ? "text-emerald-500"
+              : step.status === "active"
+                ? "text-main-text"
+                : step.status === "error"
+                  ? "text-red-400"
+                  : "text-muted"
+          }`}
+        >
           {step.label}
           {step.status === "active" && "..."}
         </p>
@@ -449,23 +592,34 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
         {hasStaked && (
           <div className="flex items-center justify-between rounded-full bg-white px-5 py-3">
             <div>
-              <p className="text-[10px] text-muted uppercase tracking-wide">Your stake</p>
+              <p className="text-[10px] text-muted uppercase tracking-wide">
+                Your stake
+              </p>
               <p className="text-sm font-bold text-main-text inline-flex items-center gap-1">
-                {myStake.amount} <UsdtLabel size={12} /> on {myStake.side === 0 ? "Yes" : "No"}
+                {myStake.amount} <UsdtLabel size={12} /> on{" "}
+                {myStake.side === 0 ? "Yes" : "No"}
               </p>
             </div>
-            <span className={`rounded-full px-3 py-1 text-xs font-semibold ${
-              hasClaimed || myStake.claimedAmount
-                ? "bg-emerald-50 text-emerald-500"
+            <span
+              className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                hasClaimed || myStake.claimedAmount
+                  ? "bg-emerald-50 text-emerald-500"
+                  : isResolved && isWinner
+                    ? "bg-amber-50 text-amber-500"
+                    : isResolved && !isWinner
+                      ? "bg-red-50 text-red-400"
+                      : myStake.side === 0
+                        ? "bg-emerald-50 text-emerald-500"
+                        : "bg-red-50 text-red-400"
+              }`}
+            >
+              {hasClaimed || myStake.claimedAmount
+                ? "Claimed"
                 : isResolved && isWinner
-                  ? "bg-amber-50 text-amber-500"
+                  ? "Won"
                   : isResolved && !isWinner
-                    ? "bg-red-50 text-red-400"
-                    : myStake.side === 0
-                      ? "bg-emerald-50 text-emerald-500"
-                      : "bg-red-50 text-red-400"
-            }`}>
-              {hasClaimed || myStake.claimedAmount ? "Claimed" : isResolved && isWinner ? "Won" : isResolved && !isWinner ? "Lost" : "Staked"}
+                    ? "Lost"
+                    : "Staked"}
             </span>
           </div>
         )}
@@ -484,20 +638,28 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
 
         {hasStaked && isResolved && !isWinner && (
           <div className="flex items-center justify-center rounded-full bg-gray-50 px-5 py-3">
-            <p className="text-sm font-medium text-muted">Better luck next time</p>
+            <p className="text-sm font-medium text-muted">
+              Better luck next time
+            </p>
           </div>
         )}
 
         {hasStaked && (hasClaimed || myStake.claimedAmount) && (
           <div className="flex items-center justify-center rounded-full bg-emerald-50 px-5 py-3">
-            <p className="text-sm font-medium text-emerald-500">Reward collected</p>
+            <p className="text-sm font-medium text-emerald-500">
+              Reward collected
+            </p>
           </div>
         )}
 
         {isResolver && !hasVoted && (
           <motion.button
             type="button"
-            onClick={() => deadlinePassed ? setResolveSheetOpen(true) : toast(`Resolve opens in ${getTimeUntilDeadline()}`)}
+            onClick={() =>
+              deadlinePassed
+                ? setResolveSheetOpen(true)
+                : toast(`Resolve opens in ${getTimeUntilDeadline()}`)
+            }
             whileTap={deadlinePassed ? { scale: 0.97 } : {}}
             className={`w-full rounded-full py-4 text-base font-semibold cursor-pointer transition-all duration-200 ${
               deadlinePassed
@@ -524,7 +686,9 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
             whileTap={{ scale: 0.97 }}
             className="w-full rounded-full bg-brand py-4 text-base font-semibold text-white cursor-pointer"
           >
-            {!isConnected || !isAuthenticated ? "Connect to Stake" : "Place Stake"}
+            {!isConnected || !isAuthenticated
+              ? "Connect to Stake"
+              : "Place Stake"}
           </motion.button>
         )}
 
@@ -549,7 +713,11 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
-              transition={{ type: "spring" as const, stiffness: 300, damping: 32 }}
+              transition={{
+                type: "spring" as const,
+                stiffness: 300,
+                damping: 32,
+              }}
               className="fixed bottom-0 left-1/2 z-101 w-full max-w-md -translate-x-1/2 rounded-t-3xl bg-white"
               style={{ maxHeight: "90dvh" }}
             >
@@ -559,7 +727,9 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
                     {steps.length > 0 ? "Processing" : "Place your stake"}
                   </h2>
                   <p className="mt-1 text-sm text-muted">
-                    {steps.length > 0 ? "Confirm each step in your wallet" : "Pick a side and enter your amount"}
+                    {steps.length > 0
+                      ? "Confirm each step in your wallet"
+                      : "Pick a side and enter your amount"}
                   </p>
                 </div>
                 {!isStaking && (
@@ -589,13 +759,17 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
                   </div>
                 ) : (
                   <>
-                    <p className="text-sm font-medium text-main-text mb-2">Your prediction</p>
+                    <p className="text-sm font-medium text-main-text mb-2">
+                      Your prediction
+                    </p>
                     <div className="flex gap-3 mb-5">
                       <button
                         type="button"
                         onClick={() => setSelectedSide(0)}
                         className={`flex-1 rounded-2xl py-4 text-base font-bold cursor-pointer transition-all duration-200 ${
-                          selectedSide === 0 ? "bg-emerald-500 text-white" : "bg-gray-50 text-muted"
+                          selectedSide === 0
+                            ? "bg-emerald-500 text-white"
+                            : "bg-gray-50 text-muted"
                         }`}
                       >
                         Yes
@@ -604,14 +778,18 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
                         type="button"
                         onClick={() => setSelectedSide(1)}
                         className={`flex-1 rounded-2xl py-4 text-base font-bold cursor-pointer transition-all duration-200 ${
-                          selectedSide === 1 ? "bg-red-400 text-white" : "bg-gray-50 text-muted"
+                          selectedSide === 1
+                            ? "bg-red-400 text-white"
+                            : "bg-gray-50 text-muted"
                         }`}
                       >
                         No
                       </button>
                     </div>
 
-                    <p className="text-sm font-medium text-main-text mb-2">Stake amount</p>
+                    <p className="text-sm font-medium text-main-text mb-2">
+                      Stake amount
+                    </p>
                     <div className="rounded-2xl bg-gray-50 p-4 mb-3">
                       <div className="flex items-center justify-between">
                         <input
@@ -619,10 +797,19 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
                           inputMode="decimal"
                           value={amount}
                           placeholder="0"
-                          onChange={(e) => setAmount(e.target.value.replace(/,/g, ".").replace(/[^0-9.]/g, ""))}
+                          onChange={(e) =>
+                            setAmount(
+                              e.target.value
+                                .replace(/,/g, ".")
+                                .replace(/[^0-9.]/g, ""),
+                            )
+                          }
                           className="flex-1 bg-transparent text-2xl font-bold text-main-text placeholder:text-muted outline-none"
                         />
-                        <UsdtLabel size={16} className="text-sm font-semibold" />
+                        <UsdtLabel
+                          size={16}
+                          className="text-sm font-semibold"
+                        />
                       </div>
                     </div>
 
@@ -633,7 +820,9 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
                           key={q}
                           onClick={() => setAmount(q)}
                           className={`flex-1 rounded-xl py-2 text-xs font-medium cursor-pointer transition-all duration-200 active:scale-[0.95] ${
-                            amount === q ? "bg-brand text-white" : "bg-gray-50 text-muted"
+                            amount === q
+                              ? "bg-brand text-white"
+                              : "bg-gray-50 text-muted"
                           }`}
                         >
                           {q}
@@ -672,13 +861,21 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
-              transition={{ type: "spring" as const, stiffness: 300, damping: 32 }}
+              transition={{
+                type: "spring" as const,
+                stiffness: 300,
+                damping: 32,
+              }}
               className="fixed bottom-0 left-1/2 z-101 w-full max-w-md -translate-x-1/2 rounded-t-3xl bg-white px-6 pt-6 pb-8"
             >
               <div className="flex items-start justify-between mb-6">
                 <div>
-                  <h2 className="text-xl font-bold text-main-text">Resolve Market</h2>
-                  <p className="mt-1 text-sm text-muted">As a resolver, decide the outcome</p>
+                  <h2 className="text-xl font-bold text-main-text">
+                    Resolve Market
+                  </h2>
+                  <p className="mt-1 text-sm text-muted">
+                    As a resolver, decide the outcome
+                  </p>
                 </div>
                 {!isResolving && (
                   <button
@@ -691,13 +888,17 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
                 )}
               </div>
 
-              <p className="text-sm font-medium text-main-text mb-3">Was the goal achieved?</p>
+              <p className="text-sm font-medium text-main-text mb-3">
+                Was the goal achieved?
+              </p>
               <div className="flex gap-3 mb-6">
                 <button
                   type="button"
                   onClick={() => setResolveChoice(0)}
                   className={`flex-1 rounded-2xl py-4 text-base font-bold cursor-pointer transition-all duration-200 ${
-                    resolveChoice === 0 ? "bg-emerald-500 text-white" : "bg-gray-50 text-muted"
+                    resolveChoice === 0
+                      ? "bg-emerald-500 text-white"
+                      : "bg-gray-50 text-muted"
                   }`}
                 >
                   Yes
@@ -706,7 +907,9 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
                   type="button"
                   onClick={() => setResolveChoice(1)}
                   className={`flex-1 rounded-2xl py-4 text-base font-bold cursor-pointer transition-all duration-200 ${
-                    resolveChoice === 1 ? "bg-red-400 text-white" : "bg-gray-50 text-muted"
+                    resolveChoice === 1
+                      ? "bg-red-400 text-white"
+                      : "bg-gray-50 text-muted"
                   }`}
                 >
                   No

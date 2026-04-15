@@ -1,5 +1,5 @@
-import { http, createConfig } from "wagmi";
 import { defineChain } from "viem";
+import { createConfig, http } from "wagmi";
 
 export const celoSepolia = defineChain({
   id: 11142220,

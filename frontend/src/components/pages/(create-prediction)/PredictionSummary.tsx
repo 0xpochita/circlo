@@ -14,7 +14,10 @@ export default function PredictionSummary() {
       <div className="rounded-2xl bg-white p-4">
         <div className="divide-y divide-gray-50">
           {fees.map((fee) => (
-            <div key={fee.label} className="flex items-center justify-between py-3">
+            <div
+              key={fee.label}
+              className="flex items-center justify-between py-3"
+            >
               <p className="text-sm text-muted">{fee.label}</p>
               <p className="text-sm font-medium text-main-text inline-flex items-center gap-1">
                 {fee.value} <UsdtLabel size={12} />

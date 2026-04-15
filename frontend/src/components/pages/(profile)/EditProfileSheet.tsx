@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { HiXMark, HiOutlinePencil, HiCheck } from "react-icons/hi2";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { HiCheck, HiOutlinePencil, HiXMark } from "react-icons/hi2";
 import { toast } from "sonner";
 import { EmojiAvatar, EmojiPicker } from "@/components/shared";
-import { useUserStore } from "@/stores/userStore";
+import { useSheetOverflow } from "@/hooks";
 import { usersApi } from "@/lib/api/endpoints";
 import { useAuthStore } from "@/stores/authStore";
+import { useUserStore } from "@/stores/userStore";
 import type { UserAvatar } from "@/types";
 
 type EditProfileSheetProps = {
@@ -15,7 +16,10 @@ type EditProfileSheetProps = {
   onClose: () => void;
 };
 
-export default function EditProfileSheet({ open, onClose }: EditProfileSheetProps) {
+export default function EditProfileSheet({
+  open,
+  onClose,
+}: EditProfileSheetProps) {
   const storeName = useUserStore((s) => s.name);
   const storeUsername = useUserStore((s) => s.username);
   const storeAvatar = useUserStore((s) => s.avatar);
@@ -36,22 +40,18 @@ export default function EditProfileSheet({ open, onClose }: EditProfileSheetProp
       setUsernameLocal(storeUsername.replace(/^@/, ""));
       setAvatarLocal(storeAvatar);
       if (isAuthenticated) {
-        usersApi.me().then((user) => {
-          if (user.username) setUsernameLocal(user.username);
-          if (user.name) setNameLocal(user.name);
-        }).catch(() => {});
+        usersApi
+          .me()
+          .then((user) => {
+            if (user.username) setUsernameLocal(user.username);
+            if (user.name) setNameLocal(user.name);
+          })
+          .catch(() => {});
       }
     }
-  }, [open, storeName, storeAvatar, isAuthenticated]);
+  }, [open, storeName, storeUsername, storeAvatar, isAuthenticated]);
 
-  useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => { document.body.style.overflow = ""; };
-  }, [open]);
+  useSheetOverflow(open);
 
   async function handleSave() {
     const trimmedName = name.trim() || "Player";
@@ -103,14 +103,22 @@ export default function EditProfileSheet({ open, onClose }: EditProfileSheetProp
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
-              transition={{ type: "spring" as const, stiffness: 300, damping: 32 }}
+              transition={{
+                type: "spring" as const,
+                stiffness: 300,
+                damping: 32,
+              }}
               className="fixed bottom-0 left-1/2 z-101 w-full max-w-md -translate-x-1/2 flex flex-col rounded-t-3xl bg-white"
               style={{ maxHeight: "90dvh" }}
             >
               <div className="flex items-start justify-between px-6 pt-6 pb-4 shrink-0">
                 <div>
-                  <h2 className="text-xl font-bold text-main-text">Edit Profile</h2>
-                  <p className="mt-1 text-sm text-muted">Update your name, username, and avatar</p>
+                  <h2 className="text-xl font-bold text-main-text">
+                    Edit Profile
+                  </h2>
+                  <p className="mt-1 text-sm text-muted">
+                    Update your name, username, and avatar
+                  </p>
                 </div>
                 <button
                   type="button"
@@ -159,13 +167,19 @@ export default function EditProfileSheet({ open, onClose }: EditProfileSheetProp
                     <input
                       type="text"
                       value={username}
-                      onChange={(e) => setUsernameLocal(e.target.value.replace(/[^a-zA-Z0-9_]/g, ""))}
+                      onChange={(e) =>
+                        setUsernameLocal(
+                          e.target.value.replace(/[^a-zA-Z0-9_]/g, ""),
+                        )
+                      }
                       placeholder="username"
                       maxLength={20}
                       className="flex-1 bg-transparent text-sm text-main-text placeholder:text-muted outline-none"
                     />
                   </div>
-                  <p className="mt-1.5 text-xs text-muted">Letters, numbers, and underscores only</p>
+                  <p className="mt-1.5 text-xs text-muted">
+                    Letters, numbers, and underscores only
+                  </p>
                 </div>
 
                 <motion.button
@@ -175,7 +189,9 @@ export default function EditProfileSheet({ open, onClose }: EditProfileSheetProp
                   whileTap={isSaving ? {} : { scale: 0.97 }}
                   className="flex w-full items-center justify-center gap-2 rounded-full bg-brand py-4 text-base font-semibold text-white cursor-pointer disabled:bg-gray-200 disabled:text-muted disabled:cursor-not-allowed"
                 >
-                  {isSaving ? "Saving..." : (
+                  {isSaving ? (
+                    "Saving..."
+                  ) : (
                     <>
                       <HiCheck className="w-5 h-5" />
                       Save Changes

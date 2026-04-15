@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import WelcomeStep from "./WelcomeStep";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+import { useAuthStore } from "@/stores/authStore";
 import ConnectStep from "./ConnectStep";
 import ProfileStep from "./ProfileStep";
-import { useAuthStore } from "@/stores/authStore";
+import WelcomeStep from "./WelcomeStep";
 
 export default function OnboardingFlow() {
   const router = useRouter();
@@ -51,7 +51,6 @@ export default function OnboardingFlow() {
 
   return (
     <div className="mx-auto w-full max-w-md bg-main-bg">
-
       <AnimatePresence mode="wait">
         {step === 0 && (
           <motion.div

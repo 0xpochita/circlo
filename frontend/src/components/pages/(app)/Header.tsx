@@ -3,12 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { toast } from "sonner";
 import { useAccount, useConnect } from "wagmi";
 import { injected } from "wagmi/connectors";
-import { toast } from "sonner";
-import { useUserStore } from "@/stores/userStore";
+import { EmojiAvatar } from "@/components/shared";
 import { useAuth } from "@/hooks/useAuth";
-import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
+import { useUserStore } from "@/stores/userStore";
 
 export default function Header() {
   const avatar = useUserStore((s) => s.avatar);

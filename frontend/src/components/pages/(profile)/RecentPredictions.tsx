@@ -1,13 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { EmojiAvatar, UsdtLabel } from "@/components/shared";
-import { goalsApi } from "@/lib/api/endpoints";
 import type { GoalResponse } from "@/lib/api/endpoints";
+import { goalsApi } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
 
-function getResultLabel(goal: GoalResponse): { label: string; positive: boolean } {
+function getResultLabel(goal: GoalResponse): {
+  label: string;
+  positive: boolean;
+} {
   if (goal.status === "resolved" || goal.status === "claimed") {
     if (goal.winningSide === "yes") return { label: "Won", positive: true };
     return { label: "Lost", positive: false };
@@ -31,14 +34,22 @@ export default function RecentPredictions() {
     return (
       <div className="px-4 py-2">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-base font-bold text-main-text">Recent predictions</p>
-          <button type="button" className="text-sm font-medium text-muted cursor-pointer">
+          <p className="text-base font-bold text-main-text">
+            Recent predictions
+          </p>
+          <button
+            type="button"
+            className="text-sm font-medium text-muted cursor-pointer"
+          >
             See all
           </button>
         </div>
         <div className="flex gap-3 overflow-x-auto scrollbar-none pb-1">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={`skel-${i}`} className="animate-pulse min-w-[160px] rounded-2xl bg-white p-1">
+            <div
+              key={`skel-${i}`}
+              className="animate-pulse min-w-[160px] rounded-2xl bg-white p-1"
+            >
               <div className="aspect-square rounded-2xl bg-gray-50 p-3 flex flex-col justify-between">
                 <div className="h-10 w-10 rounded-full bg-gray-100" />
                 <div className="h-3 w-20 rounded-lg bg-gray-100" />
@@ -58,8 +69,13 @@ export default function RecentPredictions() {
     return (
       <div className="px-4 py-2">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-base font-bold text-main-text">Recent predictions</p>
-          <button type="button" className="text-sm font-medium text-muted cursor-pointer">
+          <p className="text-base font-bold text-main-text">
+            Recent predictions
+          </p>
+          <button
+            type="button"
+            className="text-sm font-medium text-muted cursor-pointer"
+          >
             See all
           </button>
         </div>
@@ -74,7 +90,10 @@ export default function RecentPredictions() {
     <div className="px-4 py-2">
       <div className="flex items-center justify-between mb-3">
         <p className="text-base font-bold text-main-text">Recent predictions</p>
-        <button type="button" className="text-sm font-medium text-muted cursor-pointer">
+        <button
+          type="button"
+          className="text-sm font-medium text-muted cursor-pointer"
+        >
           See all
         </button>
       </div>
@@ -89,7 +108,11 @@ export default function RecentPredictions() {
             >
               <div className="flex aspect-square flex-col justify-between rounded-2xl bg-gray-50 p-3">
                 <div>
-                  <EmojiAvatar avatar={toAvatar(g.avatarEmoji, g.avatarColor)} size={40} shape="square" />
+                  <EmojiAvatar
+                    avatar={toAvatar(g.avatarEmoji, g.avatarColor)}
+                    size={40}
+                    shape="square"
+                  />
                 </div>
                 <p className="text-sm text-muted">{g.title}</p>
               </div>
@@ -97,7 +120,9 @@ export default function RecentPredictions() {
                 <p className="text-base font-bold text-main-text inline-flex items-center gap-1">
                   {g.minStake} <UsdtLabel size={12} />
                 </p>
-                <p className={`text-xs font-medium ${result.positive ? "text-emerald-500" : "text-red-400"}`}>
+                <p
+                  className={`text-xs font-medium ${result.positive ? "text-emerald-500" : "text-red-400"}`}
+                >
                   {result.label}
                 </p>
               </div>

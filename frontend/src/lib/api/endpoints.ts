@@ -10,6 +10,7 @@ export const authApi = {
   verify: (message: string, signature: string) =>
     fetchApi<{
       accessToken: string;
+      refreshToken?: string;
       user: {
         id: string;
         walletAddress: string;
@@ -124,7 +125,7 @@ export const circlesApi = {
       {
         method: "POST",
         body: JSON.stringify(inviteCode ? { inviteCode } : {}),
-      }
+      },
     ),
 
   leave: (circleId: string) =>
@@ -193,7 +194,11 @@ export const goalsApi = {
   myStake: (goalId: string) =>
     fetchApi<{
       staked: boolean;
-      data: { side: number; amount: string; claimedAmount: string | null } | null;
+      data: {
+        side: number;
+        amount: string;
+        claimedAmount: string | null;
+      } | null;
     }>(`/goals/${goalId}/my-stake`),
 
   mine: (cursor?: string) =>

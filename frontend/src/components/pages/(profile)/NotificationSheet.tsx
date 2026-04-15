@@ -1,12 +1,12 @@
 "use client";
 
+import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { HiXMark, HiOutlineBellAlert } from "react-icons/hi2";
-import { EmojiAvatar } from "@/components/shared";
-import { notificationsApi } from "@/lib/api/endpoints";
-import type { NotificationResponse } from "@/lib/api/endpoints";
+import { HiOutlineBellAlert, HiXMark } from "react-icons/hi2";
 import { toast } from "sonner";
+import { EmojiAvatar } from "@/components/shared";
+import type { NotificationResponse } from "@/lib/api/endpoints";
+import { notificationsApi } from "@/lib/api/endpoints";
 import type { UserAvatar } from "@/types";
 
 const TYPE_AVATARS: Record<string, UserAvatar> = {
@@ -36,8 +36,13 @@ type NotificationSheetProps = {
   onClose: () => void;
 };
 
-export default function NotificationSheet({ open, onClose }: NotificationSheetProps) {
-  const [notifications, setNotifications] = useState<NotificationResponse[]>([]);
+export default function NotificationSheet({
+  open,
+  onClose,
+}: NotificationSheetProps) {
+  const [notifications, setNotifications] = useState<NotificationResponse[]>(
+    [],
+  );
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -77,13 +82,19 @@ export default function NotificationSheet({ open, onClose }: NotificationSheetPr
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
-            transition={{ type: "spring" as const, stiffness: 300, damping: 32 }}
+            transition={{
+              type: "spring" as const,
+              stiffness: 300,
+              damping: 32,
+            }}
             className="fixed bottom-0 left-1/2 z-101 w-full max-w-md -translate-x-1/2 flex flex-col rounded-t-3xl bg-white"
             style={{ maxHeight: "85dvh" }}
           >
             <div className="flex items-start justify-between px-6 pt-6 pb-4 shrink-0">
               <div>
-                <h2 className="text-xl font-bold text-main-text">Notifications</h2>
+                <h2 className="text-xl font-bold text-main-text">
+                  Notifications
+                </h2>
                 <p className="mt-1 text-sm text-muted">
                   {unreadCount > 0
                     ? `You have ${unreadCount} new notifications`
@@ -103,7 +114,10 @@ export default function NotificationSheet({ open, onClose }: NotificationSheetPr
               {isLoading ? (
                 <div className="flex flex-col gap-2">
                   {Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="animate-pulse rounded-2xl bg-gray-100 h-[80px]" />
+                    <div
+                      key={i}
+                      className="animate-pulse rounded-2xl bg-gray-100 h-[80px]"
+                    />
                   ))}
                 </div>
               ) : notifications.length === 0 ? (
@@ -111,8 +125,12 @@ export default function NotificationSheet({ open, onClose }: NotificationSheetPr
                   <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-50 mb-4">
                     <HiOutlineBellAlert className="w-7 h-7 text-muted" />
                   </div>
-                  <p className="text-base font-semibold text-main-text mb-1">No notifications</p>
-                  <p className="text-sm text-muted">You&apos;re all caught up</p>
+                  <p className="text-base font-semibold text-main-text mb-1">
+                    No notifications
+                  </p>
+                  <p className="text-sm text-muted">
+                    You&apos;re all caught up
+                  </p>
                 </div>
               ) : (
                 <div className="flex flex-col gap-2">
@@ -126,7 +144,15 @@ export default function NotificationSheet({ open, onClose }: NotificationSheetPr
                         n.unread ? "bg-gray-50" : "bg-white"
                       }`}
                     >
-                      <EmojiAvatar avatar={TYPE_AVATARS[n.type] ?? { emoji: "\u{1F514}", color: "#94a3b8" }} size={44} />
+                      <EmojiAvatar
+                        avatar={
+                          TYPE_AVATARS[n.type] ?? {
+                            emoji: "\u{1F514}",
+                            color: "#94a3b8",
+                          }
+                        }
+                        size={44}
+                      />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-semibold text-main-text truncate">
@@ -136,8 +162,12 @@ export default function NotificationSheet({ open, onClose }: NotificationSheetPr
                             <span className="h-2 w-2 shrink-0 rounded-full bg-brand" />
                           )}
                         </div>
-                        <p className="text-xs text-muted truncate">{n.description}</p>
-                        <p className="mt-1 text-[11px] text-muted">{formatTime(n.createdAt)}</p>
+                        <p className="text-xs text-muted truncate">
+                          {n.description}
+                        </p>
+                        <p className="mt-1 text-[11px] text-muted">
+                          {formatTime(n.createdAt)}
+                        </p>
                       </div>
                     </motion.div>
                   ))}

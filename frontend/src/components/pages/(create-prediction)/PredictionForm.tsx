@@ -1,9 +1,9 @@
 "use client";
 
+import { motion } from "framer-motion";
 import Image from "next/image";
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { HiOutlinePencil, HiOutlineCalendarDays } from "react-icons/hi2";
+import { HiOutlineCalendarDays, HiOutlinePencil } from "react-icons/hi2";
 import { EmojiAvatar, EmojiPicker } from "@/components/shared";
 import { useCreateGoalStore } from "@/stores/createGoalStore";
 
@@ -26,8 +26,11 @@ export default function PredictionForm() {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [useCustomDeadline, setUseCustomDeadline] = useState(false);
 
-  const durationIndex = durations.findIndex((d) => d.hours === store.durationHours);
-  const selectedDuration = !useCustomDeadline && durationIndex >= 0 ? durationIndex : -1;
+  const durationIndex = durations.findIndex(
+    (d) => d.hours === store.durationHours,
+  );
+  const selectedDuration =
+    !useCustomDeadline && durationIndex >= 0 ? durationIndex : -1;
 
   function handlePresetClick(hours: number) {
     setUseCustomDeadline(false);
@@ -41,14 +44,21 @@ export default function PredictionForm() {
 
     const target = new Date(value);
     const now = new Date();
-    const diffHours = Math.max(1, Math.round((target.getTime() - now.getTime()) / 3600000));
+    const diffHours = Math.max(
+      1,
+      Math.round((target.getTime() - now.getTime()) / 3600000),
+    );
     store.setDurationHours(diffHours);
   }
 
   function getDeadlineLabel(): string {
     if (useCustomDeadline && store.customDeadline) {
       const target = new Date(store.customDeadline);
-      return target.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+      return target.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
     }
     if (selectedDuration >= 0) {
       return `~${durations[selectedDuration].hours}h`;
@@ -106,14 +116,17 @@ export default function PredictionForm() {
         <textarea
           value={store.description}
           onChange={(e) => {
-            if (e.target.value.length <= 200) store.setDescription(e.target.value);
+            if (e.target.value.length <= 200)
+              store.setDescription(e.target.value);
           }}
           placeholder="Add more context for this goal..."
           rows={3}
           maxLength={200}
           className="w-full resize-none rounded-xl bg-gray-50 px-4 py-3 text-sm text-main-text placeholder:text-muted outline-none transition-all duration-200 focus:ring-2 focus:ring-brand"
         />
-        <p className={`text-xs mt-1 text-right ${store.description.length >= 180 ? "text-red-400" : "text-muted"}`}>
+        <p
+          className={`text-xs mt-1 text-right ${store.description.length >= 180 ? "text-red-400" : "text-muted"}`}
+        >
           {store.description.length}/200
         </p>
       </div>
@@ -125,7 +138,9 @@ export default function PredictionForm() {
             <button
               type="button"
               key={outcome.label}
-              onClick={() => outcome.enabled && store.setOutcomeType(outcome.value)}
+              onClick={() =>
+                outcome.enabled && store.setOutcomeType(outcome.value)
+              }
               disabled={!outcome.enabled}
               className={`relative flex-1 rounded-xl py-2.5 text-xs font-medium transition-all duration-200 ${
                 store.outcomeType === outcome.value
@@ -189,7 +204,11 @@ export default function PredictionForm() {
                 ? `${Math.min(100, (store.durationHours / 720) * 100)}%`
                 : `${((selectedDuration + 1) / durations.length) * 100}%`,
             }}
-            transition={{ type: "spring" as const, stiffness: 300, damping: 30 }}
+            transition={{
+              type: "spring" as const,
+              stiffness: 300,
+              damping: 30,
+            }}
           />
         </div>
         <div className="flex justify-between mt-1.5">
@@ -207,7 +226,9 @@ export default function PredictionForm() {
             type="text"
             inputMode="numeric"
             value={store.stakeAmount}
-            onChange={(e) => store.setStakeAmount(e.target.value.replace(/[^0-9]/g, ""))}
+            onChange={(e) =>
+              store.setStakeAmount(e.target.value.replace(/[^0-9]/g, ""))
+            }
             placeholder="0"
             className="flex-1 bg-transparent text-sm text-main-text placeholder:text-muted outline-none"
           />
@@ -228,7 +249,9 @@ export default function PredictionForm() {
               key={amount}
               onClick={() => store.setStakeAmount(amount)}
               className={`flex-1 rounded-lg py-2 text-xs font-medium cursor-pointer transition-all duration-200 active:scale-95 ${
-                store.stakeAmount === amount ? "bg-gray-900 text-white" : "bg-gray-50 text-muted hover:bg-gray-100"
+                store.stakeAmount === amount
+                  ? "bg-gray-900 text-white"
+                  : "bg-gray-50 text-muted hover:bg-gray-100"
               }`}
             >
               {amount}

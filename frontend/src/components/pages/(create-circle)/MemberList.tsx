@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { HiOutlineMagnifyingGlass, HiOutlineUserPlus } from "react-icons/hi2";
-import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
+import { toast } from "sonner";
+import { EmojiAvatar } from "@/components/shared";
 import { usersApi } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
-import { toast } from "sonner";
 
 type SearchUser = {
   id: string;
@@ -78,7 +78,10 @@ export default function MemberList() {
             className="flex flex-col gap-2"
           >
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="animate-pulse rounded-2xl bg-gray-100 h-16" />
+              <div
+                key={i}
+                className="animate-pulse rounded-2xl bg-gray-100 h-16"
+              />
             ))}
           </motion.div>
         ) : !search.trim() || users.length === 0 ? (
@@ -92,7 +95,9 @@ export default function MemberList() {
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-50 mb-4">
               <HiOutlineUserPlus className="w-7 h-7 text-muted" />
             </div>
-            <p className="text-base font-semibold text-main-text mb-1">No friends found</p>
+            <p className="text-base font-semibold text-main-text mb-1">
+              No friends found
+            </p>
             <p className="text-sm text-muted text-center">
               Try a different name or username to find your friends
             </p>
@@ -116,13 +121,20 @@ export default function MemberList() {
                   className="flex items-center justify-between px-4 py-3.5"
                 >
                   <div className="flex items-center gap-3">
-                    <EmojiAvatar avatar={toAvatar(member.avatarEmoji, member.avatarColor)} size={40} />
+                    <EmojiAvatar
+                      avatar={toAvatar(member.avatarEmoji, member.avatarColor)}
+                      size={40}
+                    />
                     <div>
                       <p className="text-sm font-semibold text-main-text">
-                        {member.name ?? member.username ?? member.walletAddress.slice(0, 8)}
+                        {member.name ??
+                          member.username ??
+                          member.walletAddress.slice(0, 8)}
                       </p>
                       <p className="text-xs text-muted">
-                        {member.username ? `@${member.username}` : member.walletAddress.slice(0, 12)}
+                        {member.username
+                          ? `@${member.username}`
+                          : member.walletAddress.slice(0, 12)}
                       </p>
                     </div>
                   </div>

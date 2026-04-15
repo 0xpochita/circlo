@@ -28,7 +28,9 @@ export default function TrendingCategories() {
               <div>
                 <EmojiAvatar avatar={cat.avatar} size={36} shape="square" />
               </div>
-              <p className="text-base font-semibold text-main-text">{cat.label}</p>
+              <p className="text-base font-semibold text-main-text">
+                {cat.label}
+              </p>
             </div>
           </div>
         ))}

@@ -1,10 +1,10 @@
-import { type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
 const BACKEND_URL = process.env.BACKEND_API_URL ?? "http://localhost:3001";
 
 async function handler(
   request: NextRequest,
-  { params }: { params: Promise<{ path: string[] }> }
+  { params }: { params: Promise<{ path: string[] }> },
 ) {
   const { path } = await params;
   const targetPath = path.join("/");

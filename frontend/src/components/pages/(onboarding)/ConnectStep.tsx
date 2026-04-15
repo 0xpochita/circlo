@@ -1,16 +1,16 @@
 "use client";
 
-import Image from "next/image";
 import { motion } from "framer-motion";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 import { HiOutlineArrowLeft } from "react-icons/hi2";
+import { SiweMessage } from "siwe";
 import { toast } from "sonner";
 import { useConnect, useDisconnect, useSignMessage } from "wagmi";
 import { injected } from "wagmi/connectors";
-import { useState, useEffect } from "react";
-import { SiweMessage } from "siwe";
-import { useAuthStore } from "@/stores/authStore";
 import { authApi } from "@/lib/api/endpoints";
 import { celoSepolia } from "@/lib/web3/config";
+import { useAuthStore } from "@/stores/authStore";
 
 type ConnectStepProps = {
   onNext: () => void;
@@ -28,7 +28,7 @@ export default function ConnectStep({ onNext, onBack }: ConnectStepProps) {
 
   useEffect(() => {
     disconnectAsync().catch(() => {});
-  }, []);
+  }, [disconnectAsync]);
 
   async function handleConnect() {
     setIsConnecting(true);
@@ -52,6 +52,7 @@ export default function ConnectStep({ onNext, onBack }: ConnectStepProps) {
       setLoading(true);
 
       let accessToken: string | null = null;
+      let refreshToken: string | null = null;
       let user = null;
 
       try {
@@ -78,6 +79,7 @@ export default function ConnectStep({ onNext, onBack }: ConnectStepProps) {
           const verifyRes = await authApi.verify(messageString, signature);
 
           accessToken = verifyRes.accessToken || null;
+          refreshToken = verifyRes.refreshToken || null;
           user = verifyRes.user || null;
         }
       } catch {
@@ -94,16 +96,19 @@ export default function ConnectStep({ onNext, onBack }: ConnectStepProps) {
           avatarColor: string | null;
           createdAt: string;
         };
-        setAuth(accessToken, {
+        setAuth(accessToken, refreshToken, {
           id: u.id,
           wallet: u.walletAddress,
           username: u.username,
           displayName: u.name,
-          avatar: u.avatarEmoji && u.avatarColor ? `${u.avatarEmoji}|${u.avatarColor}` : null,
+          avatar:
+            u.avatarEmoji && u.avatarColor
+              ? `${u.avatarEmoji}|${u.avatarColor}`
+              : null,
           createdAt: u.createdAt,
         });
       } else {
-        setAuth(walletAddress, {
+        setAuth(walletAddress, null, {
           id: walletAddress,
           wallet: walletAddress,
           username: `@${walletAddress.slice(2, 8).toLowerCase()}`,
@@ -193,7 +198,8 @@ export default function ConnectStep({ onNext, onBack }: ConnectStepProps) {
           className="text-center mb-auto"
         >
           <p className="text-sm text-gray-400 leading-relaxed max-w-70 mx-auto">
-            Sign in securely with your wallet. MetaMask or MiniPay supported. No passwords needed.
+            Sign in securely with your wallet. MetaMask or MiniPay supported. No
+            passwords needed.
           </p>
           <p className="mt-3 text-sm font-medium text-emerald-500">
             Your keys, your funds.

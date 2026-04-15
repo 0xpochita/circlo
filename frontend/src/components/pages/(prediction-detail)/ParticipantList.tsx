@@ -1,15 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { HiOutlineUserGroup } from "react-icons/hi2";
 import { useAccount, useReadContract } from "wagmi";
 import { EmojiAvatar, UsdtLabel } from "@/components/shared";
+import type { ParticipantResponse } from "@/lib/api/endpoints";
 import { goalsApi } from "@/lib/api/endpoints";
+import { toAvatar } from "@/lib/utils";
 import { predictionPoolContract } from "@/lib/web3/contracts";
 import { fromUSDT } from "@/lib/web3/usdt";
-import type { ParticipantResponse } from "@/lib/api/endpoints";
-import { toAvatar } from "@/lib/utils";
 import { useUserStore } from "@/stores/userStore";
 
 type ParticipantListProps = {
@@ -17,7 +17,10 @@ type ParticipantListProps = {
   goalChainId?: string;
 };
 
-export default function ParticipantList({ goalId, goalChainId }: ParticipantListProps) {
+export default function ParticipantList({
+  goalId,
+  goalChainId,
+}: ParticipantListProps) {
   const [participants, setParticipants] = useState<ParticipantResponse[]>([]);
   const [isLoading, setIsLoading] = useState(!!goalId);
   const { address } = useAccount();
@@ -57,7 +60,7 @@ export default function ParticipantList({ goalId, goalChainId }: ParticipantList
   const myAmount = mySide === 0 ? myYesAmount : myNoAmount;
 
   const alreadyInList = participants.some(
-    (p) => p.user.walletAddress?.toLowerCase() === address?.toLowerCase()
+    (p) => p.user.walletAddress?.toLowerCase() === address?.toLowerCase(),
   );
 
   const showMyOnChain = myTotalStake > 0 && !alreadyInList && address;
@@ -86,8 +89,12 @@ export default function ParticipantList({ goalId, goalChainId }: ParticipantList
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gray-50 mb-3">
             <HiOutlineUserGroup className="w-6 h-6 text-muted" />
           </div>
-          <p className="text-sm font-semibold text-main-text mb-1">No participants yet</p>
-          <p className="text-xs text-muted text-center">Be the first to stake on this goal</p>
+          <p className="text-sm font-semibold text-main-text mb-1">
+            No participants yet
+          </p>
+          <p className="text-xs text-muted text-center">
+            Be the first to stake on this goal
+          </p>
         </div>
       </div>
     );
@@ -109,15 +116,21 @@ export default function ParticipantList({ goalId, goalChainId }: ParticipantList
             <div className="flex items-center gap-3">
               <EmojiAvatar avatar={userAvatar} size={40} />
               <div>
-                <p className="text-sm font-semibold text-main-text">{userName || "You"}</p>
+                <p className="text-sm font-semibold text-main-text">
+                  {userName || "You"}
+                </p>
                 <p className="text-xs text-muted inline-flex items-center gap-1">
                   Staked {Math.round(myAmount)} <UsdtLabel size={11} />
                 </p>
               </div>
             </div>
-            <span className={`rounded-full px-3 py-1 text-xs font-medium ${
-              mySide === 0 ? "bg-emerald-50 text-emerald-500" : "bg-red-50 text-red-400"
-            }`}>
+            <span
+              className={`rounded-full px-3 py-1 text-xs font-medium ${
+                mySide === 0
+                  ? "bg-emerald-50 text-emerald-500"
+                  : "bg-red-50 text-red-400"
+              }`}
+            >
               {mySide === 0 ? "Yes" : "No"}
             </span>
           </motion.div>
@@ -132,20 +145,32 @@ export default function ParticipantList({ goalId, goalChainId }: ParticipantList
             className="flex items-center justify-between px-4 py-3"
           >
             <div className="flex items-center gap-3">
-              <EmojiAvatar avatar={toAvatar(p.user.avatarEmoji, p.user.avatarColor)} size={40} />
+              <EmojiAvatar
+                avatar={toAvatar(p.user.avatarEmoji, p.user.avatarColor)}
+                size={40}
+              />
               <div>
-                <p className="text-sm font-semibold text-main-text">{p.user.name || "Member"}</p>
+                <p className="text-sm font-semibold text-main-text">
+                  {p.user.name || "Member"}
+                </p>
                 <p className="text-xs text-muted">
-                  {p.user.username ? `@${p.user.username}` : p.user.walletAddress?.slice(0, 10)}
+                  {p.user.username
+                    ? `@${p.user.username}`
+                    : p.user.walletAddress?.slice(0, 10)}
                 </p>
                 <p className="text-xs text-muted inline-flex items-center gap-1">
-                  Staked {Math.round(parseFloat(p.staked))} <UsdtLabel size={11} />
+                  Staked {Math.round(parseFloat(p.staked))}{" "}
+                  <UsdtLabel size={11} />
                 </p>
               </div>
             </div>
-            <span className={`rounded-full px-3 py-1 text-xs font-medium ${
-              p.side === 0 ? "bg-emerald-50 text-emerald-500" : "bg-red-50 text-red-400"
-            }`}>
+            <span
+              className={`rounded-full px-3 py-1 text-xs font-medium ${
+                p.side === 0
+                  ? "bg-emerald-50 text-emerald-500"
+                  : "bg-red-50 text-red-400"
+              }`}
+            >
               {p.side === 0 ? "Yes" : "No"}
             </span>
           </motion.div>

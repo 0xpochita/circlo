@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { HiChevronRight } from "react-icons/hi2";
-import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
-import { goalsApi } from "@/lib/api/endpoints";
+import { EmojiAvatar } from "@/components/shared";
 import type { GoalResponse } from "@/lib/api/endpoints";
-import { toAvatar, formatTimeLeft } from "@/lib/utils";
+import { goalsApi } from "@/lib/api/endpoints";
+import { formatTimeLeft, toAvatar } from "@/lib/utils";
 
 export default function ActivePredictionCard() {
   const [goal, setGoal] = useState<GoalResponse | null>(null);
@@ -35,10 +35,17 @@ export default function ActivePredictionCard() {
         className="flex items-center justify-between rounded-2xl bg-white p-4 cursor-pointer transition-all duration-200 active:scale-[0.97]"
       >
         <div className="flex items-center gap-3">
-          <EmojiAvatar avatar={toAvatar(goal.avatarEmoji, goal.avatarColor)} size={44} />
+          <EmojiAvatar
+            avatar={toAvatar(goal.avatarEmoji, goal.avatarColor)}
+            size={44}
+          />
           <div>
-            <p className="text-base font-semibold text-main-text">{goal.title}</p>
-            <p className="text-sm text-muted">Ends in {formatTimeLeft(goal.deadline)}</p>
+            <p className="text-base font-semibold text-main-text">
+              {goal.title}
+            </p>
+            <p className="text-sm text-muted">
+              Ends in {formatTimeLeft(goal.deadline)}
+            </p>
           </div>
         </div>
         <HiChevronRight className="w-5 h-5 text-muted shrink-0" />

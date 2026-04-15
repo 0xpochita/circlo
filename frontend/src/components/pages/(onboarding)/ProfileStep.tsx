@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
+import { useState } from "react";
 import { HiOutlinePencil } from "react-icons/hi2";
 import { toast } from "sonner";
 import { EmojiAvatar, EmojiPicker } from "@/components/shared";
-import { useUserStore } from "@/stores/userStore";
-import { useAuthStore } from "@/stores/authStore";
 import { usersApi } from "@/lib/api/endpoints";
+import { useAuthStore } from "@/stores/authStore";
+import { useUserStore } from "@/stores/userStore";
 import type { UserAvatar } from "@/types";
 
 type ProfileStepProps = {
@@ -95,7 +95,11 @@ export default function ProfileStep({ onNext, onBack }: ProfileStepProps) {
                 key={`${avatar.emoji}-${avatar.color}`}
                 initial={{ scale: 0.9 }}
                 animate={{ scale: 1 }}
-                transition={{ type: "spring" as const, stiffness: 300, damping: 20 }}
+                transition={{
+                  type: "spring" as const,
+                  stiffness: 300,
+                  damping: 20,
+                }}
               >
                 <EmojiAvatar avatar={avatar} size={88} />
               </motion.div>
@@ -126,7 +130,8 @@ export default function ProfileStep({ onNext, onBack }: ProfileStepProps) {
               <div>
                 <p className="text-sm font-semibold text-main-text">Pro tip</p>
                 <p className="text-xs text-muted">
-                  Use a name your friends will recognize. You can always change it later.
+                  Use a name your friends will recognize. You can always change
+                  it later.
                 </p>
               </div>
             </div>

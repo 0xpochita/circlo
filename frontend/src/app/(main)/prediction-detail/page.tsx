@@ -1,21 +1,43 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useState, useEffect, Suspense } from "react";
-import { DetailHeader, DetailHero, OddsCard, InfoSection, ParticipantList, StakeButton } from "@/components/pages/(prediction-detail)";
-import { PageTransition } from "@/components/pages/(app)";
-import { goalsApi, circlesApi } from "@/lib/api/endpoints";
-import { useAccount, useWriteContract, usePublicClient } from "wagmi";
-import { decodeEventLog } from "viem";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { predictionPoolContract, circleFactoryContract } from "@/lib/web3/contracts";
-import { toUSDT } from "@/lib/web3/usdt";
+import { decodeEventLog } from "viem";
+import { useAccount, usePublicClient, useWriteContract } from "wagmi";
+import { PageTransition } from "@/components/pages/(app)";
+import {
+  DetailHeader,
+  DetailHero,
+  InfoSection,
+  OddsCard,
+  ParticipantList,
+  StakeButton,
+} from "@/components/pages/(prediction-detail)";
 import type { GoalResponse } from "@/lib/api/endpoints";
+import { circlesApi, goalsApi } from "@/lib/api/endpoints";
+import {
+  circleFactoryContract,
+  predictionPoolContract,
+} from "@/lib/web3/contracts";
+import { toUSDT } from "@/lib/web3/usdt";
 
 type GoalDetail = GoalResponse & {
   metadataUri?: string;
   participationSummary?: { side: string; totalStaked: string; count: number }[];
-  resolvers?: { userId: string; vote: number | null; votedAt: string | null; user: { id: string; walletAddress?: string; name: string | null; username: string | null; avatarEmoji: string | null; avatarColor: string | null } }[];
+  resolvers?: {
+    userId: string;
+    vote: number | null;
+    votedAt: string | null;
+    user: {
+      id: string;
+      walletAddress?: string;
+      name: string | null;
+      username: string | null;
+      avatarEmoji: string | null;
+      avatarColor: string | null;
+    };
+  }[];
 };
 
 function PredictionDetailContent() {
@@ -23,14 +45,14 @@ function PredictionDetailContent() {
   const goalId = searchParams.get("id") ?? "";
   const [goal, setGoal] = useState<GoalDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isConfirming, setIsConfirming] = useState(false);
+  const [_isConfirming, setIsConfirming] = useState(false);
   const { isConnected } = useAccount();
   const { writeContractAsync } = useWriteContract();
   const publicClient = usePublicClient();
 
-  const needsConfirm = goal && !goal.chainId && isConnected;
+  const _needsConfirm = goal && !goal.chainId && isConnected;
 
-  async function handleConfirmOnChain() {
+  async function _handleConfirmOnChain() {
     if (!goal || !goalId) return;
     setIsConfirming(true);
     try {
@@ -60,12 +82,21 @@ function PredictionDetailContent() {
 
           if (publicClient) {
             try {
-              const receipt = await publicClient.waitForTransactionReceipt({ hash: circleTxHash });
+              const receipt = await publicClient.waitForTransactionReceipt({
+                hash: circleTxHash,
+              });
               for (const log of receipt.logs) {
                 try {
-                  const decoded = decodeEventLog({ abi: circleFactoryContract.abi, data: log.data, topics: log.topics });
+                  const decoded = decodeEventLog({
+                    abi: circleFactoryContract.abi,
+                    data: log.data,
+                    topics: log.topics,
+                  });
                   if (decoded.eventName === "CircleCreated") {
-                    const args = decoded.args as unknown as Record<string, unknown>;
+                    const args = decoded.args as unknown as Record<
+                      string,
+                      unknown
+                    >;
                     circleChainId = String(args.id ?? args.circleId ?? "");
                     break;
                   }
@@ -104,10 +135,15 @@ function PredictionDetailContent() {
         toast("Circle created on-chain! Now creating goal...");
       }
 
-      const deadline = BigInt(Math.floor(new Date(goal.deadline).getTime() / 1000));
+      const deadline = BigInt(
+        Math.floor(new Date(goal.deadline).getTime() / 1000),
+      );
       const minStake = toUSDT(parseFloat(goal.minStake || "0.1"));
-      const resolverAddresses = (goal.resolvers || []).map((r) => r.user?.walletAddress).filter(Boolean) as `0x${string}`[];
-      const metadataURI = goal.metadataUri || JSON.stringify({ title: goal.title });
+      const resolverAddresses = (goal.resolvers || [])
+        .map((r) => r.user?.walletAddress)
+        .filter(Boolean) as `0x${string}`[];
+      const metadataURI =
+        goal.metadataUri || JSON.stringify({ title: goal.title });
 
       let nextId = 0;
       if (publicClient) {
@@ -125,7 +161,16 @@ function PredictionDetailContent() {
         address: predictionPoolContract.address,
         abi: predictionPoolContract.abi,
         functionName: "createGoal",
-        args: [BigInt(circleChainId), 0, deadline, minStake, resolverAddresses.length > 0 ? resolverAddresses : ["0x0000000000000000000000000000000000000000" as `0x${string}`], metadataURI],
+        args: [
+          BigInt(circleChainId),
+          0,
+          deadline,
+          minStake,
+          resolverAddresses.length > 0
+            ? resolverAddresses
+            : ["0x0000000000000000000000000000000000000000" as `0x${string}`],
+          metadataURI,
+        ],
       });
 
       const onChainGoalId = nextId > 0 ? nextId : 0;
@@ -140,7 +185,9 @@ function PredictionDetailContent() {
         await goalsApi.confirm(goalId, onChainGoalId, txHash);
       } catch {}
 
-      setGoal((prev) => prev ? { ...prev, chainId: String(onChainGoalId || "1") } : prev);
+      setGoal((prev) =>
+        prev ? { ...prev, chainId: String(onChainGoalId || "1") } : prev,
+      );
       toast.success("Goal confirmed on-chain!");
     } catch (err) {
       const message = err instanceof Error ? err.message : "";
@@ -154,13 +201,13 @@ function PredictionDetailContent() {
     }
   }
 
-  function refreshGoal() {
+  const refreshGoal = useCallback(() => {
     if (!goalId) return;
     goalsApi
       .detail(goalId)
       .then((res) => setGoal(res as unknown as GoalDetail))
       .catch(() => {});
-  }
+  }, [goalId]);
 
   useEffect(() => {
     if (!goalId) {
@@ -170,7 +217,7 @@ function PredictionDetailContent() {
     goalsApi
       .detail(goalId)
       .then((res) => setGoal(res as unknown as GoalDetail))
-      .catch(() => {})
+      .catch(() => setGoal(null))
       .finally(() => setIsLoading(false));
   }, [goalId]);
 
@@ -203,6 +250,17 @@ function PredictionDetailContent() {
     );
   }
 
+  if (!goal && !isLoading) {
+    return (
+      <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-main-bg items-center justify-center gap-3 px-4">
+        <p className="text-base font-semibold text-main-text">Goal not found</p>
+        <p className="text-sm text-muted text-center">
+          This goal may have been removed or the link is invalid.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-main-bg">
       <DetailHeader goalId={goalId} title={goal?.title} />
@@ -218,7 +276,10 @@ function PredictionDetailContent() {
         />
         <OddsCard goalChainId={goal?.chainId || undefined} />
         <InfoSection goal={goal} />
-        <ParticipantList goalId={goalId || undefined} goalChainId={goal?.chainId || undefined} />
+        <ParticipantList
+          goalId={goalId || undefined}
+          goalChainId={goal?.chainId || undefined}
+        />
       </PageTransition>
       <StakeButton
         goalId={goalId || undefined}
@@ -235,11 +296,13 @@ function PredictionDetailContent() {
 
 export default function PredictionDetailPage() {
   return (
-    <Suspense fallback={
-      <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-main-bg items-center justify-center">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand border-t-transparent" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-main-bg items-center justify-center">
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand border-t-transparent" />
+        </div>
+      }
+    >
       <PredictionDetailContent />
     </Suspense>
   );

@@ -1,10 +1,15 @@
 "use client";
 
+import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import {
+  HiCheck,
+  HiOutlineDocumentDuplicate,
+  HiOutlineShieldCheck,
+  HiXMark,
+} from "react-icons/hi2";
 import QRCode from "react-qr-code";
-import { HiXMark, HiOutlineDocumentDuplicate, HiCheck, HiOutlineShieldCheck } from "react-icons/hi2";
 
 type DepositSheetProps = {
   open: boolean;
@@ -12,7 +17,11 @@ type DepositSheetProps = {
   walletAddress: string;
 };
 
-export default function DepositSheet({ open, onClose, walletAddress }: DepositSheetProps) {
+export default function DepositSheet({
+  open,
+  onClose,
+  walletAddress,
+}: DepositSheetProps) {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -56,14 +65,22 @@ export default function DepositSheet({ open, onClose, walletAddress }: DepositSh
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
-            transition={{ type: "spring" as const, stiffness: 300, damping: 32 }}
+            transition={{
+              type: "spring" as const,
+              stiffness: 300,
+              damping: 32,
+            }}
             className="fixed bottom-0 left-1/2 z-101 w-full max-w-md -translate-x-1/2 flex flex-col rounded-t-3xl bg-white"
             style={{ maxHeight: "90dvh" }}
           >
             <div className="flex items-start justify-between px-6 pt-6 pb-4 shrink-0">
               <div>
-                <h2 className="text-xl font-bold text-main-text">Deposit USDT</h2>
-                <p className="mt-1 text-sm text-muted">Send USDT to this address on Celo</p>
+                <h2 className="text-xl font-bold text-main-text">
+                  Deposit USDT
+                </h2>
+                <p className="mt-1 text-sm text-muted">
+                  Send USDT to this address on Celo
+                </p>
               </div>
               <button
                 type="button"
@@ -77,7 +94,9 @@ export default function DepositSheet({ open, onClose, walletAddress }: DepositSh
             <div className="flex-1 overflow-y-auto px-6 pb-8">
               {!walletAddress ? (
                 <div className="flex flex-col items-center justify-center py-12">
-                  <p className="text-sm font-medium text-muted">Connect your wallet first</p>
+                  <p className="text-sm font-medium text-muted">
+                    Connect your wallet first
+                  </p>
                 </div>
               ) : (
                 <>
@@ -89,7 +108,9 @@ export default function DepositSheet({ open, onClose, walletAddress }: DepositSh
                         width={20}
                         height={20}
                       />
-                      <span className="text-sm font-semibold text-main-text">USDT</span>
+                      <span className="text-sm font-semibold text-main-text">
+                        USDT
+                      </span>
                     </div>
                     <div className="flex items-center gap-2 rounded-full bg-gray-50 px-4 py-2">
                       <Image
@@ -98,14 +119,20 @@ export default function DepositSheet({ open, onClose, walletAddress }: DepositSh
                         width={20}
                         height={20}
                       />
-                      <span className="text-sm font-semibold text-main-text">Celo Mainnet</span>
+                      <span className="text-sm font-semibold text-main-text">
+                        Celo Mainnet
+                      </span>
                     </div>
                   </div>
 
                   <motion.div
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    transition={{ type: "spring" as const, stiffness: 300, damping: 22 }}
+                    transition={{
+                      type: "spring" as const,
+                      stiffness: 300,
+                      damping: 22,
+                    }}
                     className="mx-auto mb-5 flex items-center justify-center rounded-3xl bg-white p-5"
                     style={{ width: 232 }}
                   >
@@ -121,7 +148,9 @@ export default function DepositSheet({ open, onClose, walletAddress }: DepositSh
                   </motion.div>
 
                   <div className="mb-4 rounded-2xl bg-gray-50 p-4">
-                    <p className="text-xs text-muted mb-1">Your wallet address</p>
+                    <p className="text-xs text-muted mb-1">
+                      Your wallet address
+                    </p>
                     <p className="text-sm font-mono font-semibold text-main-text break-all">
                       {walletAddress}
                     </p>
@@ -157,7 +186,8 @@ export default function DepositSheet({ open, onClose, walletAddress }: DepositSh
                           Only send USDT on Celo
                         </p>
                         <p className="text-xs text-muted">
-                          Sending any other token or using a different network will result in permanent loss of funds.
+                          Sending any other token or using a different network
+                          will result in permanent loss of funds.
                         </p>
                       </div>
                     </div>

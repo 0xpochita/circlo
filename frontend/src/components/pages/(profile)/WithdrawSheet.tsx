@@ -1,9 +1,13 @@
 "use client";
 
+import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { HiXMark, HiOutlineShieldCheck, HiOutlineArrowRight } from "react-icons/hi2";
+import {
+  HiOutlineArrowRight,
+  HiOutlineShieldCheck,
+  HiXMark,
+} from "react-icons/hi2";
 
 type WithdrawSheetProps = {
   open: boolean;
@@ -13,7 +17,11 @@ type WithdrawSheetProps = {
 
 const quickAmounts = ["25%", "50%", "75%", "Max"];
 
-export default function WithdrawSheet({ open, onClose, balance }: WithdrawSheetProps) {
+export default function WithdrawSheet({
+  open,
+  onClose,
+  balance,
+}: WithdrawSheetProps) {
   const [amount, setAmount] = useState("");
   const [address, setAddress] = useState("");
 
@@ -32,12 +40,12 @@ export default function WithdrawSheet({ open, onClose, balance }: WithdrawSheetP
 
   function handleQuickAmount(label: string) {
     const balanceNum = parseFloat(balance);
-    if (isNaN(balanceNum)) return;
+    if (Number.isNaN(balanceNum)) return;
     if (label === "Max") {
       setAmount(balance);
       return;
     }
-    const pct = parseInt(label) / 100;
+    const pct = parseInt(label, 10) / 100;
     setAmount((balanceNum * pct).toFixed(2));
   }
 
@@ -58,14 +66,22 @@ export default function WithdrawSheet({ open, onClose, balance }: WithdrawSheetP
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
-            transition={{ type: "spring" as const, stiffness: 300, damping: 32 }}
+            transition={{
+              type: "spring" as const,
+              stiffness: 300,
+              damping: 32,
+            }}
             className="fixed bottom-0 left-1/2 z-101 w-full max-w-md -translate-x-1/2 flex flex-col rounded-t-3xl bg-white"
             style={{ maxHeight: "90dvh" }}
           >
             <div className="flex items-start justify-between px-6 pt-6 pb-4 shrink-0">
               <div>
-                <h2 className="text-xl font-bold text-main-text">Withdraw USDT</h2>
-                <p className="mt-1 text-sm text-muted">Send USDT to an external wallet</p>
+                <h2 className="text-xl font-bold text-main-text">
+                  Withdraw USDT
+                </h2>
+                <p className="mt-1 text-sm text-muted">
+                  Send USDT to an external wallet
+                </p>
               </div>
               <button
                 type="button"
@@ -85,7 +101,9 @@ export default function WithdrawSheet({ open, onClose, balance }: WithdrawSheetP
                     width={20}
                     height={20}
                   />
-                  <span className="text-sm font-semibold text-main-text">USDT</span>
+                  <span className="text-sm font-semibold text-main-text">
+                    USDT
+                  </span>
                 </div>
                 <div className="flex items-center gap-2 rounded-full bg-gray-50 px-4 py-2">
                   <Image
@@ -94,21 +112,27 @@ export default function WithdrawSheet({ open, onClose, balance }: WithdrawSheetP
                     width={20}
                     height={20}
                   />
-                  <span className="text-sm font-semibold text-main-text">Celo Mainnet</span>
+                  <span className="text-sm font-semibold text-main-text">
+                    Celo Mainnet
+                  </span>
                 </div>
               </div>
 
               <div className="mb-4 rounded-2xl bg-gray-50 p-4">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-xs text-muted">Amount</p>
-                  <p className="text-xs text-muted">Available: {balance} USDT</p>
+                  <p className="text-xs text-muted">
+                    Available: {balance} USDT
+                  </p>
                 </div>
                 <div className="flex items-center gap-2 mb-3 min-w-0">
                   <input
                     type="text"
                     inputMode="decimal"
                     value={amount}
-                    onChange={(e) => setAmount(e.target.value.replace(/[^0-9.]/g, ""))}
+                    onChange={(e) =>
+                      setAmount(e.target.value.replace(/[^0-9.]/g, ""))
+                    }
                     placeholder="0.00"
                     className="min-w-0 flex-1 bg-transparent text-2xl font-bold text-main-text placeholder:text-muted outline-none"
                   />
@@ -119,7 +143,9 @@ export default function WithdrawSheet({ open, onClose, balance }: WithdrawSheetP
                       width={16}
                       height={16}
                     />
-                    <span className="text-sm font-semibold text-main-text">USDT</span>
+                    <span className="text-sm font-semibold text-main-text">
+                      USDT
+                    </span>
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -150,16 +176,24 @@ export default function WithdrawSheet({ open, onClose, balance }: WithdrawSheetP
               <div className="mb-4 rounded-2xl bg-gray-50 p-4">
                 <div className="flex items-center justify-between py-1">
                   <p className="text-xs text-muted">Network fee</p>
-                  <p className="text-xs font-medium text-main-text">~0.001 USDT</p>
+                  <p className="text-xs font-medium text-main-text">
+                    ~0.001 USDT
+                  </p>
                 </div>
                 <div className="flex items-center justify-between py-1">
                   <p className="text-xs text-muted">Estimated arrival</p>
-                  <p className="text-xs font-medium text-main-text">~15 seconds</p>
+                  <p className="text-xs font-medium text-main-text">
+                    ~15 seconds
+                  </p>
                 </div>
                 <div className="mt-2 flex items-center justify-between border-t border-gray-100 pt-2">
-                  <p className="text-sm font-semibold text-main-text">You'll receive</p>
+                  <p className="text-sm font-semibold text-main-text">
+                    You'll receive
+                  </p>
                   <p className="text-sm font-bold text-main-text">
-                    {amount ? `${(parseFloat(amount) - 0.001).toFixed(3)} USDT` : "0.00 USDT"}
+                    {amount
+                      ? `${(parseFloat(amount) - 0.001).toFixed(3)} USDT`
+                      : "0.00 USDT"}
                   </p>
                 </div>
               </div>
@@ -174,7 +208,8 @@ export default function WithdrawSheet({ open, onClose, balance }: WithdrawSheetP
                       Double-check the address
                     </p>
                     <p className="text-xs text-muted">
-                      Withdrawals are irreversible. Make sure the destination supports USDT on Celo.
+                      Withdrawals are irreversible. Make sure the destination
+                      supports USDT on Celo.
                     </p>
                   </div>
                 </div>

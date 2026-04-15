@@ -1,9 +1,16 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, Suspense } from "react";
-import { PredictionHeader, CircleSelector, PredictionForm, ResolverPicker, PredictionSummary, ConfirmButton } from "@/components/pages/(create-prediction)";
+import { Suspense, useEffect } from "react";
 import { PageTransition } from "@/components/pages/(app)";
+import {
+  CircleSelector,
+  ConfirmButton,
+  PredictionForm,
+  PredictionHeader,
+  PredictionSummary,
+  ResolverPicker,
+} from "@/components/pages/(create-prediction)";
 import { useCreateGoalStore } from "@/stores/createGoalStore";
 
 function CreatePredictionContent() {
@@ -35,11 +42,13 @@ function CreatePredictionContent() {
 
 export default function CreatePredictionPage() {
   return (
-    <Suspense fallback={
-      <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-main-bg items-center justify-center">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand border-t-transparent" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-main-bg items-center justify-center">
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand border-t-transparent" />
+        </div>
+      }
+    >
       <CreatePredictionContent />
     </Suspense>
   );

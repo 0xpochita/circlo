@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { HiCheck, HiOutlineShieldCheck } from "react-icons/hi2";
 import { EmojiAvatar } from "@/components/shared";
-import { useCreateGoalStore } from "@/stores/createGoalStore";
 import { circlesApi } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
+import { useCreateGoalStore } from "@/stores/createGoalStore";
 import type { UserAvatar } from "@/types";
 
 type Member = {
@@ -31,9 +31,11 @@ export default function ResolverPicker() {
           res.items.map((m) => ({
             userId: m.userId,
             displayName: m.user.name || "Member",
-            username: m.user.username ? `@${m.user.username}` : m.user.walletAddress.slice(0, 10),
+            username: m.user.username
+              ? `@${m.user.username}`
+              : m.user.walletAddress.slice(0, 10),
             avatar: toAvatar(m.user.avatarEmoji, m.user.avatarColor),
-          }))
+          })),
         );
       })
       .catch(() => setMembers([]))
@@ -46,8 +48,9 @@ export default function ResolverPicker() {
       : [...store.resolvers, userId];
     store.setResolvers(next);
 
-    const nextNames = next
-      .map((id) => members.find((m) => m.userId === id)?.displayName ?? "Member")
+    const nextNames = next.map(
+      (id) => members.find((m) => m.userId === id)?.displayName ?? "Member",
+    );
     store.setResolverNames(nextNames);
   }
 
@@ -59,13 +62,20 @@ export default function ResolverPicker() {
             <HiOutlineShieldCheck className="w-5 h-5 text-brand" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-main-text">Pick your trusted friends</p>
-            <p className="text-xs text-muted mt-0.5">Loading circle members...</p>
+            <p className="text-sm font-semibold text-main-text">
+              Pick your trusted friends
+            </p>
+            <p className="text-xs text-muted mt-0.5">
+              Loading circle members...
+            </p>
           </div>
         </div>
         <div className="flex flex-col gap-2">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={`skel-${i}`} className="animate-pulse rounded-xl bg-gray-100 h-14" />
+            <div
+              key={`skel-${i}`}
+              className="animate-pulse rounded-xl bg-gray-100 h-14"
+            />
           ))}
         </div>
       </div>
@@ -80,9 +90,13 @@ export default function ResolverPicker() {
             <HiOutlineShieldCheck className="w-5 h-5 text-brand" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-main-text">Pick your trusted friends</p>
+            <p className="text-sm font-semibold text-main-text">
+              Pick your trusted friends
+            </p>
             <p className="text-xs text-muted mt-0.5">
-              {store.circleId ? "No members found in this circle" : "Select a circle first"}
+              {store.circleId
+                ? "No members found in this circle"
+                : "Select a circle first"}
             </p>
           </div>
         </div>
@@ -97,9 +111,12 @@ export default function ResolverPicker() {
           <HiOutlineShieldCheck className="w-5 h-5 text-brand" />
         </div>
         <div>
-          <p className="text-sm font-semibold text-main-text">Pick your trusted friends</p>
+          <p className="text-sm font-semibold text-main-text">
+            Pick your trusted friends
+          </p>
           <p className="text-xs text-muted mt-0.5">
-            They&apos;ll decide if this goal was reached when it&apos;s time to resolve
+            They&apos;ll decide if this goal was reached when it&apos;s time to
+            resolve
           </p>
         </div>
       </div>
@@ -114,12 +131,16 @@ export default function ResolverPicker() {
               onClick={() => toggle(member.userId)}
               whileTap={{ scale: 0.98 }}
               className={`flex items-center gap-3 rounded-xl p-3 cursor-pointer transition-all duration-200 ${
-                isSelected ? "bg-brand-light ring-2 ring-main-text" : "bg-gray-50"
+                isSelected
+                  ? "bg-brand-light ring-2 ring-main-text"
+                  : "bg-gray-50"
               }`}
             >
               <EmojiAvatar avatar={member.avatar} size={36} />
               <div className="flex-1 text-left">
-                <p className="text-sm font-semibold text-main-text">{member.displayName}</p>
+                <p className="text-sm font-semibold text-main-text">
+                  {member.displayName}
+                </p>
                 <p className="text-xs text-muted">{member.username}</p>
               </div>
               <div

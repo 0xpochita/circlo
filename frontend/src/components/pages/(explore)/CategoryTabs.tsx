@@ -14,7 +14,11 @@ type CategoryTabsProps = {
   onSelect: (value: string) => void;
 };
 
-export default function CategoryTabs({ categories, selected, onSelect }: CategoryTabsProps) {
+export default function CategoryTabs({
+  categories,
+  selected,
+  onSelect,
+}: CategoryTabsProps) {
   return (
     <div className="flex gap-2 overflow-x-auto px-4 py-2 scrollbar-none">
       {categories.map((tab) => {
@@ -32,7 +36,11 @@ export default function CategoryTabs({ categories, selected, onSelect }: Categor
               <motion.div
                 layoutId="activeTab"
                 className="absolute inset-0 rounded-full bg-brand"
-                transition={{ type: "spring" as const, stiffness: 400, damping: 30 }}
+                transition={{
+                  type: "spring" as const,
+                  stiffness: 400,
+                  damping: 30,
+                }}
               />
             )}
             <span className="relative z-10 flex items-center gap-1.5">

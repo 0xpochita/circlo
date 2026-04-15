@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
+import { useState } from "react";
 import { useReadContract } from "wagmi";
 import { UsdtLabel } from "@/components/shared";
 import { predictionPoolContract } from "@/lib/web3/contracts";
@@ -35,7 +35,8 @@ export default function OddsCard({ goalChainId }: OddsCardProps) {
   const noPool = noPoolRaw ? fromUSDT(noPoolRaw as bigint) : 0;
   const totalPool = yesPool + noPool;
 
-  const yesPercent = totalPool > 0 ? Math.round((yesPool / totalPool) * 100) : 50;
+  const yesPercent =
+    totalPool > 0 ? Math.round((yesPool / totalPool) * 100) : 50;
   const noPercent = totalPool > 0 ? 100 - yesPercent : 50;
 
   const options = [
@@ -68,10 +69,14 @@ export default function OddsCard({ goalChainId }: OddsCardProps) {
               <p className="text-xs font-medium mb-2 uppercase tracking-wide">
                 {opt.label}
               </p>
-              <p className={`text-2xl font-bold mb-2 ${selected === i ? "text-white" : "text-main-text"}`}>
+              <p
+                className={`text-2xl font-bold mb-2 ${selected === i ? "text-white" : "text-main-text"}`}
+              >
                 {opt.percentage}%
               </p>
-              <div className={`h-1.5 rounded-full mb-2 ${selected === i ? "bg-white/30" : "bg-gray-200"}`}>
+              <div
+                className={`h-1.5 rounded-full mb-2 ${selected === i ? "bg-white/30" : "bg-gray-200"}`}
+              >
                 <motion.div
                   className={`h-1.5 rounded-full ${selected === i ? "bg-white" : "bg-brand"}`}
                   initial={{ width: 0 }}
@@ -79,7 +84,9 @@ export default function OddsCard({ goalChainId }: OddsCardProps) {
                   transition={{ duration: 0.6, ease: "easeOut" as const }}
                 />
               </div>
-              <p className={`text-xs inline-flex items-center gap-1 ${selected === i ? "text-white/80" : "text-muted"}`}>
+              <p
+                className={`text-xs inline-flex items-center gap-1 ${selected === i ? "text-white/80" : "text-muted"}`}
+              >
                 Pool: {opt.pool} <UsdtLabel size={11} />
               </p>
             </button>

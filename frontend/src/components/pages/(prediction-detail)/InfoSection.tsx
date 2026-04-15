@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { EmojiAvatar, UsdtLabel } from "@/components/shared";
+import type { GoalResponse } from "@/lib/api/endpoints";
 import { circlesApi } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
-import type { GoalResponse } from "@/lib/api/endpoints";
 
 type Resolver = {
   userId: string;
@@ -34,11 +34,19 @@ export default function InfoSection({ goal }: InfoSectionProps) {
   }, [goal?.circleId]);
 
   const createdDate = goal?.createdAt
-    ? new Date(goal.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+    ? new Date(goal.createdAt).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
     : "--";
 
   const deadlineDate = goal?.deadline
-    ? new Date(goal.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+    ? new Date(goal.deadline).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
     : "--";
 
   const info = [
@@ -56,7 +64,10 @@ export default function InfoSection({ goal }: InfoSectionProps) {
       <p className="text-base font-bold text-main-text mb-3">Details</p>
       <div className="rounded-2xl bg-white divide-y divide-gray-50">
         {info.map((item) => (
-          <div key={item.label} className="flex items-center justify-between px-4 py-3">
+          <div
+            key={item.label}
+            className="flex items-center justify-between px-4 py-3"
+          >
             <p className="text-sm text-muted">{item.label}</p>
             <p className="text-sm font-medium text-main-text inline-flex items-center gap-1">
               {item.value}
@@ -68,12 +79,20 @@ export default function InfoSection({ goal }: InfoSectionProps) {
 
       {resolvers.length > 0 && (
         <>
-          <p className="text-base font-bold text-main-text mt-4 mb-3">Resolvers</p>
+          <p className="text-base font-bold text-main-text mt-4 mb-3">
+            Resolvers
+          </p>
           <div className="rounded-2xl bg-white divide-y divide-gray-50">
             {resolvers.map((r) => (
-              <div key={r.userId} className="flex items-center justify-between px-4 py-3">
+              <div
+                key={r.userId}
+                className="flex items-center justify-between px-4 py-3"
+              >
                 <div className="flex items-center gap-3">
-                  <EmojiAvatar avatar={toAvatar(r.user.avatarEmoji, r.user.avatarColor)} size={36} />
+                  <EmojiAvatar
+                    avatar={toAvatar(r.user.avatarEmoji, r.user.avatarColor)}
+                    size={36}
+                  />
                   <div>
                     <p className="text-sm font-semibold text-main-text">
                       {r.user.name || r.user.username || "Resolver"}
@@ -84,9 +103,13 @@ export default function InfoSection({ goal }: InfoSectionProps) {
                   </div>
                 </div>
                 {r.vote !== null ? (
-                  <span className={`rounded-full px-3 py-1 text-xs font-medium ${
-                    r.vote === 0 ? "bg-emerald-50 text-emerald-500" : "bg-red-50 text-red-400"
-                  }`}>
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-medium ${
+                      r.vote === 0
+                        ? "bg-emerald-50 text-emerald-500"
+                        : "bg-red-50 text-red-400"
+                    }`}
+                  >
                     Voted {r.vote === 0 ? "Yes" : "No"}
                   </span>
                 ) : (

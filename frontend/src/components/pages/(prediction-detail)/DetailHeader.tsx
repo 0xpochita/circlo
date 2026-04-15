@@ -1,9 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import { HiChevronLeft, HiOutlineShare, HiXMark, HiOutlineLink, HiCheck } from "react-icons/hi2";
+import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import {
+  HiCheck,
+  HiChevronLeft,
+  HiOutlineLink,
+  HiOutlineShare,
+  HiXMark,
+} from "react-icons/hi2";
 import { toast } from "sonner";
 
 type DetailHeaderProps = {
@@ -16,7 +22,9 @@ export default function DetailHeader({ goalId, title }: DetailHeaderProps) {
   const [shareOpen, setShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (typeof window !== "undefined" ? window.location.origin : "");
+  const baseUrl =
+    process.env.NEXT_PUBLIC_APP_URL ||
+    (typeof window !== "undefined" ? window.location.origin : "");
   const shareUrl = goalId ? `${baseUrl}/prediction-detail?id=${goalId}` : "";
 
   async function handleCopy() {
@@ -52,7 +60,9 @@ export default function DetailHeader({ goalId, title }: DetailHeaderProps) {
         >
           <HiChevronLeft className="w-5 h-5 text-main-text" />
         </button>
-        <p className="text-base font-semibold text-main-text">Prediction Details</p>
+        <p className="text-base font-semibold text-main-text">
+          Prediction Details
+        </p>
         <button
           type="button"
           onClick={() => setShareOpen(true)}
@@ -76,13 +86,21 @@ export default function DetailHeader({ goalId, title }: DetailHeaderProps) {
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
-              transition={{ type: "spring" as const, stiffness: 300, damping: 32 }}
+              transition={{
+                type: "spring" as const,
+                stiffness: 300,
+                damping: 32,
+              }}
               className="fixed bottom-0 left-1/2 z-101 w-full max-w-md -translate-x-1/2 rounded-t-3xl bg-white"
             >
               <div className="flex items-start justify-between px-6 pt-6 pb-4">
                 <div>
-                  <h2 className="text-xl font-bold text-main-text">Share Prediction</h2>
-                  <p className="mt-1 text-sm text-muted">Invite friends to join this prediction</p>
+                  <h2 className="text-xl font-bold text-main-text">
+                    Share Prediction
+                  </h2>
+                  <p className="mt-1 text-sm text-muted">
+                    Invite friends to join this prediction
+                  </p>
                 </div>
                 <button
                   type="button"
@@ -97,16 +115,22 @@ export default function DetailHeader({ goalId, title }: DetailHeaderProps) {
                 <div className="mb-4 rounded-2xl bg-gray-50 p-4">
                   <p className="text-xs text-muted mb-1">Share link</p>
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm text-main-text truncate flex-1">{shareUrl}</p>
+                    <p className="text-sm text-main-text truncate flex-1">
+                      {shareUrl}
+                    </p>
                     <button
                       type="button"
                       onClick={handleCopy}
                       className="flex shrink-0 items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-medium text-main-text cursor-pointer transition-all duration-200 active:scale-95"
                     >
                       {copied ? (
-                        <><HiCheck className="w-4 h-4" /> Copied</>
+                        <>
+                          <HiCheck className="w-4 h-4" /> Copied
+                        </>
                       ) : (
-                        <><HiOutlineLink className="w-4 h-4" /> Copy</>
+                        <>
+                          <HiOutlineLink className="w-4 h-4" /> Copy
+                        </>
                       )}
                     </button>
                   </div>

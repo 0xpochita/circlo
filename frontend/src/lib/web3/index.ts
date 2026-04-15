@@ -1,8 +1,8 @@
 export { celoSepolia, config } from "./config";
 export {
   circleFactoryContract,
+  mockUSDTContract,
   predictionPoolContract,
   resolutionModuleContract,
-  mockUSDTContract,
 } from "./contracts";
-export { USDT_DECIMALS, toUSDT, fromUSDT } from "./usdt";
+export { fromUSDT, toUSDT, USDT_DECIMALS } from "./usdt";

@@ -1,12 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useState } from "react";
 import {
-  HiOutlineLockClosed,
   HiOutlineGlobeAlt,
+  HiOutlineLockClosed,
   HiOutlinePencil,
 } from "react-icons/hi2";
-import { useState } from "react";
 import { EmojiAvatar, EmojiPicker } from "@/components/shared";
 import { useCreateCircleStore } from "@/stores/createCircleStore";
 
@@ -22,7 +22,9 @@ export default function CircleSetupForm() {
   const store = useCreateCircleStore();
   const [pickerOpen, setPickerOpen] = useState(false);
 
-  const categoryIndex = categories.findIndex((c) => c.value === store.category);
+  const _categoryIndex = categories.findIndex(
+    (c) => c.value === store.category,
+  );
 
   return (
     <div className="px-4 py-2 flex flex-col gap-4">
@@ -127,12 +129,16 @@ export default function CircleSetupForm() {
             type="button"
             onClick={() => store.setPrivacy("public")}
             className={`flex-1 flex flex-col items-start gap-2 rounded-xl p-4 cursor-pointer transition-all duration-200 ${
-              store.privacy === "public" ? "bg-brand text-white" : "bg-gray-50 text-muted"
+              store.privacy === "public"
+                ? "bg-brand text-white"
+                : "bg-gray-50 text-muted"
             }`}
           >
             <HiOutlineGlobeAlt className="w-5 h-5" />
             <div className="text-left">
-              <p className={`text-sm font-semibold ${store.privacy === "public" ? "text-white" : "text-main-text"}`}>
+              <p
+                className={`text-sm font-semibold ${store.privacy === "public" ? "text-white" : "text-main-text"}`}
+              >
                 Public
               </p>
               <p className="text-xs">Anyone can join</p>
@@ -142,12 +148,16 @@ export default function CircleSetupForm() {
             type="button"
             onClick={() => store.setPrivacy("private")}
             className={`flex-1 flex flex-col items-start gap-2 rounded-xl p-4 cursor-pointer transition-all duration-200 ${
-              store.privacy === "private" ? "bg-brand text-white" : "bg-gray-50 text-muted"
+              store.privacy === "private"
+                ? "bg-brand text-white"
+                : "bg-gray-50 text-muted"
             }`}
           >
             <HiOutlineLockClosed className="w-5 h-5" />
             <div className="text-left">
-              <p className={`text-sm font-semibold ${store.privacy === "private" ? "text-white" : "text-main-text"}`}>
+              <p
+                className={`text-sm font-semibold ${store.privacy === "private" ? "text-white" : "text-main-text"}`}
+              >
                 Private
               </p>
               <p className="text-xs">Invite only</p>

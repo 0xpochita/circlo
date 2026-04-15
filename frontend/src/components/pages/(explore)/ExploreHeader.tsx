@@ -1,9 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { HiXMark, HiEllipsisHorizontal } from "react-icons/hi2";
+import { HiEllipsisHorizontal, HiXMark } from "react-icons/hi2";
+import { EmojiAvatar } from "@/components/shared";
 import { useUserStore } from "@/stores/userStore";
-import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
 
 export default function ExploreHeader() {
   const router = useRouter();

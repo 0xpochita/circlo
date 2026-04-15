@@ -1,11 +1,18 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useState, useEffect, Suspense } from "react";
-import { SuccessHeader, SuccessHero, ActionCard, CircleStats, PredictionMarketList, MemberActivity } from "@/components/pages/(circle-success)";
+import { Suspense, useEffect, useState } from "react";
 import { PageTransition } from "@/components/pages/(app)";
-import { circlesApi } from "@/lib/api/endpoints";
+import {
+  ActionCard,
+  CircleStats,
+  MemberActivity,
+  PredictionMarketList,
+  SuccessHeader,
+  SuccessHero,
+} from "@/components/pages/(circle-success)";
 import type { CircleDetailResponse } from "@/lib/api/endpoints";
+import { circlesApi } from "@/lib/api/endpoints";
 
 function CircleSuccessContent() {
   const searchParams = useSearchParams();
@@ -58,11 +65,13 @@ function CircleSuccessContent() {
 
 export default function CircleSuccessPage() {
   return (
-    <Suspense fallback={
-      <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-main-bg items-center justify-center">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand border-t-transparent" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-main-bg items-center justify-center">
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand border-t-transparent" />
+        </div>
+      }
+    >
       <CircleSuccessContent />
     </Suspense>
   );

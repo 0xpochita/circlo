@@ -1,8 +1,8 @@
 "use client";
 
+import { motion } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { HiOutlineGlobeAlt, HiOutlineTicket } from "react-icons/hi2";
 
 export default function CirclesActions() {
@@ -25,7 +25,9 @@ export default function CirclesActions() {
             <HiOutlineGlobeAlt className="w-6 h-6 text-brand" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-main-text">Explore Circles</p>
+            <p className="text-sm font-semibold text-main-text">
+              Explore Circles
+            </p>
             <p className="text-xs text-muted">Find new circles to join</p>
           </div>
         </div>
@@ -37,17 +39,18 @@ export default function CirclesActions() {
         </motion.span>
       </Link>
 
-      <form
-        onSubmit={handleJoin}
-        className="rounded-2xl bg-white p-4"
-      >
+      <form onSubmit={handleJoin} className="rounded-2xl bg-white p-4">
         <div className="flex items-start gap-3 mb-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-50">
             <HiOutlineTicket className="w-5 h-5 text-brand" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-main-text">Join with invite code</p>
-            <p className="text-xs text-muted mt-0.5">Got a code from a friend? Enter it here</p>
+            <p className="text-sm font-semibold text-main-text">
+              Join with invite code
+            </p>
+            <p className="text-xs text-muted mt-0.5">
+              Got a code from a friend? Enter it here
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
