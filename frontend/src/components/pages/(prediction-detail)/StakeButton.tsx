@@ -20,6 +20,7 @@ type StakeButtonProps = {
   goalId?: string;
   goalChainId?: string;
   status?: string;
+  winningSide?: string | null;
   deadline?: string;
   resolvers?: ResolverInfo[];
   onStaked?: () => void;
@@ -32,21 +33,24 @@ type Step = {
   status: StepStatus;
 };
 
-export default function StakeButton({ goalId, goalChainId, status, deadline, resolvers, onStaked }: StakeButtonProps) {
+export default function StakeButton({ goalId, goalChainId, status, winningSide, deadline, resolvers, onStaked }: StakeButtonProps) {
   const { address, isConnected } = useAccount();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [resolveSheetOpen, setResolveSheetOpen] = useState(false);
   const [resolveChoice, setResolveChoice] = useState<number | null>(null);
   const [isResolving, setIsResolving] = useState(false);
+  const [isClaiming, setIsClaiming] = useState(false);
+  const [hasClaimed, setHasClaimed] = useState(false);
   const [amount, setAmount] = useState("");
   const [selectedSide, setSelectedSide] = useState<number | null>(null);
   const [isStaking, setIsStaking] = useState(false);
-  const [myStake, setMyStake] = useState<{ side: number; amount: string } | null>(null);
+  const [myStake, setMyStake] = useState<{ side: number; amount: string; claimedAmount: string | null } | null>(null);
   const [steps, setSteps] = useState<Step[]>([]);
   const { writeContractAsync } = useWriteContract();
   const publicClient = usePublicClient();
 
   const isOpen = !status || status === "open";
+  const isResolved = status === "resolved" || status === "paidout";
   const isResolver = resolvers?.some(
     (r) => r.user?.walletAddress?.toLowerCase() === address?.toLowerCase() || r.userId === address
   ) ?? false;
@@ -57,6 +61,10 @@ export default function StakeButton({ goalId, goalChainId, status, deadline, res
   const canResolve = isResolver && !hasVoted && deadlinePassed;
   const hasStaked = myStake !== null;
 
+  const winningSideNum = winningSide !== null && winningSide !== undefined ? parseInt(winningSide) : null;
+  const isWinner = hasStaked && winningSideNum !== null && !isNaN(winningSideNum) && myStake.side === winningSideNum;
+  const canClaim = isWinner && isResolved && !hasClaimed && !myStake.claimedAmount;
+
   useEffect(() => {
     if (!goalId || !isConnected || !address) return;
 
@@ -64,7 +72,8 @@ export default function StakeButton({ goalId, goalChainId, status, deadline, res
       .myStake(goalId)
       .then((res) => {
         if (res.staked && res.data) {
-          setMyStake({ side: res.data.side, amount: res.data.amount });
+          setMyStake({ side: res.data.side, amount: res.data.amount, claimedAmount: res.data.claimedAmount });
+          if (res.data.claimedAmount) setHasClaimed(true);
         }
       })
       .catch(() => {});
@@ -89,9 +98,9 @@ export default function StakeButton({ goalId, goalChainId, status, deadline, res
           const yesAmount = fromUSDT(yesStake as bigint);
           const noAmount = fromUSDT(noStake as bigint);
           if (yesAmount > 0) {
-            setMyStake((prev) => prev ?? { side: 0, amount: String(yesAmount) });
+            setMyStake((prev) => prev ?? { side: 0, amount: String(yesAmount), claimedAmount: null });
           } else if (noAmount > 0) {
-            setMyStake((prev) => prev ?? { side: 1, amount: String(noAmount) });
+            setMyStake((prev) => prev ?? { side: 1, amount: String(noAmount), claimedAmount: null });
           }
         })
         .catch(() => {});
@@ -292,7 +301,7 @@ export default function StakeButton({ goalId, goalChainId, status, deadline, res
 
       updateStep(stepIdx, "done");
 
-      setMyStake({ side: selectedSide, amount: String(parsed) });
+      setMyStake({ side: selectedSide, amount: String(parsed), claimedAmount: null });
       toast.success("Stake placed!");
       setTimeout(() => {
         setSheetOpen(false);
@@ -346,6 +355,40 @@ export default function StakeButton({ goalId, goalChainId, status, deadline, res
       }
     } finally {
       setIsResolving(false);
+    }
+  }
+
+  async function handleClaim() {
+    if (!goalChainId) { toast.error("Goal not on-chain"); return; }
+
+    setIsClaiming(true);
+    try {
+      const txHash = await writeContractAsync({
+        address: predictionPoolContract.address,
+        abi: predictionPoolContract.abi,
+        functionName: "claim",
+        args: [BigInt(goalChainId)],
+      });
+      if (publicClient) {
+        const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
+        if (receipt.status === "reverted") {
+          toast.error("Claim failed on-chain");
+          setIsClaiming(false);
+          return;
+        }
+      }
+      setHasClaimed(true);
+      toast.success("Reward claimed!");
+      if (onStaked) setTimeout(onStaked, 1000);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "";
+      if (msg.includes("User rejected") || msg.includes("denied")) {
+        toast("Transaction cancelled");
+      } else {
+        toast.error("Failed to claim reward");
+      }
+    } finally {
+      setIsClaiming(false);
     }
   }
 
@@ -404,10 +447,42 @@ export default function StakeButton({ goalId, goalChainId, status, deadline, res
               </p>
             </div>
             <span className={`rounded-full px-3 py-1 text-xs font-semibold ${
-              myStake.side === 0 ? "bg-emerald-50 text-emerald-500" : "bg-red-50 text-red-400"
+              hasClaimed || myStake.claimedAmount
+                ? "bg-emerald-50 text-emerald-500"
+                : isResolved && isWinner
+                  ? "bg-amber-50 text-amber-500"
+                  : isResolved && !isWinner
+                    ? "bg-red-50 text-red-400"
+                    : myStake.side === 0
+                      ? "bg-emerald-50 text-emerald-500"
+                      : "bg-red-50 text-red-400"
             }`}>
-              Staked
+              {hasClaimed || myStake.claimedAmount ? "Claimed" : isResolved && isWinner ? "Won" : isResolved && !isWinner ? "Lost" : "Staked"}
             </span>
+          </div>
+        )}
+
+        {canClaim && (
+          <motion.button
+            type="button"
+            onClick={handleClaim}
+            disabled={isClaiming}
+            whileTap={isClaiming ? {} : { scale: 0.97 }}
+            className="w-full rounded-full bg-emerald-500 py-4 text-base font-semibold text-white cursor-pointer disabled:bg-gray-200 disabled:text-muted disabled:cursor-not-allowed"
+          >
+            {isClaiming ? "Claiming..." : "Claim Reward"}
+          </motion.button>
+        )}
+
+        {hasStaked && isResolved && !isWinner && (
+          <div className="flex items-center justify-center rounded-full bg-gray-50 px-5 py-3">
+            <p className="text-sm font-medium text-muted">Better luck next time</p>
+          </div>
+        )}
+
+        {hasStaked && (hasClaimed || myStake.claimedAmount) && (
+          <div className="flex items-center justify-center rounded-full bg-emerald-50 px-5 py-3">
+            <p className="text-sm font-medium text-emerald-500">Reward collected</p>
           </div>
         )}
 

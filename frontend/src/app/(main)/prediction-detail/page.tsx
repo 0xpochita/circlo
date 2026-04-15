@@ -224,6 +224,7 @@ function PredictionDetailContent() {
         goalId={goalId || undefined}
         goalChainId={goal?.chainId || undefined}
         status={goal?.status}
+        winningSide={goal?.winningSide}
         deadline={goal?.deadline}
         resolvers={goal?.resolvers}
         onStaked={refreshGoal}
