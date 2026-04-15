@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { HiCheck } from "react-icons/hi2";
 import { useAccount, useWriteContract } from "wagmi";
 import { toast } from "sonner";
 import { circleFactoryContract } from "@/lib/web3/contracts";
 import { circlesApi } from "@/lib/api/endpoints";
+import { useAuthStore } from "@/stores/authStore";
 
 type JoinButtonProps = {
   circleId?: number;
@@ -14,14 +16,17 @@ type JoinButtonProps = {
 };
 
 export default function JoinButton({ circleId = 1, circleBackendId }: JoinButtonProps) {
+  const router = useRouter();
   const [joined, setJoined] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { isConnected } = useAccount();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const { writeContractAsync } = useWriteContract();
 
   async function handleJoin() {
-    if (!isConnected) {
-      toast("Connect your wallet first");
+    if (!isConnected || !isAuthenticated) {
+      localStorage.setItem("circlo-redirect-after-login", window.location.href);
+      router.push("/welcome");
       return;
     }
     if (joined) return;
@@ -61,7 +66,7 @@ export default function JoinButton({ circleId = 1, circleBackendId }: JoinButton
   function getButtonText() {
     if (joined) return "Joined";
     if (isLoading) return "Joining...";
-    if (!isConnected) return "Connect to Join";
+    if (!isConnected || !isAuthenticated) return "Connect to Join";
     return "Join Circle";
   }
 
@@ -73,7 +78,7 @@ export default function JoinButton({ circleId = 1, circleBackendId }: JoinButton
         disabled={isLoading || joined}
         whileTap={isLoading || joined ? {} : { scale: 0.97 }}
         className={`flex w-full items-center justify-center gap-2 rounded-full py-4 text-base font-semibold cursor-pointer transition-all duration-200 disabled:cursor-not-allowed ${
-          joined ? "bg-gray-100 text-muted" : isLoading ? "bg-gray-200 text-muted" : "bg-brand text-white"
+          joined ? "bg-gray-100 text-muted" : isLoading ? "bg-gray-200 text-muted" : "bg-gray-900 text-white"
         }`}
       >
         {joined && <HiCheck className="w-5 h-5" />}

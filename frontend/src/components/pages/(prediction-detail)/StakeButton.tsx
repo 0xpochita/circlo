@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { useAccount, useWriteContract, usePublicClient } from "wagmi";
 import { HiXMark, HiCheck } from "react-icons/hi2";
 import { toast } from "sonner";
+import { useAuthStore } from "@/stores/authStore";
 import { UsdtLabel } from "@/components/shared";
 import { mockUSDTContract, predictionPoolContract, circleFactoryContract, resolutionModuleContract } from "@/lib/web3/contracts";
 import { toUSDT, fromUSDT } from "@/lib/web3/usdt";
@@ -34,7 +36,9 @@ type Step = {
 };
 
 export default function StakeButton({ goalId, goalChainId, status, winningSide, deadline, resolvers, onStaked }: StakeButtonProps) {
+  const router = useRouter();
   const { address, isConnected } = useAccount();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [resolveSheetOpen, setResolveSheetOpen] = useState(false);
   const [resolveChoice, setResolveChoice] = useState<number | null>(null);
@@ -125,7 +129,11 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
   }, [sheetOpen]);
 
   function handleOpen() {
-    if (!isConnected) { toast("Connect wallet first"); return; }
+    if (!isConnected || !isAuthenticated) {
+      localStorage.setItem("circlo-redirect-after-login", window.location.href);
+      router.push("/welcome");
+      return;
+    }
     if (!isOpen) { toast("Staking is closed for this goal"); return; }
     setSteps([]);
     setSheetOpen(true);
@@ -516,7 +524,7 @@ export default function StakeButton({ goalId, goalChainId, status, winningSide, 
             whileTap={{ scale: 0.97 }}
             className="w-full rounded-full bg-brand py-4 text-base font-semibold text-white cursor-pointer"
           >
-            {!isConnected ? "Connect to Stake" : "Place Stake"}
+            {!isConnected || !isAuthenticated ? "Connect to Stake" : "Place Stake"}
           </motion.button>
         )}
 

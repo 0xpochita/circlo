@@ -15,14 +15,23 @@ export default function OnboardingFlow() {
 
   useEffect(() => {
     const completed = localStorage.getItem("circlo-onboarding-done");
-    if (completed === "true") {
+    const hasRedirect = localStorage.getItem("circlo-redirect-after-login");
+    if (completed === "true" && !hasRedirect) {
       router.replace("/");
+    } else if (completed === "true" && hasRedirect) {
+      setStep(1);
     }
   }, [router]);
 
   function handleComplete() {
     localStorage.setItem("circlo-onboarding-done", "true");
-    router.replace("/");
+    const redirect = localStorage.getItem("circlo-redirect-after-login");
+    if (redirect) {
+      localStorage.removeItem("circlo-redirect-after-login");
+      window.location.href = redirect;
+    } else {
+      router.replace("/");
+    }
   }
 
   const hasProfile = useCallback(() => {
