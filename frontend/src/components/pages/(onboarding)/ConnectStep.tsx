@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { HiOutlineShieldCheck, HiOutlineBolt, HiOutlineUserGroup } from "react-icons/hi2";
+import { HiOutlineArrowLeft } from "react-icons/hi2";
 import { toast } from "sonner";
 import { useConnect, useDisconnect, useSignMessage } from "wagmi";
 import { injected } from "wagmi/connectors";
@@ -16,12 +16,6 @@ type ConnectStepProps = {
   onNext: () => void;
   onBack: () => void;
 };
-
-const features = [
-  { icon: HiOutlineShieldCheck, title: "Non-custodial", desc: "Your keys, your funds" },
-  { icon: HiOutlineBolt, title: "Instant", desc: "Sub-second transactions on Celo" },
-  { icon: HiOutlineUserGroup, title: "Social", desc: "Predict goals with friends" },
-];
 
 export default function ConnectStep({ onNext, onBack }: ConnectStepProps) {
   const { connectAsync } = useConnect();
@@ -87,8 +81,7 @@ export default function ConnectStep({ onNext, onBack }: ConnectStepProps) {
           user = verifyRes.user || null;
         }
       } catch {
-        // SIWE failed — backend might not be ready
-        // continue with wallet-only auth
+        // SIWE failed — continue with wallet-only auth
       }
 
       if (accessToken && user) {
@@ -132,74 +125,104 @@ export default function ConnectStep({ onNext, onBack }: ConnectStepProps) {
   }
 
   return (
-    <div className="flex flex-col min-h-dvh px-6 py-10">
-      <button
-        type="button"
-        onClick={onBack}
-        className="self-start text-sm text-muted cursor-pointer mb-8"
-      >
-        Back
-      </button>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="flex-1 flex flex-col"
-      >
-        <div className="flex items-center gap-3 mb-2">
-          <Image
-            src="/Assets/Images/Logo/logo-coin/celo-logo.svg"
-            alt="Celo"
-            width={32}
-            height={32}
-          />
-          <p className="text-xs text-muted uppercase tracking-wide font-medium">Celo Network</p>
+    <div className="flex flex-col min-h-dvh bg-gray-50">
+      <div className="flex items-center gap-3 px-6 pt-6 pb-2">
+        <button
+          type="button"
+          onClick={onBack}
+          className="flex h-9 w-9 items-center justify-center rounded-full bg-white cursor-pointer transition-all duration-200 active:scale-95"
+        >
+          <HiOutlineArrowLeft className="w-4 h-4 text-main-text" />
+        </button>
+        <div className="flex-1 flex flex-col items-center">
+          <p className="text-xs text-gray-400 mb-1">1 / 2</p>
+          <div className="flex w-full gap-1.5">
+            <div className="h-1 flex-1 rounded-full bg-emerald-500" />
+            <div className="h-1 flex-1 rounded-full bg-gray-200" />
+          </div>
         </div>
+        <div className="w-9" />
+      </div>
 
-        <h1 className="text-2xl font-bold tracking-tight text-main-text mb-2">
-          Connect your wallet
-        </h1>
-        <p className="text-sm text-muted mb-8">
-          Sign in securely with your wallet. MetaMask or MiniPay supported.
-        </p>
+      <div className="flex-1 flex flex-col px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center mt-6 mb-4"
+        >
+          <h1 className="text-2xl font-bold tracking-tight text-emerald-500">
+            Connect wallet
+          </h1>
+          <p className="mt-1 text-xs text-gray-400 uppercase tracking-[0.2em]">
+            Secure sign-in with Celo
+          </p>
+        </motion.div>
 
-        <div className="flex flex-col gap-3 mb-auto">
-          {features.map((f, i) => (
-            <motion.div
-              key={f.title}
-              initial={{ opacity: 0, x: -12 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3, delay: 0.1 + 0.1 * i }}
-              className="flex items-center gap-3 rounded-2xl bg-white p-4"
-            >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-50">
-                <f.icon className="w-5 h-5 text-main-text" />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="w-full rounded-3xl bg-white overflow-hidden mb-6"
+        >
+          <div className="flex flex-col items-center justify-end h-56 relative">
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-64 h-64 rounded-full bg-gray-100/60" />
+            <div className="relative z-10 flex items-end gap-3 pb-8">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 ring-4 ring-emerald-200/50">
+                <Image
+                  src="/Assets/Images/Logo/logo-coin/celo-logo.svg"
+                  alt="Celo"
+                  width={28}
+                  height={28}
+                />
               </div>
-              <div>
-                <p className="text-sm font-semibold text-main-text">{f.title}</p>
-                <p className="text-xs text-muted">{f.desc}</p>
+              <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
+                <div className="h-2 w-2 rounded-full bg-gray-300" />
               </div>
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
+              <div className="h-8 w-8 rounded-full bg-gray-50 flex items-center justify-center">
+                <div className="h-1.5 w-1.5 rounded-full bg-gray-200" />
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="text-center mb-auto"
+        >
+          <p className="text-sm text-gray-400 leading-relaxed max-w-70 mx-auto">
+            Sign in securely with your wallet. MetaMask or MiniPay supported. No passwords needed.
+          </p>
+          <p className="mt-3 text-sm font-medium text-emerald-500">
+            Your keys, your funds.
+          </p>
+        </motion.div>
+      </div>
 
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.4 }}
-        className="w-full"
+        transition={{ duration: 0.4, delay: 0.5 }}
+        className="px-6 pb-8 pt-6"
       >
         <motion.button
           type="button"
           onClick={handleConnect}
           disabled={isConnecting}
           whileTap={isConnecting ? {} : { scale: 0.97 }}
-          className="w-full rounded-full bg-brand py-4 text-base font-semibold text-white cursor-pointer disabled:bg-gray-200 disabled:text-muted disabled:cursor-not-allowed"
+          className="w-full rounded-full bg-gray-900 py-4 text-base font-semibold text-white cursor-pointer disabled:bg-gray-200 disabled:text-muted disabled:cursor-not-allowed"
         >
           {isConnecting ? statusText : "Connect Wallet"}
         </motion.button>
+        <button
+          type="button"
+          onClick={onBack}
+          className="w-full mt-3 text-sm font-medium text-gray-400 cursor-pointer text-center underline"
+        >
+          Go back
+        </button>
       </motion.div>
     </div>
   );

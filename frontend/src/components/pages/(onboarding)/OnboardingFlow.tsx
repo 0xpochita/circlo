@@ -1,15 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import WelcomeStep from "./WelcomeStep";
 import ConnectStep from "./ConnectStep";
 import ProfileStep from "./ProfileStep";
+import { useAuthStore } from "@/stores/authStore";
 
 export default function OnboardingFlow() {
   const router = useRouter();
   const [step, setStep] = useState(0);
+  const user = useAuthStore((s) => s.user);
 
   useEffect(() => {
     const completed = localStorage.getItem("circlo-onboarding-done");
@@ -23,20 +25,23 @@ export default function OnboardingFlow() {
     router.replace("/");
   }
 
+  const hasProfile = useCallback(() => {
+    if (!user) return false;
+    const hasName = user.displayName && user.displayName !== "Player";
+    const hasUsername = user.username && !user.username.startsWith("@");
+    return !!(hasName || hasUsername);
+  }, [user]);
+
+  function handleConnectNext() {
+    if (hasProfile()) {
+      handleComplete();
+    } else {
+      setStep(2);
+    }
+  }
+
   return (
     <div className="mx-auto w-full max-w-md bg-main-bg">
-      <div className="relative w-full">
-        <div className="absolute top-4 left-6 right-6 z-10 flex gap-1.5">
-          {[0, 1, 2].map((i) => (
-            <div
-              key={`step-${i}`}
-              className={`h-1 flex-1 rounded-full transition-all duration-300 ${
-                i <= step ? "bg-brand" : "bg-gray-200"
-              }`}
-            />
-          ))}
-        </div>
-      </div>
 
       <AnimatePresence mode="wait">
         {step === 0 && (
@@ -58,7 +63,7 @@ export default function OnboardingFlow() {
             exit={{ opacity: 0, x: -50 }}
             transition={{ duration: 0.3 }}
           >
-            <ConnectStep onNext={() => setStep(2)} onBack={() => setStep(0)} />
+            <ConnectStep onNext={handleConnectNext} onBack={() => setStep(0)} />
           </motion.div>
         )}
         {step === 2 && (

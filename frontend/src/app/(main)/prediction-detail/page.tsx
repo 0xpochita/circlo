@@ -205,7 +205,7 @@ function PredictionDetailContent() {
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-main-bg">
-      <DetailHeader />
+      <DetailHeader goalId={goalId} title={goal?.title} />
       <PageTransition>
         <DetailHero
           title={goal?.title}

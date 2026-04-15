@@ -7,7 +7,7 @@ import { HiXMark, HiCheck } from "react-icons/hi2";
 import { toast } from "sonner";
 import { UsdtLabel } from "@/components/shared";
 import { mockUSDTContract, predictionPoolContract, circleFactoryContract, resolutionModuleContract } from "@/lib/web3/contracts";
-import { toUSDT } from "@/lib/web3/usdt";
+import { toUSDT, fromUSDT } from "@/lib/web3/usdt";
 import { goalsApi, circlesApi } from "@/lib/api/endpoints";
 
 type ResolverInfo = {
@@ -58,7 +58,8 @@ export default function StakeButton({ goalId, goalChainId, status, deadline, res
   const hasStaked = myStake !== null;
 
   useEffect(() => {
-    if (!goalId || !isConnected) return;
+    if (!goalId || !isConnected || !address) return;
+
     goalsApi
       .myStake(goalId)
       .then((res) => {
@@ -67,7 +68,35 @@ export default function StakeButton({ goalId, goalChainId, status, deadline, res
         }
       })
       .catch(() => {});
-  }, [goalId, isConnected]);
+
+    if (goalChainId && publicClient) {
+      const chainId = BigInt(goalChainId);
+      Promise.all([
+        publicClient.readContract({
+          address: predictionPoolContract.address,
+          abi: predictionPoolContract.abi,
+          functionName: "stakeOf",
+          args: [chainId, address, 0],
+        }),
+        publicClient.readContract({
+          address: predictionPoolContract.address,
+          abi: predictionPoolContract.abi,
+          functionName: "stakeOf",
+          args: [chainId, address, 1],
+        }),
+      ])
+        .then(([yesStake, noStake]) => {
+          const yesAmount = fromUSDT(yesStake as bigint);
+          const noAmount = fromUSDT(noStake as bigint);
+          if (yesAmount > 0) {
+            setMyStake((prev) => prev ?? { side: 0, amount: String(yesAmount) });
+          } else if (noAmount > 0) {
+            setMyStake((prev) => prev ?? { side: 1, amount: String(noAmount) });
+          }
+        })
+        .catch(() => {});
+    }
+  }, [goalId, goalChainId, isConnected, address, publicClient]);
 
   useEffect(() => {
     if (sheetOpen) {
@@ -263,6 +292,7 @@ export default function StakeButton({ goalId, goalChainId, status, deadline, res
 
       updateStep(stepIdx, "done");
 
+      setMyStake({ side: selectedSide, amount: String(parsed) });
       toast.success("Stake placed!");
       setTimeout(() => {
         setSheetOpen(false);
