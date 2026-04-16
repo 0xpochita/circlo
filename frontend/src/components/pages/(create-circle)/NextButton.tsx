@@ -99,6 +99,20 @@ export default function NextButton() {
         circleId = created.id;
       } catch {}
 
+      if (circleId && store.inviteUsernames.length > 0) {
+        setStatusText("Sending invites...");
+        try {
+          const res = await circlesApi.invite(circleId, store.inviteUsernames);
+          if (res.invalidUsernames && res.invalidUsernames.length > 0) {
+            toast.error(
+              `Some usernames not found: ${res.invalidUsernames.join(", ")}`,
+            );
+          }
+        } catch {
+          toast.error("Failed to send some invites");
+        }
+      }
+
       const params = new URLSearchParams();
       if (circleId) params.set("id", circleId);
       params.set("name", circleName);

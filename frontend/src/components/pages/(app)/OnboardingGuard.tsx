@@ -2,21 +2,32 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useAuthStore } from "@/stores/authStore";
 
 export default function OnboardingGuard({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const router = useRouter();
   const [checked, setChecked] = useState(false);
+  const accessToken = useAuthStore((s) => s.accessToken);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   useEffect(() => {
     const completed = localStorage.getItem("circlo-onboarding-done");
     if (completed !== "true") {
       router.replace("/welcome");
-    } else {
-      setChecked(true);
+      return;
     }
+    setChecked(true);
   }, [router.replace]);
+
+  useEffect(() => {
+    if (!checked) return;
+    if (!accessToken || !isAuthenticated) {
+      localStorage.setItem("circlo-redirect-after-login", window.location.href);
+      router.replace("/welcome");
+    }
+  }, [checked, accessToken, isAuthenticated, router.replace]);
 
   if (!checked) {
     return (

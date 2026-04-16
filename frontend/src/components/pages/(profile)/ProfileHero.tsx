@@ -11,11 +11,12 @@ import {
 import { toast } from "sonner";
 import { useAccount, useConnect } from "wagmi";
 import { injected } from "wagmi/connectors";
-import { EmojiAvatar, EmojiPicker } from "@/components/shared";
+import { EmojiAvatar } from "@/components/shared";
 import { useAuth } from "@/hooks/useAuth";
 import { useUSDTBalance } from "@/hooks/useUSDT";
 import { useUserStore } from "@/stores/userStore";
 import DepositSheet from "./DepositSheet";
+import EditProfileSheet from "./EditProfileSheet";
 import NotificationSheet from "./NotificationSheet";
 import WithdrawSheet from "./WithdrawSheet";
 
@@ -24,8 +25,7 @@ export default function ProfileHero() {
   const name = useUserStore((s) => s.name);
   const username = useUserStore((s) => s.username);
   const avatar = useUserStore((s) => s.avatar);
-  const setAvatar = useUserStore((s) => s.setAvatar);
-  const [pickerOpen, setPickerOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [depositOpen, setDepositOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
@@ -69,8 +69,9 @@ export default function ProfileHero() {
             <div className="flex items-center gap-3">
               <button
                 type="button"
-                onClick={() => setPickerOpen(true)}
-                className="relative cursor-pointer"
+                onClick={() => setEditOpen(true)}
+                className="relative cursor-pointer transition-transform duration-200 active:scale-95"
+                aria-label="Edit profile"
               >
                 <EmojiAvatar avatar={avatar} size={44} />
                 <div className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-white">
@@ -160,12 +161,7 @@ export default function ProfileHero() {
         </div>
       </div>
 
-      <EmojiPicker
-        open={pickerOpen}
-        onClose={() => setPickerOpen(false)}
-        value={avatar}
-        onSave={setAvatar}
-      />
+      <EditProfileSheet open={editOpen} onClose={() => setEditOpen(false)} />
       <NotificationSheet open={notifOpen} onClose={() => setNotifOpen(false)} />
       <DepositSheet
         open={depositOpen}

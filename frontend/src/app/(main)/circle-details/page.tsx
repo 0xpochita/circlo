@@ -10,6 +10,7 @@ import {
   DetailsHeader,
   DetailsHero,
   DetailsMembers,
+  InviteMemberButton,
   DetailsStats,
   JoinButton,
 } from "@/components/pages/(circle-details)";
@@ -128,15 +129,18 @@ function CircleDetailsContent() {
           circle={circle ?? undefined}
         />
         {isMember && (
-          <div className="px-4 py-2">
-            <Link
-              href={`/create-prediction?circleId=${circleId}`}
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-brand py-4 text-base font-semibold text-white cursor-pointer transition-all duration-200 active:scale-[0.97]"
-            >
-              <TbTargetArrow className="w-5 h-5" />
-              Create Goal
-            </Link>
-          </div>
+          <>
+            <div className="px-4 py-2">
+              <Link
+                href={`/create-prediction?circleId=${circleId}`}
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-brand py-4 text-base font-semibold text-white cursor-pointer transition-all duration-200 active:scale-[0.97]"
+              >
+                <TbTargetArrow className="w-5 h-5" />
+                Create Goal
+              </Link>
+            </div>
+            <InviteMemberButton circleId={circleId || undefined} />
+          </>
         )}
         <DetailsGoals circleId={circleId || undefined} />
         <DetailsMembers circleId={circleId || undefined} />
