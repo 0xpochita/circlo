@@ -1,5 +1,10 @@
-import { CirclesHeader, CirclesStats, CirclesActions, CirclesList } from "@/components/pages/(circles)";
 import { BottomTabBar, PageTransition } from "@/components/pages/(app)";
+import {
+  CirclesActions,
+  CirclesHeader,
+  CirclesList,
+  CirclesStats,
+} from "@/components/pages/(circles)";
 
 export default function CirclesPage() {
   return (

@@ -24,8 +24,16 @@ export default function RewardStats() {
   }, []);
 
   const stats = [
-    { value: loading ? "--" : String(invitedCount).padStart(2, "0"), label: "Friends invited", usdt: false },
-    { value: loading ? "--" : String(verifiedCount).padStart(2, "0"), label: "Friends verified", usdt: false },
+    {
+      value: loading ? "--" : String(invitedCount).padStart(2, "0"),
+      label: "Friends invited",
+      usdt: false,
+    },
+    {
+      value: loading ? "--" : String(verifiedCount).padStart(2, "0"),
+      label: "Friends verified",
+      usdt: false,
+    },
     { value: loading ? "--" : totalEarned, label: "Total earned", usdt: true },
   ];
 
@@ -48,7 +56,9 @@ export default function RewardStats() {
           >
             <p className="text-xl font-bold text-main-text inline-flex items-center gap-1">
               {stat.value}
-              {stat.usdt && <UsdtLabel size={14} className="text-xs font-medium" />}
+              {stat.usdt && (
+                <UsdtLabel size={14} className="text-xs font-medium" />
+              )}
             </p>
             <p className="mt-1 text-xs text-muted">{stat.label}</p>
           </div>

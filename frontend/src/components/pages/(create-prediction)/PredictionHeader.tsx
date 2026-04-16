@@ -1,7 +1,7 @@
 "use client";
 
-import { HiChevronLeft, HiXMark } from "react-icons/hi2";
 import { useRouter } from "next/navigation";
+import { HiChevronLeft, HiXMark } from "react-icons/hi2";
 
 export default function PredictionHeader() {
   const router = useRouter();
@@ -15,7 +15,9 @@ export default function PredictionHeader() {
       >
         <HiChevronLeft className="w-5 h-5 text-main-text" />
       </button>
-      <p className="text-base font-semibold text-main-text">Create Prediction</p>
+      <p className="text-base font-semibold text-main-text">
+        Create Prediction
+      </p>
       <button
         type="button"
         onClick={() => router.back()}

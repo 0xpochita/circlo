@@ -2,8 +2,15 @@
 
 import { useState } from "react";
 import { HiOutlinePencilSquare } from "react-icons/hi2";
-import { ProfileHero, ReferralBanner, ActiveCircles, RecentPredictions, DisconnectButton, EditProfileSheet } from "@/components/pages/(profile)";
 import { BottomTabBar, PageTransition } from "@/components/pages/(app)";
+import {
+  ActiveCircles,
+  DisconnectButton,
+  EditProfileSheet,
+  ProfileHero,
+  RecentPredictions,
+  ReferralBanner,
+} from "@/components/pages/(profile)";
 
 export default function ProfilePage() {
   const [editOpen, setEditOpen] = useState(false);

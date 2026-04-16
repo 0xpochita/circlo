@@ -1,8 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { ExploreHeader, SearchCircle, InviteCodeInput, CategoryTabs, CircleList } from "@/components/pages/(explore)";
 import { BottomTabBar, PageTransition } from "@/components/pages/(app)";
+import {
+  CategoryTabs,
+  CircleList,
+  ExploreHeader,
+  InviteCodeInput,
+  SearchCircle,
+} from "@/components/pages/(explore)";
 
 const categories = [
   { label: "All", emoji: "✨", value: "" },
@@ -23,7 +29,9 @@ export default function ExplorePage() {
         <ExploreHeader />
         <div className="px-4 py-2">
           <h2 className="text-xl font-bold text-main-text">Find new circles</h2>
-          <p className="mt-1 text-sm text-muted">Join circles that match your interest</p>
+          <p className="mt-1 text-sm text-muted">
+            Join circles that match your interest
+          </p>
         </div>
         <SearchCircle value={search} onChange={setSearch} />
         <InviteCodeInput />

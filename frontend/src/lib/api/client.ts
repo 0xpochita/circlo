@@ -1,6 +1,9 @@
 import { useAuthStore } from "@/stores/authStore";
 
 const BASE_URL = "/api/proxy";
+const DEFAULT_TIMEOUT_MS = 15_000;
+
+let refreshPromise: Promise<boolean> | null = null;
 
 export class ApiError extends Error {
   status: number;
@@ -10,69 +13,124 @@ export class ApiError extends Error {
   }
 }
 
+type FetchApiOptions = RequestInit & {
+  timeout?: number;
+};
+
 async function fetchApi<T>(
   path: string,
-  options: RequestInit = {}
+  options: FetchApiOptions = {},
 ): Promise<T> {
+  const { timeout = DEFAULT_TIMEOUT_MS, ...requestInit } = options;
   const { accessToken } = useAuthStore.getState();
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
-    ...((options.headers as Record<string, string>) ?? {}),
+    ...((requestInit.headers as Record<string, string>) ?? {}),
   };
 
   if (accessToken) {
-    headers["Authorization"] = `Bearer ${accessToken}`;
+    headers.Authorization = `Bearer ${accessToken}`;
   }
 
-  let response = await fetch(`${BASE_URL}${path}`, {
-    ...options,
-    headers,
-  });
+  const controller = new AbortController();
+  const externalSignal = requestInit.signal;
 
-  if (response.status === 401 && accessToken) {
-    const refreshed = await attemptRefresh();
-    if (refreshed) {
-      const { accessToken: newToken } = useAuthStore.getState();
-      headers["Authorization"] = `Bearer ${newToken}`;
-      response = await fetch(`${BASE_URL}${path}`, {
-        ...options,
-        headers,
-      });
+  if (externalSignal?.aborted) {
+    controller.abort(externalSignal.reason);
+  } else {
+    externalSignal?.addEventListener("abort", () => {
+      controller.abort(externalSignal.reason);
+    });
+  }
+
+  const timeoutId = setTimeout(
+    () => controller.abort("Request timeout"),
+    timeout,
+  );
+
+  try {
+    let response = await fetch(`${BASE_URL}${path}`, {
+      ...requestInit,
+      headers,
+      signal: controller.signal,
+    });
+
+    if (response.status === 401 && accessToken) {
+      const refreshed = await attemptRefresh();
+      if (refreshed) {
+        const { accessToken: newToken } = useAuthStore.getState();
+        headers.Authorization = `Bearer ${newToken}`;
+        response = await fetch(`${BASE_URL}${path}`, {
+          ...requestInit,
+          headers,
+          signal: controller.signal,
+        });
+      }
     }
-  }
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({
-      message: "An unexpected error occurred",
-    }));
-    throw new ApiError(
-      error.message ?? `Request failed with status ${response.status}`,
-      response.status
-    );
-  }
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({
+        message: "An unexpected error occurred",
+      }));
+      throw new ApiError(
+        error.message ?? `Request failed with status ${response.status}`,
+        response.status,
+      );
+    }
 
-  return response.json() as Promise<T>;
+    return response.json() as Promise<T>;
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw new ApiError("Request was cancelled or timed out", 0);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 async function attemptRefresh(): Promise<boolean> {
+  if (refreshPromise) return refreshPromise;
+
+  refreshPromise = doRefresh();
   try {
+    return await refreshPromise;
+  } finally {
+    refreshPromise = null;
+  }
+}
+
+async function doRefresh(): Promise<boolean> {
+  const { refreshToken } = useAuthStore.getState();
+
+  try {
+    const body: Record<string, string> = {};
+    if (refreshToken) {
+      body.refreshToken = refreshToken;
+    }
+
     const response = await fetch(`${BASE_URL}/auth/refresh`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
-      useAuthStore.getState().clearAuth();
+      if (response.status === 401 || response.status === 403) {
+        useAuthStore.getState().clearAuth();
+      }
       return false;
     }
 
     const data = await response.json();
-    useAuthStore.getState().setToken(data.accessToken);
-    return true;
+    if (data.accessToken) {
+      useAuthStore.getState().setToken(data.accessToken);
+      return true;
+    }
+    return false;
   } catch {
-    useAuthStore.getState().clearAuth();
     return false;
   }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { UsdtLabel } from "@/components/shared";
 import { circlesApi } from "@/lib/api/endpoints";
 
@@ -15,14 +15,28 @@ export default function CircleStats({ circleId }: CircleStatsProps) {
   useEffect(() => {
     if (!circleId) return;
     Promise.all([
-      circlesApi.members(circleId).then((res) => setMemberCount(res.items?.length ?? 0)).catch(() => {}),
-      circlesApi.goals(circleId).then((res) => setGoalCount(res.items?.length ?? 0)).catch(() => {}),
+      circlesApi
+        .members(circleId)
+        .then((res) => setMemberCount(res.items?.length ?? 0))
+        .catch(() => {}),
+      circlesApi
+        .goals(circleId)
+        .then((res) => setGoalCount(res.items?.length ?? 0))
+        .catch(() => {}),
     ]);
   }, [circleId]);
 
   const stats = [
-    { value: String(memberCount).padStart(2, "0"), label: "Members", usdt: false },
-    { value: String(goalCount).padStart(2, "0"), label: "Predictions", usdt: false },
+    {
+      value: String(memberCount).padStart(2, "0"),
+      label: "Members",
+      usdt: false,
+    },
+    {
+      value: String(goalCount).padStart(2, "0"),
+      label: "Predictions",
+      usdt: false,
+    },
     { value: "0", label: "Total staked", usdt: true },
   ];
 
@@ -45,7 +59,9 @@ export default function CircleStats({ circleId }: CircleStatsProps) {
           >
             <p className="text-xl font-bold text-main-text inline-flex items-center gap-1">
               {stat.value}
-              {stat.usdt && <UsdtLabel size={14} className="text-xs font-medium" />}
+              {stat.usdt && (
+                <UsdtLabel size={14} className="text-xs font-medium" />
+              )}
             </p>
             <p className="mt-1 text-xs text-muted">{stat.label}</p>
           </div>

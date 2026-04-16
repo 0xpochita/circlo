@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { HiXMark } from "react-icons/hi2";
 import { useRouter } from "next/navigation";
+import { HiXMark } from "react-icons/hi2";
 
 export default function SuccessHeader() {
   const router = useRouter();
@@ -17,7 +17,9 @@ export default function SuccessHeader() {
           height={32}
           className="rounded-lg"
         />
-        <p className="text-xl font-bold tracking-tight text-main-text">Circlo</p>
+        <p className="text-xl font-bold tracking-tight text-main-text">
+          Circlo
+        </p>
       </div>
       <button
         type="button"

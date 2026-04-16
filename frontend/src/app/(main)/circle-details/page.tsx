@@ -1,21 +1,29 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import { useState, useEffect, useMemo, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { TbTargetArrow } from "react-icons/tb";
-import { useAuthStore } from "@/stores/authStore";
-import { DetailsHeader, DetailsHero, DetailsStats, DetailsGoals, DetailsMembers, JoinButton } from "@/components/pages/(circle-details)";
 import { PageTransition } from "@/components/pages/(app)";
+import {
+  DetailsGoals,
+  DetailsHeader,
+  DetailsHero,
+  DetailsMembers,
+  DetailsStats,
+  JoinButton,
+} from "@/components/pages/(circle-details)";
 import { ShareSheet } from "@/components/shared";
-import { circlesApi } from "@/lib/api/endpoints";
 import type { CircleDetailResponse } from "@/lib/api/endpoints";
+import { circlesApi } from "@/lib/api/endpoints";
+import { useAuthStore } from "@/stores/authStore";
 
 function CircleDetailsContent() {
   const searchParams = useSearchParams();
   const circleId = searchParams.get("id") ?? "";
   const [circle, setCircle] = useState<CircleDetailResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const userId = useAuthStore((s) => s.user?.id);
 
@@ -33,7 +41,7 @@ function CircleDetailsContent() {
     circlesApi
       .detail(circleId)
       .then((res) => setCircle(res))
-      .catch(() => {})
+      .catch(() => setError(true))
       .finally(() => setIsLoading(false));
   }, [circleId]);
 
@@ -80,7 +88,10 @@ function CircleDetailsContent() {
           <div className="h-5 w-20 rounded-lg bg-gray-100 mb-3" />
           <div className="rounded-2xl bg-white divide-y divide-gray-50">
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={`mskel-${i}`} className="flex items-center gap-3 px-4 py-3">
+              <div
+                key={`mskel-${i}`}
+                className="flex items-center gap-3 px-4 py-3"
+              >
                 <div className="h-10 w-10 rounded-full bg-gray-100" />
                 <div className="flex-1">
                   <div className="h-4 w-28 rounded-lg bg-gray-100 mb-1" />
@@ -94,12 +105,28 @@ function CircleDetailsContent() {
     );
   }
 
+  if (error || (!circle && !isLoading)) {
+    return (
+      <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-main-bg items-center justify-center gap-3 px-4">
+        <p className="text-base font-semibold text-main-text">
+          Circle not found
+        </p>
+        <p className="text-sm text-muted text-center">
+          This circle may have been removed or the link is invalid.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-main-bg">
       <DetailsHeader onShare={() => setShareOpen(true)} />
       <PageTransition>
         <DetailsHero circle={circle ?? undefined} />
-        <DetailsStats circleId={circleId || undefined} circle={circle ?? undefined} />
+        <DetailsStats
+          circleId={circleId || undefined}
+          circle={circle ?? undefined}
+        />
         {isMember && (
           <div className="px-4 py-2">
             <Link
@@ -115,7 +142,10 @@ function CircleDetailsContent() {
         <DetailsMembers circleId={circleId || undefined} />
       </PageTransition>
       {!isMember && (
-        <JoinButton circleId={circle?.chainId ? Number(circle.chainId) : 1} circleBackendId={circleId || undefined} />
+        <JoinButton
+          circleId={circle?.chainId ? Number(circle.chainId) : 1}
+          circleBackendId={circleId || undefined}
+        />
       )}
       <ShareSheet
         open={shareOpen}
@@ -132,11 +162,13 @@ function CircleDetailsContent() {
 
 export default function CircleDetailsPage() {
   return (
-    <Suspense fallback={
-      <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-main-bg items-center justify-center">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand border-t-transparent" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-main-bg items-center justify-center">
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand border-t-transparent" />
+        </div>
+      }
+    >
       <CircleDetailsContent />
     </Suspense>
   );

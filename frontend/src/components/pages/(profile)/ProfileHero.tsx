@@ -3,21 +3,26 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { HiOutlineMagnifyingGlass, HiOutlineBell, HiOutlinePencil } from "react-icons/hi2";
+import {
+  HiOutlineBell,
+  HiOutlineMagnifyingGlass,
+  HiOutlinePencil,
+} from "react-icons/hi2";
+import { toast } from "sonner";
 import { useAccount, useConnect } from "wagmi";
 import { injected } from "wagmi/connectors";
-import { toast } from "sonner";
-import { useUserStore } from "@/stores/userStore";
+import { EmojiAvatar, EmojiPicker } from "@/components/shared";
 import { useAuth } from "@/hooks/useAuth";
 import { useUSDTBalance } from "@/hooks/useUSDT";
-import { EmojiAvatar, EmojiPicker } from "@/components/shared";
-import NotificationSheet from "./NotificationSheet";
+import { useUserStore } from "@/stores/userStore";
 import DepositSheet from "./DepositSheet";
+import NotificationSheet from "./NotificationSheet";
 import WithdrawSheet from "./WithdrawSheet";
 
 export default function ProfileHero() {
   const router = useRouter();
   const name = useUserStore((s) => s.name);
+  const username = useUserStore((s) => s.username);
   const avatar = useUserStore((s) => s.avatar);
   const setAvatar = useUserStore((s) => s.setAvatar);
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -29,7 +34,8 @@ export default function ProfileHero() {
   const { address, isConnected } = useAccount();
   const { connect } = useConnect();
   const { login } = useAuth();
-  const { formatted: usdtBalance, isLoading: isBalanceLoading } = useUSDTBalance(address);
+  const { formatted: usdtBalance, isLoading: isBalanceLoading } =
+    useUSDTBalance(address);
 
   const displayBalance = isBalanceLoading ? "..." : usdtBalance.toFixed(2);
   const unreadCount = 3;
@@ -71,7 +77,14 @@ export default function ProfileHero() {
                   <HiOutlinePencil className="w-3 h-3 text-main-text" />
                 </div>
               </button>
-              <p className="text-base font-semibold text-white">Hi, {name}</p>
+              <div>
+                <p className="text-base font-semibold text-white">Hi, {name}</p>
+                {username && (
+                  <p className="text-xs text-white/60">
+                    @{username.replace(/^@/, "")}
+                  </p>
+                )}
+              </div>
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -109,7 +122,9 @@ export default function ProfileHero() {
               </div>
             </div>
             {isConnected && (
-              <p className="mt-1 text-sm font-medium text-emerald-300">+2.30 (22.5%)</p>
+              <p className="mt-1 text-sm font-medium text-emerald-300">
+                +2.30 (22.5%)
+              </p>
             )}
           </div>
 
@@ -157,7 +172,11 @@ export default function ProfileHero() {
         onClose={() => setDepositOpen(false)}
         walletAddress={address ?? ""}
       />
-      <WithdrawSheet open={withdrawOpen} onClose={() => setWithdrawOpen(false)} balance={displayBalance} />
+      <WithdrawSheet
+        open={withdrawOpen}
+        onClose={() => setWithdrawOpen(false)}
+        balance={displayBalance}
+      />
     </>
   );
 }

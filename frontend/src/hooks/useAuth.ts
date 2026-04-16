@@ -1,17 +1,24 @@
 "use client";
 
 import { useCallback } from "react";
-import { useAccount, useSignMessage } from "wagmi";
 import { SiweMessage } from "siwe";
-import { useAuthStore } from "@/stores/authStore";
+import { useAccount, useSignMessage } from "wagmi";
 import { authApi } from "@/lib/api/endpoints";
 import { celoSepolia } from "@/lib/web3/config";
+import { useAuthStore } from "@/stores/authStore";
 
 export function useAuth() {
   const { address } = useAccount();
   const { signMessageAsync } = useSignMessage();
-  const { setAuth, clearAuth, setToken, setLoading, isLoading, isAuthenticated, user } =
-    useAuthStore();
+  const {
+    setAuth,
+    clearAuth,
+    setToken,
+    setLoading,
+    isLoading,
+    isAuthenticated,
+    user,
+  } = useAuthStore();
 
   const login = useCallback(async () => {
     if (!address) throw new Error("Wallet not connected");
@@ -35,19 +42,22 @@ export function useAuth() {
       const verifyRes = await authApi.verify(messageString, signature);
 
       const u = verifyRes.user;
-      setAuth(verifyRes.accessToken, {
+      setAuth(verifyRes.accessToken, verifyRes.refreshToken || null, {
         id: u.id,
         wallet: u.walletAddress,
         username: u.username,
         displayName: u.name,
-        avatar: u.avatarEmoji && u.avatarColor ? `${u.avatarEmoji}|${u.avatarColor}` : null,
+        avatar:
+          u.avatarEmoji && u.avatarColor
+            ? `${u.avatarEmoji}|${u.avatarColor}`
+            : null,
         createdAt: u.createdAt,
       });
     } catch (error) {
-      clearAuth();
+      setLoading(false);
       throw error;
     }
-  }, [address, signMessageAsync, setAuth, clearAuth, setLoading]);
+  }, [address, signMessageAsync, setAuth, setLoading]);
 
   const logout = useCallback(async () => {
     try {
@@ -60,11 +70,13 @@ export function useAuth() {
   const refresh = useCallback(async () => {
     try {
       const res = await authApi.refresh();
-      setToken(res.accessToken);
+      if (res.accessToken) {
+        setToken(res.accessToken);
+      }
     } catch {
-      clearAuth();
+      // Don't clear auth on transient refresh failures
     }
-  }, [setToken, clearAuth]);
+  }, [setToken]);
 
   return { login, logout, refresh, isLoading, isAuthenticated, user, address };
 }

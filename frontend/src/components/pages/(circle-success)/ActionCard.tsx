@@ -16,7 +16,9 @@ export default function ActionCard() {
             <TbTargetArrow className="w-6 h-6 text-brand" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-main-text">Create your first prediction</p>
+            <p className="text-sm font-semibold text-main-text">
+              Create your first prediction
+            </p>
             <p className="text-xs text-muted max-w-[220px]">
               Kickstart your circle with a fun prediction event.
             </p>

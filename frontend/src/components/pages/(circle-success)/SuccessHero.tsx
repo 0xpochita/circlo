@@ -2,12 +2,17 @@
 
 import { motion } from "framer-motion";
 import { HiCheck } from "react-icons/hi2";
-import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
-import { toAvatar } from "@/lib/utils";
+import { EmojiAvatar } from "@/components/shared";
 import type { CircleDetailResponse } from "@/lib/api/endpoints";
+import { toAvatar } from "@/lib/utils";
 import type { UserAvatar } from "@/types";
 
-const defaultPositions: { avatar: UserAvatar; x: number; y: number; size: number }[] = [
+const defaultPositions: {
+  avatar: UserAvatar;
+  x: number;
+  y: number;
+  size: number;
+}[] = [
   { avatar: { emoji: "🚀", color: "#6366f1" }, x: 0, y: 0, size: 72 },
   { avatar: { emoji: "🌟", color: "#f59e0b" }, x: 78, y: -8, size: 72 },
   { avatar: { emoji: "🔥", color: "#ef4444" }, x: 156, y: 4, size: 72 },
@@ -51,16 +56,23 @@ export default function SuccessHero({ circle }: SuccessHeroProps) {
         >
           <HiCheck className="w-4 h-4 text-white" />
         </motion.div>
-        <p className="text-xs font-medium text-emerald-500 uppercase tracking-wide">Circle Created</p>
+        <p className="text-xs font-medium text-emerald-500 uppercase tracking-wide">
+          Circle Created
+        </p>
       </div>
 
       <div className="mb-4">
         <div className="flex items-center gap-2 mb-1">
-          {circleAvatar && <EmojiAvatar avatar={circleAvatar} size={32} shape="square" />}
-          <h1 className="text-2xl font-bold tracking-tight text-main-text">{circleName}</h1>
+          {circleAvatar && (
+            <EmojiAvatar avatar={circleAvatar} size={32} shape="square" />
+          )}
+          <h1 className="text-2xl font-bold tracking-tight text-main-text">
+            {circleName}
+          </h1>
         </div>
         <p className="text-sm text-muted">
-          {circle?.description || "Your circle is ready. Invite more friends to grow your community."}
+          {circle?.description ||
+            "Your circle is ready. Invite more friends to grow your community."}
         </p>
       </div>
 
@@ -81,7 +93,11 @@ export default function SuccessHero({ circle }: SuccessHeroProps) {
                 className="absolute"
                 style={{ left: p.x, top: p.y }}
               >
-                <EmojiAvatar avatar={p.avatar} size={p.size} className="border-4 border-white" />
+                <EmojiAvatar
+                  avatar={p.avatar}
+                  size={p.size}
+                  className="border-4 border-white"
+                />
               </motion.div>
             ))}
           </div>

@@ -1,7 +1,7 @@
 "use client";
 
-import { HiChevronLeft, HiOutlineShare } from "react-icons/hi2";
 import { useRouter } from "next/navigation";
+import { HiChevronLeft, HiOutlineShare } from "react-icons/hi2";
 
 type DetailsHeaderProps = {
   onShare?: () => void;

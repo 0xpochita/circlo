@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
+import { useState } from "react";
 import { HiOutlinePencil } from "react-icons/hi2";
 import { toast } from "sonner";
 import { EmojiAvatar, EmojiPicker } from "@/components/shared";
-import { useUserStore } from "@/stores/userStore";
-import { useAuthStore } from "@/stores/authStore";
 import { usersApi } from "@/lib/api/endpoints";
+import { useAuthStore } from "@/stores/authStore";
+import { useUserStore } from "@/stores/userStore";
 import type { UserAvatar } from "@/types";
 
 type ProfileStepProps = {
@@ -52,26 +52,38 @@ export default function ProfileStep({ onNext, onBack }: ProfileStepProps) {
 
   return (
     <div className="flex flex-col min-h-dvh">
-      <div className="flex-1 overflow-y-auto px-6 pt-10 pb-4">
+      <div className="flex items-center gap-3 px-6 pt-10 pb-4">
         <button
           type="button"
           onClick={onBack}
-          className="self-start text-sm text-muted cursor-pointer mb-6"
+          className="flex h-9 w-9 items-center justify-center rounded-full bg-white cursor-pointer transition-all duration-200 active:scale-[0.95]"
         >
-          Back
+          <span className="text-sm text-main-text">&larr;</span>
         </button>
+        <div className="flex-1 flex flex-col items-center">
+          <p className="text-xs text-muted mb-1">2 / 2</p>
+          <div className="flex w-full gap-1.5">
+            <div className="h-1 flex-1 rounded-full bg-emerald-500" />
+            <div className="h-1 flex-1 rounded-full bg-emerald-500" />
+          </div>
+        </div>
+        <div className="w-9" />
+      </div>
 
+      <div className="flex-1 overflow-y-auto px-6 pb-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-2xl font-bold tracking-tight text-main-text mb-1">
-            Set up your profile
-          </h1>
-          <p className="text-sm text-muted mb-6">
-            Pick an avatar and name so your friends can find you.
-          </p>
+          <div className="text-center mb-6">
+            <h1 className="text-2xl font-bold tracking-tight text-emerald-500">
+              Set up your profile
+            </h1>
+            <p className="mt-1 text-xs text-muted uppercase tracking-widest">
+              Almost there
+            </p>
+          </div>
 
           <div className="flex flex-col items-center mb-6">
             <button
@@ -83,7 +95,11 @@ export default function ProfileStep({ onNext, onBack }: ProfileStepProps) {
                 key={`${avatar.emoji}-${avatar.color}`}
                 initial={{ scale: 0.9 }}
                 animate={{ scale: 1 }}
-                transition={{ type: "spring" as const, stiffness: 300, damping: 20 }}
+                transition={{
+                  type: "spring" as const,
+                  stiffness: 300,
+                  damping: 20,
+                }}
               >
                 <EmojiAvatar avatar={avatar} size={88} />
               </motion.div>
@@ -114,7 +130,8 @@ export default function ProfileStep({ onNext, onBack }: ProfileStepProps) {
               <div>
                 <p className="text-sm font-semibold text-main-text">Pro tip</p>
                 <p className="text-xs text-muted">
-                  Use a name your friends will recognize. You can always change it later.
+                  Use a name your friends will recognize. You can always change
+                  it later.
                 </p>
               </div>
             </div>

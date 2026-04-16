@@ -10,6 +10,7 @@ export const authApi = {
   verify: (message: string, signature: string) =>
     fetchApi<{
       accessToken: string;
+      refreshToken?: string;
       user: {
         id: string;
         walletAddress: string;
@@ -124,7 +125,7 @@ export const circlesApi = {
       {
         method: "POST",
         body: JSON.stringify(inviteCode ? { inviteCode } : {}),
-      }
+      },
     ),
 
   leave: (circleId: string) =>
@@ -175,13 +176,30 @@ export const goalsApi = {
       body: JSON.stringify(data),
     }),
 
-  confirm: (goalId: string, txHash: string) =>
+  confirm: (goalId: string, chainId: number, txHash: string) =>
     fetchApi<GoalResponse>(`/goals/${goalId}/confirm`, {
       method: "POST",
-      body: JSON.stringify({ txHash }),
+      body: JSON.stringify({ chainId, txHash }),
     }),
 
   detail: (goalId: string) => fetchApi<GoalResponse>(`/goals/${goalId}`),
+
+  participants: (goalId: string, cursor?: string) =>
+    fetchApi<{
+      items: ParticipantResponse[];
+      nextCursor: string | null;
+      hasMore: boolean;
+    }>(`/goals/${goalId}/participants${cursor ? `?cursor=${cursor}` : ""}`),
+
+  myStake: (goalId: string) =>
+    fetchApi<{
+      staked: boolean;
+      data: {
+        side: number;
+        amount: string;
+        claimedAmount: string | null;
+      } | null;
+    }>(`/goals/${goalId}/my-stake`),
 
   mine: (cursor?: string) =>
     fetchApi<{
@@ -291,4 +309,21 @@ export type NotificationResponse = {
   description: string;
   unread: boolean;
   createdAt: string;
+};
+
+export type ParticipantResponse = {
+  userId: string;
+  side: number;
+  staked: string;
+  claimed: boolean;
+  claimedAmount: string | null;
+  createdAt: string;
+  user: {
+    id: string;
+    walletAddress: string;
+    name: string | null;
+    username: string | null;
+    avatarEmoji: string | null;
+    avatarColor: string | null;
+  };
 };

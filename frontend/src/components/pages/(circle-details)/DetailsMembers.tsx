@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { HiOutlineUserGroup } from "react-icons/hi2";
 import { toast } from "sonner";
-import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
-import { circlesApi } from "@/lib/api/endpoints";
+import { EmojiAvatar } from "@/components/shared";
 import type { MemberResponse } from "@/lib/api/endpoints";
+import { circlesApi } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
 
 type DetailsMembersProps = {
@@ -38,16 +38,31 @@ export default function DetailsMembers({ circleId }: DetailsMembersProps) {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center rounded-2xl bg-white py-10">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-200 border-t-brand" />
+        <div className="rounded-2xl bg-white divide-y divide-gray-50">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={`skel-${i}`} className="flex items-center justify-between px-4 py-3 animate-pulse">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full bg-gray-100" />
+                <div>
+                  <div className="h-4 w-24 rounded-lg bg-gray-100 mb-1.5" />
+                  <div className="h-3 w-16 rounded-lg bg-gray-100" />
+                </div>
+              </div>
+              <div className="h-6 w-14 rounded-full bg-gray-100" />
+            </div>
+          ))}
         </div>
       ) : members.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl bg-white py-10 px-4">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gray-50 mb-3">
             <HiOutlineUserGroup className="w-6 h-6 text-muted" />
           </div>
-          <p className="text-sm font-semibold text-main-text mb-1">No members yet</p>
-          <p className="text-xs text-muted text-center">Invite friends to join this circle</p>
+          <p className="text-sm font-semibold text-main-text mb-1">
+            No members yet
+          </p>
+          <p className="text-xs text-muted text-center">
+            Invite friends to join this circle
+          </p>
         </div>
       ) : (
         <div className="rounded-2xl bg-white divide-y divide-gray-50">
@@ -60,10 +75,19 @@ export default function DetailsMembers({ circleId }: DetailsMembersProps) {
               className="flex items-center justify-between px-4 py-3"
             >
               <div className="flex items-center gap-3">
-                <EmojiAvatar avatar={toAvatar(m.user.avatarEmoji, m.user.avatarColor)} size={40} />
+                <EmojiAvatar
+                  avatar={toAvatar(m.user.avatarEmoji, m.user.avatarColor)}
+                  size={40}
+                />
                 <div>
-                  <p className="text-sm font-semibold text-main-text">{m.user.name || "Anonymous"}</p>
-                  <p className="text-xs text-muted">{m.user.username ? `@${m.user.username}` : m.user.walletAddress.slice(0, 10)}</p>
+                  <p className="text-sm font-semibold text-main-text">
+                    {m.user.name || "Anonymous"}
+                  </p>
+                  <p className="text-xs text-muted">
+                    {m.user.username
+                      ? `@${m.user.username}`
+                      : m.user.walletAddress.slice(0, 10)}
+                  </p>
                 </div>
               </div>
               <span

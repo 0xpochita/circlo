@@ -1,7 +1,7 @@
 "use client";
 
-import { HiXMark, HiOutlineTrophy } from "react-icons/hi2";
 import { useState } from "react";
+import { HiOutlineTrophy, HiXMark } from "react-icons/hi2";
 
 export default function Banner() {
   const [visible, setVisible] = useState(true);

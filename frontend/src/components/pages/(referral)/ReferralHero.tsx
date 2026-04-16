@@ -4,18 +4,39 @@ import { motion } from "framer-motion";
 import { UsdtLabel } from "@/components/shared";
 
 const gridCells: { highlight?: "soft" | "active"; initials?: string }[] = [
-  { highlight: "soft" }, {}, { highlight: "soft" }, {}, {}, { highlight: "soft" }, {},
-  {}, { highlight: "soft" }, {}, { highlight: "active", initials: "FM" }, { highlight: "soft" }, {}, {},
-  {}, {}, {}, {}, { highlight: "soft" }, {}, { highlight: "soft" },
+  { highlight: "soft" },
+  {},
+  { highlight: "soft" },
+  {},
+  {},
+  { highlight: "soft" },
+  {},
+  {},
+  { highlight: "soft" },
+  {},
+  { highlight: "active", initials: "FM" },
+  { highlight: "soft" },
+  {},
+  {},
+  {},
+  {},
+  {},
+  {},
+  { highlight: "soft" },
+  {},
+  { highlight: "soft" },
 ];
 
 export default function ReferralHero() {
   return (
     <div className="px-4 py-2">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight text-main-text">Referral Bonus</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-main-text">
+          Referral Bonus
+        </h1>
         <p className="mt-1 text-sm text-muted inline-flex items-center gap-1 flex-wrap">
-          Invite your friends and earn 1 <UsdtLabel size={12} /> each when they sign up.
+          Invite your friends and earn 1 <UsdtLabel size={12} /> each when they
+          sign up.
         </p>
       </div>
 
@@ -36,12 +57,14 @@ export default function ReferralHero() {
               cell.highlight === "active"
                 ? "bg-main-text"
                 : cell.highlight === "soft"
-                ? "bg-gray-100"
-                : "bg-white"
+                  ? "bg-gray-100"
+                  : "bg-white"
             }`}
           >
             {cell.initials && (
-              <span className="text-xs font-bold text-white">{cell.initials}</span>
+              <span className="text-xs font-bold text-white">
+                {cell.initials}
+              </span>
             )}
           </motion.div>
         ))}

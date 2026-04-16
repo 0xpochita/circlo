@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import type { UserAvatar } from "@/types";
 
 type EmojiAvatarProps = {
@@ -9,7 +10,7 @@ type EmojiAvatarProps = {
   shape?: "circle" | "square";
 };
 
-export default function EmojiAvatar({
+function EmojiAvatar({
   avatar,
   size = 40,
   className = "",
@@ -33,3 +34,5 @@ export default function EmojiAvatar({
     </div>
   );
 }
+
+export default memo(EmojiAvatar);

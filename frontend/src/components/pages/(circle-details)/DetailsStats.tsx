@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { UsdtLabel } from "@/components/shared";
-import { circlesApi } from "@/lib/api/endpoints";
 import type { CircleDetailResponse } from "@/lib/api/endpoints";
+import { circlesApi } from "@/lib/api/endpoints";
 
 type DetailsStatsProps = {
   circleId?: string;
@@ -16,8 +16,13 @@ export default function DetailsStats({ circleId, circle }: DetailsStatsProps) {
 
   useEffect(() => {
     if (!circleId) return;
-    circlesApi.members(circleId).then((res) => setMemberCount(res.items?.length ?? 0)).catch(() => {});
-    circlesApi.goals(circleId).then((res) => setGoalCount(res.items?.length ?? 0)).catch(() => {});
+    Promise.all([
+      circlesApi.members(circleId).catch(() => null),
+      circlesApi.goals(circleId).catch(() => null),
+    ]).then(([membersRes, goalsRes]) => {
+      setMemberCount(membersRes?.items?.length ?? 0);
+      setGoalCount(goalsRes?.items?.length ?? 0);
+    });
   }, [circleId]);
 
   const stats = [
@@ -36,7 +41,9 @@ export default function DetailsStats({ circleId, circle }: DetailsStatsProps) {
           >
             <p className="text-xl font-bold text-main-text inline-flex items-center gap-1">
               {stat.value}
-              {stat.usdt && <UsdtLabel size={14} className="text-xs font-medium" />}
+              {stat.usdt && (
+                <UsdtLabel size={14} className="text-xs font-medium" />
+              )}
             </p>
             <p className="mt-1 text-xs text-muted">{stat.label}</p>
           </div>

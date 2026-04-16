@@ -1,16 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { HiChevronDown, HiCheck } from "react-icons/hi2";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { HiCheck, HiChevronDown } from "react-icons/hi2";
 import { EmojiAvatar } from "@/components/shared";
-import { useCreateGoalStore } from "@/stores/createGoalStore";
 import { circlesApi } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
+import { useCreateGoalStore } from "@/stores/createGoalStore";
 import type { UserAvatar } from "@/types";
 
 type CircleOption = {
   id: string;
+  chainId: string;
   name: string;
   memberCount: number;
   avatar: UserAvatar;
@@ -25,15 +26,38 @@ export default function CircleSelector() {
   useEffect(() => {
     circlesApi
       .list()
-      .then((res) => {
-        setCircles(
-          res.items.map((c) => ({
-            id: c.id,
-            name: c.name || "Circle",
-            memberCount: c.memberCount || 0,
-            avatar: toAvatar(c.avatarEmoji, c.avatarColor),
-          }))
+      .then(async (res) => {
+        const items = res.items || [];
+        const withCounts = await Promise.all(
+          items.map(async (c) => {
+            let count = c.memberCount ?? 0;
+            if (!count) {
+              try {
+                const m = await circlesApi.members(c.id);
+                count = m.items?.length ?? 1;
+              } catch {
+                count = 1;
+              }
+            }
+            return {
+              id: c.id,
+              chainId: c.chainId || "",
+              name: c.name || "Circle",
+              memberCount: count,
+              avatar: toAvatar(c.avatarEmoji, c.avatarColor),
+            };
+          }),
         );
+        setCircles(withCounts);
+
+        const state = useCreateGoalStore.getState();
+        if (state.circleId) {
+          const match = withCounts.find((c) => c.id === state.circleId);
+          if (match) {
+            useCreateGoalStore.getState().setCircleName(match.name);
+            useCreateGoalStore.getState().setCircleChainId(match.chainId);
+          }
+        }
       })
       .catch(() => setCircles([]))
       .finally(() => setIsLoading(false));
@@ -43,6 +67,8 @@ export default function CircleSelector() {
 
   function handleSelect(circle: CircleOption) {
     store.setCircleId(circle.id);
+    store.setCircleChainId(circle.chainId);
+    store.setCircleName(circle.name);
     setOpen(false);
   }
 
@@ -60,7 +86,9 @@ export default function CircleSelector() {
       <div className="px-4 py-2">
         <p className="text-sm font-medium text-main-text mb-2">Select Circle</p>
         <div className="rounded-2xl bg-white p-4 text-center">
-          <p className="text-sm text-muted">No circles found. Create or join a circle first.</p>
+          <p className="text-sm text-muted">
+            No circles found. Create or join a circle first.
+          </p>
         </div>
       </div>
     );
@@ -85,11 +113,16 @@ export default function CircleSelector() {
               {current?.name ?? "Choose a circle"}
             </p>
             {current && (
-              <p className="text-xs text-muted">{current.memberCount} members</p>
+              <p className="text-xs text-muted">
+                {current.memberCount} members
+              </p>
             )}
           </div>
         </div>
-        <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }}>
+        <motion.div
+          animate={{ rotate: open ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
+        >
           <HiChevronDown className="w-5 h-5 text-muted" />
         </motion.div>
       </button>
@@ -112,13 +145,21 @@ export default function CircleSelector() {
                   className="flex w-full items-center justify-between px-4 py-3 cursor-pointer transition-all duration-200"
                 >
                   <div className="flex items-center gap-3">
-                    <EmojiAvatar avatar={circle.avatar} size={36} shape="square" />
+                    <EmojiAvatar
+                      avatar={circle.avatar}
+                      size={36}
+                      shape="square"
+                    />
                     <div className="text-left">
                       <p className="text-sm text-main-text">{circle.name}</p>
-                      <p className="text-xs text-muted">{circle.memberCount} members</p>
+                      <p className="text-xs text-muted">
+                        {circle.memberCount} members
+                      </p>
                     </div>
                   </div>
-                  {store.circleId === circle.id && <HiCheck className="w-5 h-5 text-brand" />}
+                  {store.circleId === circle.id && (
+                    <HiCheck className="w-5 h-5 text-brand" />
+                  )}
                 </button>
               ))}
             </div>

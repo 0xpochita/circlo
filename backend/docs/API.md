@@ -799,15 +799,12 @@ Rate limited to **10 requests per IP per minute**.
 ### POST /api/v1/circles/:id/invite
 
 **Auth required:** Yes  
-**Description:** Sends in-app notifications to invite other users to a circle. Caller must be a member of the circle. Max 50 user IDs per request.
+**Description:** Sends in-app notifications to invite other users to a circle. Caller must be a member of the circle. Accepts a list of **usernames** (max 50). Returns 400 if any username is not found.
 
 **Request Body:**
 ```json
 {
-  "userIds": [
-    "660f9511-f39c-52e5-b827-557766551111",
-    "770fa622-a40d-63f6-c938-668877662222"
-  ]
+  "usernames": ["alice_celo", "bob_web3"]
 }
 ```
 
@@ -822,7 +819,16 @@ Rate limited to **10 requests per IP per minute**.
 ```json
 {
   "error": "ValidationError",
-  "message": "userIds must contain at least 1 element",
+  "message": "usernames must contain at least 1 element",
+  "statusCode": 400
+}
+```
+
+**Response 400 – username tidak ditemukan:**
+```json
+{
+  "error": "NotFound",
+  "message": "Users not found: alice_celo, unknown_user",
   "statusCode": 400
 }
 ```

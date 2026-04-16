@@ -1,11 +1,31 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { Web3Provider } from "@/providers/Web3Provider";
 import { Toaster } from "sonner";
+import { Web3Provider } from "@/providers/Web3Provider";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#ffffff",
+};
 
 export const metadata: Metadata = {
-  title: "Circlo",
+  title: {
+    default: "Circlo",
+    template: "%s | Circlo",
+  },
   description: "Tokenize Your Circle, Turn Predictions into Real Goals",
+  openGraph: {
+    title: "Circlo",
+    description: "Tokenize Your Circle, Turn Predictions into Real Goals",
+    type: "website",
+    siteName: "Circlo",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Circlo",
+    description: "Tokenize Your Circle, Turn Predictions into Real Goals",
+  },
 };
 
 export default function RootLayout({

@@ -1,8 +1,13 @@
 "use client";
 
-import { HiOutlineHome, HiOutlineMagnifyingGlass, HiOutlineUser, HiOutlineUserGroup } from "react-icons/hi2";
+import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
-import { motion, AnimatePresence, type Variants } from "framer-motion";
+import {
+  HiOutlineHome,
+  HiOutlineMagnifyingGlass,
+  HiOutlineUser,
+  HiOutlineUserGroup,
+} from "react-icons/hi2";
 
 const tabs = [
   { icon: HiOutlineHome, label: "Home", href: "/" },

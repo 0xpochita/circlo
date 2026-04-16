@@ -11,7 +11,7 @@ export function parseAvatar(avatarString: string | null): UserAvatar {
 
 export function toAvatar(
   emoji: string | null | undefined,
-  color: string | null | undefined
+  color: string | null | undefined,
 ): UserAvatar {
   return {
     emoji: emoji || "\u{1F31F}",

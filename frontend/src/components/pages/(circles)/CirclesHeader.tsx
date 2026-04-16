@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { HiOutlinePlus } from "react-icons/hi2";
+import { EmojiAvatar } from "@/components/shared";
 import { useUserStore } from "@/stores/userStore";
-import { EmojiAvatar } from "@/components/shared/EmojiAvatar";
 
 export default function CirclesHeader() {
   const avatar = useUserStore((s) => s.avatar);
@@ -14,7 +14,9 @@ export default function CirclesHeader() {
         <EmojiAvatar avatar={avatar} size={40} />
         <div>
           <p className="text-xs text-muted">Your</p>
-          <h1 className="text-xl font-bold tracking-tight text-main-text">Circles</h1>
+          <h1 className="text-xl font-bold tracking-tight text-main-text">
+            Circles
+          </h1>
         </div>
       </div>
       <Link

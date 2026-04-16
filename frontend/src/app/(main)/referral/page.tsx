@@ -1,5 +1,11 @@
-import { ReferralHeader, ReferralHero, RewardCard, RewardStats, RecentActivity } from "@/components/pages/(referral)";
 import { PageTransition } from "@/components/pages/(app)";
+import {
+  RecentActivity,
+  ReferralHeader,
+  ReferralHero,
+  RewardCard,
+  RewardStats,
+} from "@/components/pages/(referral)";
 
 export default function ReferralPage() {
   return (

@@ -1,15 +1,18 @@
 "use client";
 
 import Image from "next/image";
+import { memo } from "react";
 
 type UsdtLabelProps = {
   size?: number;
   className?: string;
 };
 
-export default function UsdtLabel({ size = 14, className = "" }: UsdtLabelProps) {
+function UsdtLabel({ size = 14, className = "" }: UsdtLabelProps) {
   return (
-    <span className={`inline-flex items-center gap-1 align-middle ${className}`}>
+    <span
+      className={`inline-flex items-center gap-1 align-middle ${className}`}
+    >
       USDT
       <Image
         src="/Assets/Images/Logo/logo-coin/usdt-logo.svg"
@@ -21,3 +24,5 @@ export default function UsdtLabel({ size = 14, className = "" }: UsdtLabelProps)
     </span>
   );
 }
+
+export default memo(UsdtLabel);

@@ -19,8 +19,12 @@ export default function RecentActivity() {
         <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gray-50 mb-3">
           <HiOutlineGift className="w-6 h-6 text-muted" />
         </div>
-        <p className="text-sm font-semibold text-main-text mb-1">No referral activity yet</p>
-        <p className="text-xs text-muted text-center">Share your referral code to start earning rewards</p>
+        <p className="text-sm font-semibold text-main-text mb-1">
+          No referral activity yet
+        </p>
+        <p className="text-xs text-muted text-center">
+          Share your referral code to start earning rewards
+        </p>
       </div>
     </div>
   );

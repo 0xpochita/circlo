@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useAccount, useWriteContract } from "wagmi";
+import { useState } from "react";
 import { toast } from "sonner";
-import { useCreateCircleStore } from "@/stores/createCircleStore";
-import { circleFactoryContract } from "@/lib/web3/contracts";
+import { decodeEventLog } from "viem";
+import { useAccount, usePublicClient, useWriteContract } from "wagmi";
 import { circlesApi } from "@/lib/api/endpoints";
+import { circleFactoryContract } from "@/lib/web3/contracts";
+import { useCreateCircleStore } from "@/stores/createCircleStore";
 
 export default function NextButton() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function NextButton() {
   const [statusText, setStatusText] = useState("Create Circle");
 
   const { writeContractAsync } = useWriteContract();
+  const publicClient = usePublicClient();
 
   async function handleCreate() {
     if (!isConnected) {
@@ -48,18 +50,45 @@ export default function NextButton() {
         avatar: `${circleEmoji}|${circleColor}`,
       });
 
-      await writeContractAsync({
+      const txHash = await writeContractAsync({
         address: circleFactoryContract.address,
         abi: circleFactoryContract.abi,
         functionName: "createCircle",
         args: [circlePrivacy === "private", metadataURI],
       });
 
+      setStatusText("Waiting for confirmation...");
+
+      let onChainCircleId: string | undefined;
+
+      if (publicClient) {
+        try {
+          const receipt = await publicClient.waitForTransactionReceipt({
+            hash: txHash,
+          });
+          for (const log of receipt.logs) {
+            try {
+              const decoded = decodeEventLog({
+                abi: circleFactoryContract.abi,
+                data: log.data,
+                topics: log.topics,
+              });
+              if (decoded.eventName === "CircleCreated") {
+                const args = decoded.args as unknown as Record<string, unknown>;
+                onChainCircleId = String(args.id ?? args.circleId ?? "");
+                break;
+              }
+            } catch {}
+          }
+        } catch {}
+      }
+
       setStatusText("Saving to backend...");
 
       let circleId = "";
       try {
         const created = await circlesApi.create({
+          ...(onChainCircleId ? { chainId: Number(onChainCircleId) } : {}),
           name: circleName,
           description: circleDescription,
           category: circleCategory,
@@ -87,7 +116,11 @@ export default function NextButton() {
       } else if (message.includes("chain") || message.includes("Chain")) {
         toast("Please switch to Celo Sepolia network");
       } else {
-        toast.error(message.length > 120 ? "Failed to create circle. Please try again." : message);
+        toast.error(
+          message.length > 120
+            ? "Failed to create circle. Please try again."
+            : message,
+        );
       }
     } finally {
       setIsCreating(false);

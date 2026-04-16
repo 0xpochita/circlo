@@ -31,14 +31,15 @@ export default function PageTransition({
       animate="visible"
       className="flex flex-col"
     >
-      {Array.isArray(children)
-        ? children.map((child, i) => (
-            <motion.div key={`item-${i}`} variants={itemVariants}>
-              {child}
-            </motion.div>
-          ))
-        : <motion.div variants={itemVariants}>{children}</motion.div>
-      }
+      {Array.isArray(children) ? (
+        children.map((child, i) => (
+          <motion.div key={`item-${i}`} variants={itemVariants}>
+            {child}
+          </motion.div>
+        ))
+      ) : (
+        <motion.div variants={itemVariants}>{children}</motion.div>
+      )}
     </motion.div>
   );
 }

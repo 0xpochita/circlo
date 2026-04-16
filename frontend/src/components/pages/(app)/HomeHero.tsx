@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import Header from "./Header";
 import BalanceCard from "./BalanceCard";
+import Header from "./Header";
 
 export default function HomeHero() {
   return (

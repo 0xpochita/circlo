@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { HiOutlineUserGroup, HiOutlineGlobeAlt } from "react-icons/hi2";
+import { HiOutlineGlobeAlt, HiOutlineUserGroup } from "react-icons/hi2";
 
 export default function FeatureCards() {
   return (

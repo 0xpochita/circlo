@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import WelcomeStep from "./WelcomeStep";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { usersApi } from "@/lib/api/endpoints";
 import ConnectStep from "./ConnectStep";
 import ProfileStep from "./ProfileStep";
+import WelcomeStep from "./WelcomeStep";
 
 export default function OnboardingFlow() {
   const router = useRouter();
@@ -13,31 +14,40 @@ export default function OnboardingFlow() {
 
   useEffect(() => {
     const completed = localStorage.getItem("circlo-onboarding-done");
-    if (completed === "true") {
+    const hasRedirect = localStorage.getItem("circlo-redirect-after-login");
+    if (completed === "true" && !hasRedirect) {
       router.replace("/");
+    } else if (completed === "true" && hasRedirect) {
+      setStep(1);
     }
   }, [router]);
 
   function handleComplete() {
     localStorage.setItem("circlo-onboarding-done", "true");
-    router.replace("/");
+    const redirect = localStorage.getItem("circlo-redirect-after-login");
+    if (redirect) {
+      localStorage.removeItem("circlo-redirect-after-login");
+      window.location.href = redirect;
+    } else {
+      router.replace("/");
+    }
+  }
+
+  async function handleConnectNext() {
+    try {
+      const me = await usersApi.me();
+      if (me.name && me.username) {
+        handleComplete();
+        return;
+      }
+    } catch {
+      // fall through to profile setup if check fails
+    }
+    setStep(2);
   }
 
   return (
     <div className="mx-auto w-full max-w-md bg-main-bg">
-      <div className="relative w-full">
-        <div className="absolute top-4 left-6 right-6 z-10 flex gap-1.5">
-          {[0, 1, 2].map((i) => (
-            <div
-              key={`step-${i}`}
-              className={`h-1 flex-1 rounded-full transition-all duration-300 ${
-                i <= step ? "bg-brand" : "bg-gray-200"
-              }`}
-            />
-          ))}
-        </div>
-      </div>
-
       <AnimatePresence mode="wait">
         {step === 0 && (
           <motion.div
@@ -58,7 +68,7 @@ export default function OnboardingFlow() {
             exit={{ opacity: 0, x: -50 }}
             transition={{ duration: 0.3 }}
           >
-            <ConnectStep onNext={() => setStep(2)} onBack={() => setStep(0)} />
+            <ConnectStep onNext={handleConnectNext} onBack={() => setStep(0)} />
           </motion.div>
         )}
         {step === 2 && (
