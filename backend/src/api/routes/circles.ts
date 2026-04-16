@@ -36,7 +36,7 @@ const joinCircleSchema = z.object({
 });
 
 const inviteSchema = z.object({
-  userIds: z.array(z.string().uuid()).min(1).max(50),
+  usernames: z.array(z.string().min(3).max(20)).min(1).max(50),
 });
 
 function serializeCircle(
@@ -400,11 +400,26 @@ export default async function circleRoutes(app: FastifyInstance) {
         });
       }
 
+      const users = await prisma.user.findMany({
+        where: { username: { in: body.data.usernames } },
+        select: { id: true, username: true },
+      });
+
+      const foundUsernames = new Set(users.map((u) => u.username));
+      const notFound = body.data.usernames.filter((u) => !foundUsernames.has(u));
+      if (notFound.length > 0) {
+        return reply.status(400).send({
+          error: "NotFound",
+          message: `Users not found: ${notFound.join(", ")}`,
+          statusCode: 400,
+        });
+      }
+
       await Promise.all(
-        body.data.userIds.map(async (userId) => {
+        users.map(async (user) => {
           const notification = {
             id: uuidv4(),
-            userId,
+            userId: user.id,
             type: "circle.invited",
             actorId: req.jwtUser.sub,
             entityType: "circle",
@@ -418,7 +433,7 @@ export default async function circleRoutes(app: FastifyInstance) {
           await prisma.notification.create({
             data: {
               id: notification.id,
-              user_id: userId,
+              user_id: user.id,
               type: notification.type,
               actor_id: req.jwtUser.sub,
               entity_type: "circle",
@@ -428,7 +443,7 @@ export default async function circleRoutes(app: FastifyInstance) {
             },
           });
 
-          await publishNotification(userId, notification);
+          await publishNotification(user.id, notification);
         })
       );
 
