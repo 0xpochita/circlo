@@ -142,6 +142,15 @@ export const circlesApi = {
       },
     ),
 
+  acceptInvite: (circleId: string) =>
+    fetchApi<{ success: boolean; alreadyMember?: boolean }>(
+      `/circles/${circleId}/accept-invite`,
+      {
+        method: "POST",
+        body: JSON.stringify({}),
+      },
+    ),
+
   members: (circleId: string, cursor?: string) =>
     fetchApi<{
       items: MemberResponse[];

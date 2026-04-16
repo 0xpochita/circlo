@@ -164,7 +164,7 @@ export default function InviteMemberButton({
                     autoFocus
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Search by username..."
+                    placeholder="Search username to invite..."
                     className="flex-1 bg-transparent text-sm text-main-text placeholder:text-muted outline-none"
                   />
                 </div>

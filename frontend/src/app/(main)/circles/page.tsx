@@ -4,6 +4,7 @@ import {
   CirclesHeader,
   CirclesList,
   CirclesStats,
+  PendingInvites,
 } from "@/components/pages/(circles)";
 
 export default function CirclesPage() {
@@ -12,6 +13,7 @@ export default function CirclesPage() {
       <PageTransition>
         <CirclesHeader />
         <CirclesStats />
+        <PendingInvites />
         <CirclesActions />
         <CirclesList />
       </PageTransition>
