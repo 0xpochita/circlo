@@ -287,6 +287,7 @@ function PredictionDetailContent() {
         status={goal?.status}
         winningSide={goal?.winningSide}
         deadline={goal?.deadline}
+        minStake={goal?.minStake}
         resolvers={goal?.resolvers}
         onStaked={refreshGoal}
       />

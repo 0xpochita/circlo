@@ -30,6 +30,7 @@ type StakeButtonProps = {
   status?: string;
   winningSide?: string | null;
   deadline?: string;
+  minStake?: string;
   resolvers?: ResolverInfo[];
   onStaked?: () => void;
 };
@@ -47,6 +48,7 @@ export default function StakeButton({
   status,
   winningSide,
   deadline,
+  minStake,
   resolvers,
   onStaked,
 }: StakeButtonProps) {
@@ -188,6 +190,9 @@ export default function StakeButton({
       return;
     }
     setSteps([]);
+    if (!amount && minStake && parseFloat(minStake) > 0) {
+      setAmount(String(parseFloat(minStake)));
+    }
     setSheetOpen(true);
   }
 
@@ -205,6 +210,11 @@ export default function StakeButton({
     const parsed = parseFloat(amount);
     if (Number.isNaN(parsed) || parsed <= 0) {
       toast("Enter a valid amount");
+      return;
+    }
+    const minStakeNum = parseFloat(minStake || "0");
+    if (minStakeNum > 0 && parsed < minStakeNum) {
+      toast.error(`Minimum stake is ${minStakeNum} USDT`);
       return;
     }
 
@@ -787,16 +797,32 @@ export default function StakeButton({
                       </button>
                     </div>
 
-                    <p className="text-sm font-medium text-main-text mb-2">
-                      Stake amount
-                    </p>
-                    <div className="rounded-2xl bg-gray-50 p-4 mb-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm font-medium text-main-text">
+                        Stake amount
+                      </p>
+                      {minStake && parseFloat(minStake) > 0 && (
+                        <p className="text-xs text-muted inline-flex items-center gap-1">
+                          Min: {parseFloat(minStake)} <UsdtLabel size={10} />
+                        </p>
+                      )}
+                    </div>
+                    <div
+                      className={`rounded-2xl p-4 mb-3 transition-colors ${
+                        amount &&
+                        parseFloat(amount) > 0 &&
+                        minStake &&
+                        parseFloat(amount) < parseFloat(minStake)
+                          ? "bg-red-50 ring-2 ring-red-200"
+                          : "bg-gray-50"
+                      }`}
+                    >
                       <div className="flex items-center justify-between">
                         <input
                           type="text"
                           inputMode="decimal"
                           value={amount}
-                          placeholder="0"
+                          placeholder={minStake || "0"}
                           onChange={(e) =>
                             setAmount(
                               e.target.value
@@ -813,29 +839,51 @@ export default function StakeButton({
                       </div>
                     </div>
 
+                    {amount &&
+                      parseFloat(amount) > 0 &&
+                      minStake &&
+                      parseFloat(amount) < parseFloat(minStake) && (
+                        <p className="text-xs text-red-400 mb-3">
+                          Minimum stake is {parseFloat(minStake)} USDT
+                        </p>
+                      )}
+
                     <div className="flex gap-2 mb-6">
-                      {["1", "5", "10", "50"].map((q) => (
-                        <button
-                          type="button"
-                          key={q}
-                          onClick={() => setAmount(q)}
-                          className={`flex-1 rounded-xl py-2 text-xs font-medium cursor-pointer transition-all duration-200 active:scale-[0.95] ${
-                            amount === q
-                              ? "bg-brand text-white"
-                              : "bg-gray-50 text-muted"
-                          }`}
-                        >
-                          {q}
-                        </button>
-                      ))}
+                      {["1", "5", "10", "50"].map((q) => {
+                        const min = parseFloat(minStake || "0");
+                        const disabled = min > 0 && parseFloat(q) < min;
+                        return (
+                          <button
+                            type="button"
+                            key={q}
+                            disabled={disabled}
+                            onClick={() => !disabled && setAmount(q)}
+                            className={`flex-1 rounded-xl py-2 text-xs font-medium transition-all duration-200 active:scale-95 ${
+                              disabled
+                                ? "bg-gray-50 text-gray-300 cursor-not-allowed"
+                                : amount === q
+                                  ? "bg-gray-900 text-white cursor-pointer"
+                                  : "bg-gray-50 text-muted cursor-pointer"
+                            }`}
+                          >
+                            {q}
+                          </button>
+                        );
+                      })}
                     </div>
 
                     <motion.button
                       type="button"
                       onClick={handleConfirmStake}
-                      disabled={isStaking}
+                      disabled={
+                        isStaking ||
+                        !amount ||
+                        parseFloat(amount) <= 0 ||
+                        (!!minStake &&
+                          parseFloat(amount) < parseFloat(minStake))
+                      }
                       whileTap={isStaking ? {} : { scale: 0.97 }}
-                      className="w-full rounded-full bg-brand py-4 text-base font-semibold text-white cursor-pointer disabled:bg-gray-200 disabled:text-muted disabled:cursor-not-allowed"
+                      className="w-full rounded-full bg-gray-900 py-4 text-base font-semibold text-white cursor-pointer disabled:bg-gray-200 disabled:text-muted disabled:cursor-not-allowed"
                     >
                       Confirm Stake
                     </motion.button>
