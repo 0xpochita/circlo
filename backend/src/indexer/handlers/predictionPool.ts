@@ -102,6 +102,17 @@ export async function handleGoalCreated(args: {
     return;
   }
 
+  const alreadyIndexed = await prisma.goal.findFirst({
+    where: { chain_id: args.id },
+  });
+
+  if (alreadyIndexed) {
+    console.log(
+      `[PredictionPool] GoalCreated: chain_id=${args.id} already indexed, skipping`
+    );
+    return;
+  }
+
   const existingGoal = await prisma.goal.findFirst({
     where: {
       creator_id: user.id,
