@@ -133,11 +133,14 @@ export const circlesApi = {
       method: "DELETE",
     }),
 
-  invite: (circleId: string, userIds: string[]) =>
-    fetchApi<{ success: boolean }>(`/circles/${circleId}/invite`, {
-      method: "POST",
-      body: JSON.stringify({ userIds }),
-    }),
+  invite: (circleId: string, usernames: string[]) =>
+    fetchApi<{ success: boolean; invalidUsernames?: string[] }>(
+      `/circles/${circleId}/invite`,
+      {
+        method: "POST",
+        body: JSON.stringify({ usernames }),
+      },
+    ),
 
   members: (circleId: string, cursor?: string) =>
     fetchApi<{

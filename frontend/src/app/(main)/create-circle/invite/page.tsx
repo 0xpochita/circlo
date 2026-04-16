@@ -1,3 +1,7 @@
+"use client";
+
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import {
   BackHeader,
   CircleHero,
@@ -5,7 +9,10 @@ import {
   NextButton,
 } from "@/components/pages/(create-circle)";
 
-export default function InviteFriendsPage() {
+function InviteContent() {
+  const searchParams = useSearchParams();
+  const circleId = searchParams.get("id") ?? "";
+
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-main-bg">
       <BackHeader />
@@ -18,8 +25,22 @@ export default function InviteFriendsPage() {
         </p>
       </div>
       <CircleHero />
-      <MemberList />
+      <MemberList circleId={circleId} />
       <NextButton />
     </div>
+  );
+}
+
+export default function InviteFriendsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col items-center justify-center bg-main-bg">
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand border-t-transparent" />
+        </div>
+      }
+    >
+      <InviteContent />
+    </Suspense>
   );
 }

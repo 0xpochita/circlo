@@ -11,11 +11,13 @@ import {
 } from "react-icons/hi2";
 import { TbTargetArrow } from "react-icons/tb";
 import { toast } from "sonner";
+import { usePublicClient } from "wagmi";
 import { EmojiAvatar, UsdtLabel } from "@/components/shared";
 import { useSheetOverflow } from "@/hooks";
 import type { GoalResponse } from "@/lib/api/endpoints";
-import { circlesApi } from "@/lib/api/endpoints";
+import { circlesApi, goalsApi } from "@/lib/api/endpoints";
 import { formatTimeLeft, toAvatar } from "@/lib/utils";
+import { predictionPoolContract } from "@/lib/web3/contracts";
 
 type DetailsGoalsProps = {
   circleId?: string;
@@ -48,6 +50,7 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 export default function DetailsGoals({ circleId }: DetailsGoalsProps) {
+  const publicClient = usePublicClient();
   const [goals, setGoals] = useState<GoalResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -61,12 +64,66 @@ export default function DetailsGoals({ circleId }: DetailsGoalsProps) {
       return;
     }
 
+    let cancelled = false;
+
+    async function getCount(g: GoalResponse): Promise<number> {
+      let backendCount = 0;
+      try {
+        const r = await goalsApi.participants(g.id);
+        backendCount = r.items?.length ?? 0;
+      } catch {
+        backendCount = g.participantCount ?? 0;
+      }
+
+      if (backendCount > 0 || !g.chainId || !publicClient) {
+        return backendCount;
+      }
+
+      try {
+        const [yesPool, noPool] = await Promise.all([
+          publicClient.readContract({
+            address: predictionPoolContract.address,
+            abi: predictionPoolContract.abi,
+            functionName: "poolPerSide",
+            args: [BigInt(g.chainId), 0],
+          }),
+          publicClient.readContract({
+            address: predictionPoolContract.address,
+            abi: predictionPoolContract.abi,
+            functionName: "poolPerSide",
+            args: [BigInt(g.chainId), 1],
+          }),
+        ]);
+        const total = (yesPool as bigint) + (noPool as bigint);
+        return total > BigInt(0) ? 1 : 0;
+      } catch {
+        return 0;
+      }
+    }
+
     circlesApi
       .goals(circleId)
-      .then((res) => setGoals(res.items))
+      .then(async (res) => {
+        if (cancelled) return;
+        const items = res.items;
+        setGoals(items);
+
+        const counts = await Promise.all(items.map(getCount));
+
+        if (cancelled) return;
+        setGoals(
+          items.map((g, i) => ({ ...g, participantCount: counts[i] })),
+        );
+      })
       .catch((err) => toast.error(err.message))
-      .finally(() => setLoading(false));
-  }, [circleId]);
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [circleId, publicClient]);
 
   const filteredGoals = useMemo(() => {
     if (activeFilter === "all") return goals;

@@ -5,8 +5,9 @@ import { useEffect, useRef, useState } from "react";
 import { HiOutlineMagnifyingGlass, HiOutlineUserPlus } from "react-icons/hi2";
 import { toast } from "sonner";
 import { EmojiAvatar } from "@/components/shared";
-import { usersApi } from "@/lib/api/endpoints";
+import { circlesApi, usersApi } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
+import { useCreateCircleStore } from "@/stores/createCircleStore";
 
 type SearchUser = {
   id: string;
@@ -18,11 +19,19 @@ type SearchUser = {
   createdAt: string;
 };
 
-export default function MemberList() {
+type MemberListProps = {
+  circleId?: string;
+};
+
+export default function MemberList({ circleId }: MemberListProps) {
+  const inviteUsernames = useCreateCircleStore((s) => s.inviteUsernames);
+  const toggleInvite = useCreateCircleStore((s) => s.toggleInvite);
+
   const [search, setSearch] = useState("");
   const [users, setUsers] = useState<SearchUser[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [invited, setInvited] = useState<Record<string, boolean>>({});
+  const [invitingId, setInvitingId] = useState<string | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -51,8 +60,42 @@ export default function MemberList() {
     };
   }, [search]);
 
-  function handleInvite(userId: string) {
-    setInvited((prev) => ({ ...prev, [userId]: true }));
+  async function handleInvite(user: SearchUser) {
+    if (!user.username) {
+      toast.error("This user has no username yet");
+      return;
+    }
+
+    if (!circleId) {
+      toggleInvite(user.username);
+      const isAdding = !inviteUsernames.includes(user.username);
+      setInvited((prev) => ({ ...prev, [user.id]: isAdding }));
+      if (isAdding) {
+        toast(`@${user.username} will be invited after circle is created`);
+      }
+      return;
+    }
+
+    setInvitingId(user.id);
+    try {
+      const res = await circlesApi.invite(circleId, [user.username]);
+      if (res.invalidUsernames && res.invalidUsernames.length > 0) {
+        toast.error(`Username not found: ${res.invalidUsernames.join(", ")}`);
+        return;
+      }
+      setInvited((prev) => ({ ...prev, [user.id]: true }));
+      toast.success(`Invited @${user.username}`);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "";
+      if (message.includes("already")) {
+        setInvited((prev) => ({ ...prev, [user.id]: true }));
+        toast(`@${user.username} is already a member`);
+      } else {
+        toast.error("Failed to send invite");
+      }
+    } finally {
+      setInvitingId(null);
+    }
   }
 
   return (
@@ -111,7 +154,11 @@ export default function MemberList() {
             className="rounded-2xl bg-white divide-y divide-gray-50"
           >
             {users.map((member, i) => {
-              const isInvited = invited[member.id];
+              const inSelection =
+                !!member.username && inviteUsernames.includes(member.username);
+              const isInvited = invited[member.id] || inSelection;
+              const isInviting = invitingId === member.id;
+              const canInvite = !!member.username;
               return (
                 <motion.div
                   key={member.id}
@@ -145,10 +192,11 @@ export default function MemberList() {
                   ) : (
                     <button
                       type="button"
-                      onClick={() => handleInvite(member.id)}
-                      className="rounded-full bg-brand px-4 py-1.5 text-xs font-medium text-white cursor-pointer transition-all duration-200 active:scale-[0.95]"
+                      onClick={() => handleInvite(member)}
+                      disabled={isInviting || !canInvite}
+                      className="rounded-full bg-gray-900 px-4 py-1.5 text-xs font-medium text-white cursor-pointer transition-all duration-200 active:scale-95 disabled:bg-gray-200 disabled:text-muted disabled:cursor-not-allowed"
                     >
-                      Invite
+                      {isInviting ? "..." : "Invite"}
                     </button>
                   )}
                 </motion.div>
