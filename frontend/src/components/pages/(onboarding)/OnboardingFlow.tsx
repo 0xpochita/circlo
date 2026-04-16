@@ -2,8 +2,8 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
-import { useAuthStore } from "@/stores/authStore";
+import { useEffect, useState } from "react";
+import { usersApi } from "@/lib/api/endpoints";
 import ConnectStep from "./ConnectStep";
 import ProfileStep from "./ProfileStep";
 import WelcomeStep from "./WelcomeStep";
@@ -11,7 +11,6 @@ import WelcomeStep from "./WelcomeStep";
 export default function OnboardingFlow() {
   const router = useRouter();
   const [step, setStep] = useState(0);
-  const user = useAuthStore((s) => s.user);
 
   useEffect(() => {
     const completed = localStorage.getItem("circlo-onboarding-done");
@@ -34,19 +33,17 @@ export default function OnboardingFlow() {
     }
   }
 
-  const hasProfile = useCallback(() => {
-    if (!user) return false;
-    const hasName = user.displayName && user.displayName !== "Player";
-    const hasUsername = user.username && !user.username.startsWith("@");
-    return !!(hasName || hasUsername);
-  }, [user]);
-
-  function handleConnectNext() {
-    if (hasProfile()) {
-      handleComplete();
-    } else {
-      setStep(2);
+  async function handleConnectNext() {
+    try {
+      const me = await usersApi.me();
+      if (me.name && me.username) {
+        handleComplete();
+        return;
+      }
+    } catch {
+      // fall through to profile setup if check fails
     }
+    setStep(2);
   }
 
   return (

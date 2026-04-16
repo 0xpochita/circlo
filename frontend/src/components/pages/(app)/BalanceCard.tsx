@@ -88,7 +88,11 @@ export default function BalanceCard() {
           "Faucet transaction reverted. You may have already claimed recently.",
         );
       } else {
-        toast.error("Faucet failed. Please try again.");
+        toast.error(
+          message.length > 80
+            ? `Faucet failed: ${message.slice(0, 80)}...`
+            : `Faucet failed: ${message || "Unknown error"}`,
+        );
       }
     } finally {
       setIsFauceting(false);

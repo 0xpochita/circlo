@@ -9,6 +9,7 @@ import { useSheetOverflow } from "@/hooks";
 import type { GoalResponse } from "@/lib/api/endpoints";
 import { goalsApi } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
+import { useDataCache } from "@/stores/dataCache";
 
 function getResultLabel(goal: GoalResponse): {
   label: string;
@@ -22,17 +23,31 @@ function getResultLabel(goal: GoalResponse): {
 }
 
 export default function RecentPredictions() {
-  const [goals, setGoals] = useState<GoalResponse[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const cached = useDataCache((s) => s.myGoals);
+  const isStale = useDataCache((s) => s.isStale);
+  const setMyGoals = useDataCache((s) => s.setMyGoals);
+  const hasCached = cached.length > 0;
+  const [goals, setGoals] = useState<GoalResponse[]>(cached);
+  const [isLoading, setIsLoading] = useState(!hasCached);
   const [sheetOpen, setSheetOpen] = useState(false);
 
   useSheetOverflow(sheetOpen);
 
   useEffect(() => {
+    if (!isStale("myGoals") && hasCached) {
+      setGoals(cached);
+      return;
+    }
+
     goalsApi
       .mine()
-      .then((res) => setGoals(res.items))
-      .catch(() => setGoals([]))
+      .then((res) => {
+        setGoals(res.items);
+        setMyGoals(res.items);
+      })
+      .catch(() => {
+        if (!hasCached) setGoals([]);
+      })
       .finally(() => setIsLoading(false));
   }, []);
 

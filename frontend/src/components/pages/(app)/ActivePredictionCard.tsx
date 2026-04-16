@@ -7,19 +7,31 @@ import { EmojiAvatar } from "@/components/shared";
 import type { GoalResponse } from "@/lib/api/endpoints";
 import { goalsApi } from "@/lib/api/endpoints";
 import { formatTimeLeft, toAvatar } from "@/lib/utils";
+import { useDataCache } from "@/stores/dataCache";
 
 export default function ActivePredictionCard() {
-  const [goal, setGoal] = useState<GoalResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const cached = useDataCache((s) => s.feedGoal);
+  const isStale = useDataCache((s) => s.isStale);
+  const setFeedGoal = useDataCache((s) => s.setFeedGoal);
+  const hasCached = cached !== null;
+  const [goal, setGoal] = useState<GoalResponse | null>(cached);
+  const [isLoading, setIsLoading] = useState(!hasCached);
 
   useEffect(() => {
+    if (!isStale("feedGoal") && hasCached) {
+      setGoal(cached);
+      return;
+    }
+
     goalsApi
       .feed()
       .then((res) => {
-        setGoal(res.items.length > 0 ? res.items[0] : null);
+        const first = res.items.length > 0 ? res.items[0] : null;
+        setGoal(first);
+        setFeedGoal(first);
       })
       .catch(() => {
-        setGoal(null);
+        if (!hasCached) setGoal(null);
       })
       .finally(() => setIsLoading(false));
   }, []);

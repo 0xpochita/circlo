@@ -5,6 +5,7 @@ import { circlesApi } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
 import { circleFactoryContract } from "@/lib/web3/contracts";
 import { useCircleStore } from "@/stores/circleStore";
+import { useDataCache } from "@/stores/dataCache";
 import type { UserAvatar } from "@/types";
 import { useContract } from "./useContract";
 
@@ -21,47 +22,57 @@ export type CircleWithCount = {
   avatarColor: string | null;
 };
 
+async function fetchCirclesData(): Promise<CircleWithCount[]> {
+  const res = await circlesApi.list();
+  const items = res.items || [];
+  return Promise.all(
+    items.map(async (c) => {
+      let count = c.memberCount ?? 0;
+      if (!count) {
+        try {
+          const m = await circlesApi.members(c.id);
+          count = m.items?.length ?? 1;
+        } catch {
+          count = 1;
+        }
+      }
+      return {
+        id: c.id,
+        chainId: c.chainId || "",
+        name: c.name || "Circle",
+        description: c.description || "",
+        category: c.category || "general",
+        privacy: c.privacy || "public",
+        memberCount: count,
+        avatar: toAvatar(c.avatarEmoji, c.avatarColor),
+        avatarEmoji: c.avatarEmoji,
+        avatarColor: c.avatarColor,
+      };
+    }),
+  );
+}
+
 export function useMyCircles() {
-  const [circles, setCircles] = useState<CircleWithCount[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const cached = useDataCache((s) => s.myCircles);
+  const isStale = useDataCache((s) => s.isStale);
+  const setMyCircles = useDataCache((s) => s.setMyCircles);
+  const hasCached = cached.length > 0;
+  const [isLoading, setIsLoading] = useState(!hasCached);
 
   useEffect(() => {
-    circlesApi
-      .list()
-      .then(async (res) => {
-        const items = res.items || [];
-        const withCounts = await Promise.all(
-          items.map(async (c) => {
-            let count = c.memberCount ?? 0;
-            if (!count) {
-              try {
-                const m = await circlesApi.members(c.id);
-                count = m.items?.length ?? 1;
-              } catch {
-                count = 1;
-              }
-            }
-            return {
-              id: c.id,
-              chainId: c.chainId || "",
-              name: c.name || "Circle",
-              description: c.description || "",
-              category: c.category || "general",
-              privacy: c.privacy || "public",
-              memberCount: count,
-              avatar: toAvatar(c.avatarEmoji, c.avatarColor),
-              avatarEmoji: c.avatarEmoji,
-              avatarColor: c.avatarColor,
-            };
-          }),
-        );
-        setCircles(withCounts);
+    if (!isStale("myCircles") && hasCached) return;
+
+    fetchCirclesData()
+      .then((data) => {
+        setMyCircles(data);
       })
-      .catch(() => setCircles([]))
+      .catch(() => {
+        if (!hasCached) setMyCircles([]);
+      })
       .finally(() => setIsLoading(false));
   }, []);
 
-  return { circles, isLoading };
+  return { circles: cached, isLoading };
 }
 
 export function useCreateCircle() {
