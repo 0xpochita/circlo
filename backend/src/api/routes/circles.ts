@@ -451,6 +451,93 @@ export default async function circleRoutes(app: FastifyInstance) {
     }
   );
 
+  app.post(
+    "/:id/accept-invite",
+    { preHandler: requireAuth },
+    async (req, reply) => {
+      const { id } = req.params as { id: string };
+
+      const invite = await prisma.notification.findFirst({
+        where: {
+          user_id: req.jwtUser.sub,
+          entity_id: id,
+          type: "circle.invited",
+        },
+      });
+
+      if (!invite) {
+        return reply.status(403).send({
+          error: "Forbidden",
+          message: "No invitation found for this circle",
+          statusCode: 403,
+        });
+      }
+
+      const existing = await prisma.circleMember.findUnique({
+        where: {
+          circle_id_user_id: { circle_id: id, user_id: req.jwtUser.sub },
+        },
+      });
+
+      if (existing) {
+        return reply.send({ success: true, alreadyMember: true });
+      }
+
+      const circle = await prisma.circle.findUnique({ where: { id } });
+      if (!circle) {
+        return reply.status(404).send({
+          error: "NotFound",
+          message: "Circle not found",
+          statusCode: 404,
+        });
+      }
+
+      await prisma.$transaction([
+        prisma.circleMember.create({
+          data: { circle_id: id, user_id: req.jwtUser.sub, role: "member" },
+        }),
+        prisma.notification.updateMany({
+          where: {
+            user_id: req.jwtUser.sub,
+            entity_id: id,
+            type: "circle.invited",
+          },
+          data: { unread: false },
+        }),
+      ]);
+
+      const joinNotification = {
+        id: uuidv4(),
+        userId: circle.owner_id,
+        type: "circle.joined",
+        actorId: req.jwtUser.sub,
+        entityType: "circle",
+        entityId: id,
+        title: "New member joined",
+        description: `Someone accepted your invitation to "${circle.name}"`,
+        unread: true,
+        createdAt: new Date(),
+      };
+
+      await prisma.notification.create({
+        data: {
+          id: joinNotification.id,
+          user_id: circle.owner_id,
+          type: joinNotification.type,
+          actor_id: req.jwtUser.sub,
+          entity_type: "circle",
+          entity_id: id,
+          title: joinNotification.title,
+          description: joinNotification.description,
+        },
+      });
+
+      await publishNotification(circle.owner_id, joinNotification);
+
+      return reply.send({ success: true });
+    }
+  );
+
   app.get(
     "/:id/members",
     { preHandler: requireAuth },

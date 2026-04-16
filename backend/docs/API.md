@@ -862,6 +862,57 @@ Rate limited to **10 requests per IP per minute**.
 
 ---
 
+### POST /api/v1/circles/:id/accept-invite
+
+**Auth required:** Yes  
+**Description:** Accepts an invitation to join a circle. The user must have a `circle.invited` notification for the target circle. On success, the user is added as a member, the invite notification is marked as read, and the circle owner receives a `circle.joined` notification.
+
+**Request Body:** *(none)*
+
+**Response 200 – berhasil join:**
+```json
+{
+  "success": true
+}
+```
+
+**Response 200 – sudah jadi member sebelumnya:**
+```json
+{
+  "success": true,
+  "alreadyMember": true
+}
+```
+
+**Response 401:**
+```json
+{
+  "error": "Unauthorized",
+  "message": "Missing or invalid access token",
+  "statusCode": 401
+}
+```
+
+**Response 403 – tidak ada invite:**
+```json
+{
+  "error": "Forbidden",
+  "message": "No invitation found for this circle",
+  "statusCode": 403
+}
+```
+
+**Response 404 – circle not found:**
+```json
+{
+  "error": "NotFound",
+  "message": "Circle not found",
+  "statusCode": 404
+}
+```
+
+---
+
 ### DELETE /api/v1/circles/:id/leave
 
 **Auth required:** Yes  
