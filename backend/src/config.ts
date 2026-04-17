@@ -13,6 +13,7 @@ function optional(name: string, fallback: string): string {
 export const config = {
   port: parseInt(optional("PORT", "3001"), 10),
   nodeEnv: optional("NODE_ENV", "development"),
+  apiUrl: optional("API_URL", "http://localhost:3001"),
   frontendOrigin: optional("FRONTEND_ORIGIN", "http://localhost:3000"),
 
   databaseUrl: required("DATABASE_URL"),

@@ -54,10 +54,12 @@ export default function PredictionForm() {
   function getDeadlineLabel(): string {
     if (useCustomDeadline && store.customDeadline) {
       const target = new Date(store.customDeadline);
-      return target.toLocaleDateString("en-US", {
+      return target.toLocaleString("en-US", {
         month: "short",
         day: "numeric",
         year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
       });
     }
     if (selectedDuration >= 0) {
@@ -66,10 +68,11 @@ export default function PredictionForm() {
     return "";
   }
 
-  function getMinDate(): string {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    return tomorrow.toISOString().split("T")[0];
+  function getMinDateTime(): string {
+    const next = new Date(Date.now() + 60 * 60 * 1000);
+    const offset = next.getTimezoneOffset();
+    const local = new Date(next.getTime() - offset * 60 * 1000);
+    return local.toISOString().slice(0, 16);
   }
 
   return (
@@ -187,9 +190,9 @@ export default function PredictionForm() {
           <div className="flex items-center gap-2 rounded-xl bg-gray-50 px-4 py-3">
             <HiOutlineCalendarDays className="w-4 h-4 text-muted shrink-0" />
             <input
-              type="date"
+              type="datetime-local"
               value={store.customDeadline || ""}
-              min={getMinDate()}
+              min={getMinDateTime()}
               onChange={(e) => handleCustomDate(e.target.value)}
               className="flex-1 bg-transparent text-sm text-main-text placeholder:text-muted outline-none cursor-pointer"
             />
