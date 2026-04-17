@@ -112,7 +112,7 @@ export default async function goalRoutes(app: FastifyInstance) {
       }
 
       const goalId = uuidv4();
-      const metadataUri = `${config.frontendOrigin}/api/v1/goals/${goalId}/metadata`;
+      const metadataUri = `${config.apiUrl}/api/v1/goals/${goalId}/metadata`;
 
       const goal = await prisma.$transaction(async (tx) => {
         const g = await tx.goal.create({
