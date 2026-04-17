@@ -70,6 +70,7 @@ export default function StakeButton({
     claimedAmount: string | null;
   } | null>(null);
   const [steps, setSteps] = useState<Step[]>([]);
+  const [hasParticipants, setHasParticipants] = useState<boolean | null>(null);
   const { writeContractAsync } = useWriteContract();
   const publicClient = usePublicClient();
 
@@ -176,6 +177,39 @@ export default function StakeButton({
       cancelled = true;
     };
   }, [goalId, goalChainId, isConnected, address, publicClient]);
+
+  useEffect(() => {
+    if (!goalChainId || !publicClient) return;
+    let cancelled = false;
+    const chainId = BigInt(goalChainId);
+
+    Promise.all([
+      publicClient.readContract({
+        address: predictionPoolContract.address,
+        abi: predictionPoolContract.abi,
+        functionName: "poolPerSide",
+        args: [chainId, 0],
+      }),
+      publicClient.readContract({
+        address: predictionPoolContract.address,
+        abi: predictionPoolContract.abi,
+        functionName: "poolPerSide",
+        args: [chainId, 1],
+      }),
+    ])
+      .then(([yesPool, noPool]) => {
+        if (cancelled) return;
+        const total = (yesPool as bigint) + (noPool as bigint);
+        setHasParticipants(total > BigInt(0));
+      })
+      .catch(() => {
+        if (!cancelled) setHasParticipants(null);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [goalChainId, publicClient]);
 
   useSheetOverflow(sheetOpen);
 
@@ -662,26 +696,38 @@ export default function StakeButton({
           </div>
         )}
 
-        {isResolver && !hasVoted && (
-          <motion.button
-            type="button"
-            onClick={() =>
-              deadlinePassed
-                ? setResolveSheetOpen(true)
-                : toast(`Resolve opens in ${getTimeUntilDeadline()}`)
-            }
-            whileTap={deadlinePassed ? { scale: 0.97 } : {}}
-            className={`w-full rounded-full py-4 text-base font-semibold cursor-pointer transition-all duration-200 ${
-              deadlinePassed
-                ? "bg-amber-500 text-white"
-                : "bg-gray-100 text-muted"
-            }`}
-          >
-            {deadlinePassed
-              ? "Resolve Market"
-              : `Resolve in ${getTimeUntilDeadline()}`}
-          </motion.button>
-        )}
+        {isResolver &&
+          !hasVoted &&
+          (deadlinePassed && hasParticipants === false ? (
+            <div className="rounded-2xl bg-gray-50 ring-1 ring-gray-100 px-5 py-4 text-center">
+              <p className="text-sm font-semibold text-main-text mb-1">
+                Nothing to resolve
+              </p>
+              <p className="text-xs text-muted">
+                No one staked on this market. There&apos;s no outcome to vote
+                on.
+              </p>
+            </div>
+          ) : (
+            <motion.button
+              type="button"
+              onClick={() =>
+                deadlinePassed
+                  ? setResolveSheetOpen(true)
+                  : toast(`Resolve opens in ${getTimeUntilDeadline()}`)
+              }
+              whileTap={deadlinePassed ? { scale: 0.97 } : {}}
+              className={`w-full rounded-full py-4 text-base font-semibold cursor-pointer transition-all duration-200 ${
+                deadlinePassed
+                  ? "bg-amber-500 text-white"
+                  : "bg-gray-100 text-muted"
+              }`}
+            >
+              {deadlinePassed
+                ? "Resolve Market"
+                : `Resolve in ${getTimeUntilDeadline()}`}
+            </motion.button>
+          ))}
 
         {isResolver && hasVoted && (
           <div className="flex items-center justify-center rounded-full bg-gray-50 px-5 py-3">
