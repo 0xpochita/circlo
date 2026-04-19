@@ -50,7 +50,8 @@ export default function PendingInvites() {
             (n.type === "circle.invited" ||
               n.type === "circle_invite" ||
               n.type === "circle.invite") &&
-            n.entityId,
+            n.entityId &&
+            n.unread,
         );
 
         if (inviteNotifs.length === 0) {
@@ -113,6 +114,7 @@ export default function PendingInvites() {
       try {
         await notificationsApi.markRead([invite.notificationId]);
       } catch {}
+      setDismissed((prev) => ({ ...prev, [invite.notificationId]: true }));
       invalidateCache("myCircles");
       setActiveInvite(null);
       router.push(`/circle-details?id=${invite.circleId}`);
