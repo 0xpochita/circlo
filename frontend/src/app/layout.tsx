@@ -26,6 +26,10 @@ export const metadata: Metadata = {
     title: "Circlo",
     description: "Tokenize Your Circle, Turn Predictions into Real Goals",
   },
+  other: {
+    "talentapp:project_verification":
+      "4d6eafd747ff48412df9f67e179f8e37bf6228beeda1a83e8c7a2178e2c5fa48577ce9f776f3b57d08e234a4862798953cd0a9cdd479d8fb802661d8693e1c0e",
+  },
 };
 
 export default function RootLayout({
