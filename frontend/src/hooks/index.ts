@@ -15,6 +15,7 @@ export {
   useStake,
   useSubmitVote,
 } from "./useGoals";
+export { useMiniPay } from "./useMiniPay";
 export { useSheetOverflow } from "./useSheetOverflow";
 export {
   useApproveUSDT,

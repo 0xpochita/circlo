@@ -5,4 +5,5 @@ export {
   predictionPoolContract,
   resolutionModuleContract,
 } from "./contracts";
+export { isMiniPay } from "./minipay";
 export { fromUSDT, toUSDT, USDT_DECIMALS } from "./usdt";
