@@ -95,6 +95,103 @@ File yang harus diupdate setelah blocker 1 & 2 selesai:
 
 ---
 
+## 💰 Platform Fee Setup
+
+`PredictionPool.sol` sudah punya infrastruktur fee (`protocolFeeBps` + `feeRecipient`, FEE_SETTER_ROLE). Default `0`, harus diaktifkan post-deploy mainnet.
+
+### Cara kerja fee
+
+- Fee diambil **saat user claim reward** (bukan saat stake), basis: payout user
+- Hitungan: `fee = payout × protocolFeeBps / 10_000`
+- User terima: `payout - fee`, Treasury terima: `fee`
+- Max cap di contract: **10% (1000 bps)** — tidak bisa lebih
+- Loser tidak kena fee (karena payout = 0)
+
+### Rekomendasi fee structure
+
+| Tier | bps | % | Use case |
+|------|-----|---|----------|
+| **Soft launch (week 1-4)** | `0` | 0% | Acquisition, no friction |
+| **Growth phase** | `100` | 1% | Cover ops cost, masih kompetitif |
+| **Sustainable** | `200-300` | 2-3% | Industry standard prediction market |
+| **Premium** | `500` | 5% | Hanya kalau ada value-add jelas (insurance, instant resolve) |
+
+> Polymarket: 0% trading fee, 2% on resolution. Augur: 1% reporter + 1% creator. Manifold: 0% (no real money).
+>
+> **Saran**: start `0` untuk MiniPay launch (4-8 minggu), naikin ke `100` (1%) setelah ada engaged user base.
+
+### Setup steps
+
+1. **Setup treasury wallet** (sebelum deploy)
+   - Idealnya **Gnosis Safe multisig** di Celo mainnet (2-of-3 atau 3-of-5)
+   - Alternatif sementara: hardware wallet (Ledger) single signer
+   - **JANGAN** pakai EOA hot wallet — kena hack langsung treasury habis
+   - Setup di: https://safe.global → New Safe → Pilih Celo network
+
+2. **Deploy contract** (lihat Blocker 1)
+
+3. **Set fee post-deploy**:
+   ```solidity
+   // Via cast / Foundry script (FEE_SETTER_ROLE holder only)
+   predictionPool.setFee(0, TREASURY_ADDRESS);
+   ```
+   Set ke `0` dulu, recipient sudah dipasang treasury. Nanti tinggal panggil `setFee(100, TREASURY_ADDRESS)` saat mau aktifkan tanpa upgrade contract.
+
+4. **Frontend disclosure** — wajib tampilkan fee ke user **sebelum** mereka stake:
+   - Stake screen: "Platform fee: X% on winnings"
+   - Claim screen: tampilkan breakdown `Gross payout / Platform fee / Net to you`
+   - Tooltip / info icon dengan detail
+   - **Tanpa disclosure = MiniPay reject** (consumer protection)
+
+5. **Treasury management policy** (dokumenkan):
+   - Siapa boleh sign transactions (founders + advisor)
+   - Kapan withdraw (monthly? quarterly?)
+   - Allocation: ops cost / dev / marketing / reserve
+   - Public reporting? (dashboard balance treasury)
+
+### Tax & compliance
+
+- Treasury inflow = **revenue** untuk perusahaan (kena pajak penghasilan)
+- Indonesia: pajak crypto 0.11% PPN + 0.1% PPh per transaksi (PMK 68/2022)
+- Pertimbangkan setup entity (PT) sebelum activate fee
+- Konsultasi tax advisor sebelum revenue > Rp 500M/tahun
+- Simpan log semua tx ke treasury (block explorer + spreadsheet)
+
+### Alternative monetization (kalau fee 0%)
+
+Untuk MiniPay launch tanpa fee, revenue sources:
+- **Premium circles** (subscription off-chain via Stripe/RevenueCat)
+- **Sponsored predictions** (brand sponsor topup pool)
+- **API access** untuk developer
+- **NFT badges** untuk top resolvers
+- Grant program Celo Foundation (typical $5-50K untuk MiniPay dApps)
+
+### UI implementation checklist
+
+File yang harus diupdate untuk disclosure:
+
+- [ ] `StakeButton.tsx` — show fee % di confirmation
+- [ ] `ClaimRewardButton.tsx` — breakdown gross/fee/net
+- [ ] `(prediction-detail)/StakeStats.tsx` — info badge "Y% platform fee"
+- [ ] Settings/About page — link ke fee policy
+- [ ] Read fee dari contract (`protocolFeeBps()`) di config helper, jangan hardcode
+
+```ts
+// src/lib/web3/fee.ts
+export async function getPlatformFeeBps(client: PublicClient): Promise<number> {
+  const bps = await client.readContract({
+    address: predictionPoolContract.address,
+    abi: predictionPoolContract.abi,
+    functionName: "protocolFeeBps",
+  });
+  return Number(bps);
+}
+```
+
+Cache 5 menit di `dataCache` biar nggak fetch tiap render.
+
+---
+
 ## 🚀 Deployment Checklist
 
 ### Step 1 — Domain & HTTPS
@@ -255,3 +352,4 @@ dApp siap submission ke MiniPay App Store kalau:
 - [ ] Tidak ada popup signature di seluruh flow
 - [ ] Performance Lighthouse mobile ≥ 80
 - [ ] Crash-free rate > 99% dalam testing
+- [ ] Treasury wallet (multisig) ready, fee policy documented + disclosed di UI
