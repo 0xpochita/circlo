@@ -6,6 +6,7 @@ import {
   CategoryTabs,
   CircleList,
   ExploreHeader,
+  type ExploreSortKey,
   InviteCodeInput,
   SearchCircle,
 } from "@/components/pages/(explore)";
@@ -22,11 +23,12 @@ const categories = [
 export default function ExplorePage() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
+  const [sortBy, setSortBy] = useState<ExploreSortKey>("newest");
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-main-bg pb-28">
       <PageTransition>
-        <ExploreHeader />
+        <ExploreHeader sortBy={sortBy} onSortChange={setSortBy} />
         <div className="px-4 py-2">
           <h2 className="text-xl font-bold text-main-text">Find new circles</h2>
           <p className="mt-1 text-sm text-muted">
@@ -40,7 +42,7 @@ export default function ExplorePage() {
           selected={category}
           onSelect={setCategory}
         />
-        <CircleList search={search} category={category} />
+        <CircleList search={search} category={category} sortBy={sortBy} />
       </PageTransition>
       <BottomTabBar />
     </div>

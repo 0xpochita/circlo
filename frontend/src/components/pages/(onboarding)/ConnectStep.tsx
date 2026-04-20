@@ -8,6 +8,7 @@ import { SiweMessage } from "siwe";
 import { toast } from "sonner";
 import { useConnect, useDisconnect, useSignMessage } from "wagmi";
 import { injected } from "wagmi/connectors";
+import { useMiniPay } from "@/hooks";
 import { authApi } from "@/lib/api/endpoints";
 import { celoSepolia } from "@/lib/web3/config";
 import { useAuthStore } from "@/stores/authStore";
@@ -23,12 +24,18 @@ export default function ConnectStep({ onNext, onBack }: ConnectStepProps) {
   const { signMessageAsync } = useSignMessage();
   const setAuth = useAuthStore((s) => s.setAuth);
   const setLoading = useAuthStore((s) => s.setLoading);
+  const isMiniPayBrowser = useMiniPay();
   const [isConnecting, setIsConnecting] = useState(false);
   const [statusText, setStatusText] = useState("Connect Wallet");
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: handleConnect is stable within component scope
   useEffect(() => {
-    disconnectAsync().catch(() => {});
-  }, [disconnectAsync]);
+    if (isMiniPayBrowser) {
+      handleConnect();
+    } else {
+      disconnectAsync().catch(() => {});
+    }
+  }, [isMiniPayBrowser]);
 
   async function handleConnect() {
     setIsConnecting(true);
@@ -60,7 +67,9 @@ export default function ConnectStep({ onNext, onBack }: ConnectStepProps) {
         const nonce = nonceRes.nonce;
 
         if (nonce) {
-          setStatusText("Sign the message...");
+          setStatusText(
+            isMiniPayBrowser ? "Verifying..." : "Sign the message...",
+          );
 
           const message = new SiweMessage({
             domain: window.location.host,
@@ -132,13 +141,17 @@ export default function ConnectStep({ onNext, onBack }: ConnectStepProps) {
   return (
     <div className="flex flex-col min-h-dvh bg-gray-50">
       <div className="flex items-center gap-3 px-6 pt-6 pb-2">
-        <button
-          type="button"
-          onClick={onBack}
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-white cursor-pointer transition-all duration-200 active:scale-95"
-        >
-          <HiOutlineArrowLeft className="w-4 h-4 text-main-text" />
-        </button>
+        {isMiniPayBrowser ? (
+          <div className="w-9" />
+        ) : (
+          <button
+            type="button"
+            onClick={onBack}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-white cursor-pointer transition-all duration-200 active:scale-95"
+          >
+            <HiOutlineArrowLeft className="w-4 h-4 text-main-text" />
+          </button>
+        )}
         <div className="flex-1 flex flex-col items-center">
           <p className="text-xs text-gray-400 mb-1">1 / 2</p>
           <div className="flex w-full gap-1.5">
@@ -198,8 +211,9 @@ export default function ConnectStep({ onNext, onBack }: ConnectStepProps) {
           className="text-center mb-auto"
         >
           <p className="text-sm text-gray-400 leading-relaxed max-w-70 mx-auto">
-            Sign in securely with your wallet. MetaMask or MiniPay supported. No
-            passwords needed.
+            {isMiniPayBrowser
+              ? "Signing you in via MiniPay. No password needed."
+              : "Sign in securely with your wallet. MetaMask or MiniPay supported. No passwords needed."}
           </p>
           <p className="mt-3 text-sm font-medium text-emerald-500">
             Your keys, your funds.
@@ -213,22 +227,33 @@ export default function ConnectStep({ onNext, onBack }: ConnectStepProps) {
         transition={{ duration: 0.4, delay: 0.5 }}
         className="px-6 pb-8 pt-6"
       >
-        <motion.button
-          type="button"
-          onClick={handleConnect}
-          disabled={isConnecting}
-          whileTap={isConnecting ? {} : { scale: 0.97 }}
-          className="w-full rounded-full bg-gray-900 py-4 text-base font-semibold text-white cursor-pointer disabled:bg-gray-200 disabled:text-muted disabled:cursor-not-allowed"
-        >
-          {isConnecting ? statusText : "Connect Wallet"}
-        </motion.button>
-        <button
-          type="button"
-          onClick={onBack}
-          className="w-full mt-3 text-sm font-medium text-gray-400 cursor-pointer text-center underline"
-        >
-          Go back
-        </button>
+        {isMiniPayBrowser ? (
+          <div className="flex items-center justify-center gap-2 w-full rounded-full bg-gray-100 py-4">
+            <div className="h-4 w-4 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin" />
+            <span className="text-sm font-medium text-main-text">
+              {statusText}
+            </span>
+          </div>
+        ) : (
+          <>
+            <motion.button
+              type="button"
+              onClick={handleConnect}
+              disabled={isConnecting}
+              whileTap={isConnecting ? {} : { scale: 0.97 }}
+              className="w-full rounded-full bg-gray-900 py-4 text-base font-semibold text-white cursor-pointer disabled:bg-gray-200 disabled:text-muted disabled:cursor-not-allowed"
+            >
+              {isConnecting ? statusText : "Connect Wallet"}
+            </motion.button>
+            <button
+              type="button"
+              onClick={onBack}
+              className="w-full mt-3 text-sm font-medium text-gray-400 cursor-pointer text-center underline"
+            >
+              Go back
+            </button>
+          </>
+        )}
       </motion.div>
     </div>
   );

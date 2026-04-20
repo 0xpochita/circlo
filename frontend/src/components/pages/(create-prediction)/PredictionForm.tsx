@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useState } from "react";
-import { HiOutlineCalendarDays, HiOutlinePencil } from "react-icons/hi2";
+import { HiOutlinePencil } from "react-icons/hi2";
 import { EmojiAvatar, EmojiPicker } from "@/components/shared";
 import { useCreateGoalStore } from "@/stores/createGoalStore";
 
@@ -24,55 +24,21 @@ const outcomes = [
 export default function PredictionForm() {
   const store = useCreateGoalStore();
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [useCustomDeadline, setUseCustomDeadline] = useState(false);
 
-  const durationIndex = durations.findIndex(
+  const selectedDuration = durations.findIndex(
     (d) => d.hours === store.durationHours,
   );
-  const selectedDuration =
-    !useCustomDeadline && durationIndex >= 0 ? durationIndex : -1;
 
   function handlePresetClick(hours: number) {
-    setUseCustomDeadline(false);
     store.setDurationHours(hours);
     store.setCustomDeadline("");
   }
 
-  function handleCustomDate(value: string) {
-    setUseCustomDeadline(true);
-    store.setCustomDeadline(value);
-
-    const target = new Date(value);
-    const now = new Date();
-    const diffHours = Math.max(
-      1,
-      Math.round((target.getTime() - now.getTime()) / 3600000),
-    );
-    store.setDurationHours(diffHours);
-  }
-
   function getDeadlineLabel(): string {
-    if (useCustomDeadline && store.customDeadline) {
-      const target = new Date(store.customDeadline);
-      return target.toLocaleString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-        hour: "numeric",
-        minute: "2-digit",
-      });
-    }
     if (selectedDuration >= 0) {
       return `~${durations[selectedDuration].hours}h`;
     }
     return "";
-  }
-
-  function getMinDateTime(): string {
-    const next = new Date(Date.now() + 60 * 60 * 1000);
-    const offset = next.getTimezoneOffset();
-    const local = new Date(next.getTime() - offset * 60 * 1000);
-    return local.toISOString().slice(0, 16);
   }
 
   return (
@@ -169,7 +135,7 @@ export default function PredictionForm() {
           <p className="text-sm font-medium text-main-text">Deadline</p>
           <p className="text-xs text-muted">{getDeadlineLabel()}</p>
         </div>
-        <div className="flex gap-2 mb-3">
+        <div className="flex gap-2 mb-4">
           {durations.map((d, i) => (
             <button
               type="button"
@@ -186,26 +152,11 @@ export default function PredictionForm() {
           ))}
         </div>
 
-        <div className="relative mb-4">
-          <div className="flex items-center gap-2 rounded-xl bg-gray-50 px-4 py-3">
-            <HiOutlineCalendarDays className="w-4 h-4 text-muted shrink-0" />
-            <input
-              type="datetime-local"
-              value={store.customDeadline || ""}
-              min={getMinDateTime()}
-              onChange={(e) => handleCustomDate(e.target.value)}
-              className="flex-1 bg-transparent text-sm text-main-text placeholder:text-muted outline-none cursor-pointer"
-            />
-          </div>
-        </div>
-
         <div className="relative h-2 rounded-full bg-gray-100">
           <motion.div
             className="absolute top-0 left-0 h-2 rounded-full bg-gray-900"
             animate={{
-              width: useCustomDeadline
-                ? `${Math.min(100, (store.durationHours / 720) * 100)}%`
-                : `${((selectedDuration + 1) / durations.length) * 100}%`,
+              width: `${((selectedDuration + 1) / durations.length) * 100}%`,
             }}
             transition={{
               type: "spring" as const,

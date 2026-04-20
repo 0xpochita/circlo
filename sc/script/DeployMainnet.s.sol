@@ -9,24 +9,24 @@ import "../src/CircleFactory.sol";
 import "../src/PredictionPool.sol";
 import "../src/ResolutionModule.sol";
 import "../src/RewardDistributor.sol";
-import "../src/mocks/MockUSDT.sol";
 
-contract Deploy is Script {
-    address constant USDT_MAINNET  = 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e;
-    uint256 constant CELO_MAINNET  = 42220;
-    uint256 constant CELO_SEPOLIA  = 11142220;
+contract DeployMainnet is Script {
+    address constant USDT_MAINNET   = 0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e;
+    uint256 constant CELO_MAINNET   = 42220;
     uint256 constant TIMELOCK_DELAY = 172800;
 
     function run() external {
         uint256 deployerPk = vm.envUint("PRIVATE_KEY");
         address deployer   = vm.addr(deployerPk);
         address safe       = vm.envAddress("SAFE_MULTISIG_ADDRESS");
-        bool isTestnet     = block.chainid == CELO_SEPOLIA;
+
+        require(block.chainid == CELO_MAINNET, "DeployMainnet: use Celo Mainnet (42220) only");
+        address stableToken = USDT_MAINNET;
 
         console.log("Deployer:", deployer);
         console.log("Safe:    ", safe);
         console.log("Chain:   ", block.chainid);
-        console.log("Testnet: ", isTestnet);
+        console.log("Stable:  ", stableToken);
 
         vm.startBroadcast(deployerPk);
 
@@ -41,7 +41,6 @@ contract Deploy is Script {
             executors,
             address(0)
         );
-        console.log("CONTRACT_TIMELOCK=", address(timelock));
 
         CircleFactory factoryImpl = new CircleFactory();
         CircleFactory factoryProxy = CircleFactory(address(
@@ -50,7 +49,6 @@ contract Deploy is Script {
                 abi.encodeCall(CircleFactory.initialize, (deployer))
             )
         ));
-        console.log("CONTRACT_CIRCLE_FACTORY=", address(factoryProxy));
 
         ResolutionModule resolutionImpl = new ResolutionModule();
         ResolutionModule resolutionProxy = ResolutionModule(address(
@@ -59,40 +57,27 @@ contract Deploy is Script {
                 abi.encodeCall(ResolutionModule.initialize, (deployer, 51, 100, 259200))
             )
         ));
-        console.log("CONTRACT_RESOLUTION_MODULE=", address(resolutionProxy));
-
-        address usdtAddress;
-        if (block.chainid == CELO_MAINNET) {
-            usdtAddress = USDT_MAINNET;
-            console.log("CONTRACT_USDT= (mainnet real USDT)", usdtAddress);
-        } else {
-            MockUSDT mockUsdt = new MockUSDT();
-            usdtAddress = address(mockUsdt);
-            console.log("CONTRACT_USDT= (MockUSDT testnet)", usdtAddress);
-        }
 
         PredictionPool poolImpl = new PredictionPool();
         PredictionPool poolProxy = PredictionPool(address(
             new ERC1967Proxy(
                 address(poolImpl),
                 abi.encodeCall(PredictionPool.initialize, (
-                    usdtAddress,
+                    stableToken,
                     address(factoryProxy),
                     address(resolutionProxy),
                     deployer
                 ))
             )
         ));
-        console.log("CONTRACT_PREDICTION_POOL=", address(poolProxy));
 
         RewardDistributor rewardImpl = new RewardDistributor();
         RewardDistributor rewardProxy = RewardDistributor(address(
             new ERC1967Proxy(
                 address(rewardImpl),
-                abi.encodeCall(RewardDistributor.initialize, (usdtAddress, deployer))
+                abi.encodeCall(RewardDistributor.initialize, (stableToken, deployer))
             )
         ));
-        console.log("CONTRACT_REWARD_DISTRIBUTOR=", address(rewardProxy));
 
         resolutionProxy.setPool(address(poolProxy));
         poolProxy.setResolutionModule(address(resolutionProxy));
@@ -126,12 +111,13 @@ contract Deploy is Script {
 
         console.log("");
         console.log("=== DEPLOYMENT COMPLETE ===");
-        console.log("DEPLOY_BLOCK=", block.number);
+        console.log("STABLE_TOKEN=", stableToken);
+        console.log("STABLE_TOKEN_DECIMALS=6");
         console.log("CONTRACT_CIRCLE_FACTORY=", address(factoryProxy));
         console.log("CONTRACT_PREDICTION_POOL=", address(poolProxy));
         console.log("CONTRACT_RESOLUTION_MODULE=", address(resolutionProxy));
-        console.log("CONTRACT_REWARD_DISTRIBUTOR=", address(rewardProxy));
         console.log("CONTRACT_TIMELOCK=", address(timelock));
-        console.log("CONTRACT_USDT=", usdtAddress);
+        console.log("CONTRACT_REWARD_DISTRIBUTOR=", address(rewardProxy));
+        console.log("DEPLOY_BLOCK=", block.number);
     }
 }

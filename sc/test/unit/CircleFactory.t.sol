@@ -13,7 +13,6 @@ contract CircleFactoryTest is Test {
     address public bob     = makeAddr("bob");
     address public charlie = makeAddr("charlie");
 
-    // EIP-712 domain & typehash (must match CircleFactory)
     bytes32 private constant DOMAIN_TYPEHASH =
         keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
     bytes32 private constant INVITE_PROOF_TYPEHASH =
@@ -27,10 +26,6 @@ contract CircleFactoryTest is Test {
         factory = CircleFactory(address(proxy));
         vm.stopPrank();
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Helpers
-    // ─────────────────────────────────────────────────────────────────────────
 
     function _createPublicCircle() internal returns (uint256 id) {
         vm.prank(alice);
@@ -65,13 +60,8 @@ contract CircleFactoryTest is Test {
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(ownerPk, digest);
         bytes memory sig = abi.encodePacked(r, s, v);
         proof = abi.encode(sig, expiry);
-        // suppress unused param warning
         ownerAddr;
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Tests
-    // ─────────────────────────────────────────────────────────────────────────
 
     function testCreateCircle_PublicSuccess() public {
         uint256 id = _createPublicCircle();
@@ -134,7 +124,6 @@ contract CircleFactoryTest is Test {
         vm.prank(ownerAddr);
         uint256 id = factory.createCircle(true, "ipfs://private");
 
-        // Sign with a different key (not the owner)
         uint256 wrongPk = 0xBAD1;
         uint256 expiry = block.timestamp + 1 days;
         bytes memory proof = _buildInviteProof(wrongPk, vm.addr(wrongPk), id, bob, expiry);
@@ -150,7 +139,7 @@ contract CircleFactoryTest is Test {
         vm.prank(ownerAddr);
         uint256 id = factory.createCircle(true, "ipfs://private");
 
-        uint256 expiry = block.timestamp - 1; // already expired
+        uint256 expiry = block.timestamp - 1;
         bytes memory proof = _buildInviteProof(ownerPk, ownerAddr, id, bob, expiry);
 
         vm.prank(bob);
@@ -184,7 +173,7 @@ contract CircleFactoryTest is Test {
 
     function testLeaveCircle_OwnerCannotLeaveReverts() public {
         uint256 id = _createPublicCircle();
-        vm.prank(alice); // alice is owner
+        vm.prank(alice);
         vm.expectRevert(CircleFactory.OwnerCannotLeave.selector);
         factory.leaveCircle(id);
     }
@@ -223,25 +212,22 @@ contract CircleFactoryTest is Test {
     }
 
     function testGetMembers_Paginated() public {
-        uint256 id = _createPublicCircle(); // alice is member 0
+        uint256 id = _createPublicCircle();
         vm.prank(bob);
         factory.joinCircle(id);
         vm.prank(charlie);
         factory.joinCircle(id);
 
-        // Get all
         address[] memory all = factory.getMembers(id, 0, 10);
         assertEq(all.length, 3);
         assertEq(all[0], alice);
         assertEq(all[1], bob);
         assertEq(all[2], charlie);
 
-        // Paginate: page 1 (offset=1, limit=1)
         address[] memory page1 = factory.getMembers(id, 1, 1);
         assertEq(page1.length, 1);
         assertEq(page1[0], bob);
 
-        // Out-of-bounds offset
         address[] memory empty = factory.getMembers(id, 100, 5);
         assertEq(empty.length, 0);
     }

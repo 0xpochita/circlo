@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { HiOutlineUserGroup } from "react-icons/hi2";
 import { toast } from "sonner";
 import { useAccount } from "wagmi";
@@ -11,15 +11,18 @@ import type { CircleResponse } from "@/lib/api/endpoints";
 import { circlesApi } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
 import { useDataCache } from "@/stores/dataCache";
+import type { ExploreSortKey } from "./ExploreHeader";
 
 type CircleListProps = {
   search?: string;
   category?: string;
+  sortBy?: ExploreSortKey;
 };
 
 export default function CircleList({
   search = "",
   category = "",
+  sortBy = "newest",
 }: CircleListProps) {
   const cached = useDataCache((s) => s.publicCircles);
   const isStale = useDataCache((s) => s.isStale);
@@ -99,6 +102,21 @@ export default function CircleList({
     }
   }
 
+  const sortedCircles = useMemo(() => {
+    const arr = [...circles];
+    if (sortBy === "members") {
+      arr.sort((a, b) => (b.memberCount ?? 0) - (a.memberCount ?? 0));
+    } else if (sortBy === "alphabetical") {
+      arr.sort((a, b) => a.name.localeCompare(b.name));
+    } else {
+      arr.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      );
+    }
+    return arr;
+  }, [circles, sortBy]);
+
   if (isLoading) {
     return (
       <div className="flex flex-col gap-3 px-4 py-2">
@@ -142,7 +160,7 @@ export default function CircleList({
 
   return (
     <div className="flex flex-col gap-3 px-4 py-2">
-      {circles.map((circle, i) => {
+      {sortedCircles.map((circle, i) => {
         const isJoined = joined[circle.id];
         const isJoining = joiningId === circle.id;
 

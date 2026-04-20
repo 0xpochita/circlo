@@ -9,7 +9,10 @@ import { useAccount, usePublicClient, useWriteContract } from "wagmi";
 import { EmojiAvatar, UsdtLabel } from "@/components/shared";
 import { useSheetOverflow } from "@/hooks";
 import { circlesApi, goalsApi } from "@/lib/api/endpoints";
-import { predictionPoolContract } from "@/lib/web3/contracts";
+import {
+  circleFactoryContract,
+  predictionPoolContract,
+} from "@/lib/web3/contracts";
 import { toUSDT } from "@/lib/web3/usdt";
 import { useCreateGoalStore } from "@/stores/createGoalStore";
 
@@ -88,11 +91,43 @@ export default function ConfirmButton() {
   async function handleConfirm() {
     setIsCreating(true);
 
+    const deadlineTimestamp = store.customDeadline
+      ? BigInt(Math.floor(new Date(store.customDeadline).getTime() / 1000))
+      : BigInt(Math.floor(Date.now() / 1000) + store.durationHours * 3600);
+    const minStake = store.stakeAmount
+      ? toUSDT(parseFloat(store.stakeAmount))
+      : toUSDT(1);
+    const metadataURI = JSON.stringify({
+      title: store.title,
+      description: store.description,
+      avatar: `${store.avatar.emoji}|${store.avatar.color}`,
+    });
+
+    let onChainId = store.circleChainId;
+    if (!onChainId) {
+      try {
+        const detail = await circlesApi.detail(store.circleId);
+        onChainId = detail.chainId || "";
+      } catch {}
+    }
+
+    if (!onChainId) {
+      toast.error("Circle is not on-chain yet");
+      setIsCreating(false);
+      return;
+    }
+    if (!publicClient || !address) {
+      toast.error("Connect your wallet first");
+      setIsCreating(false);
+      return;
+    }
+
     const stepsToRun: Step[] = [
-      { label: "Creating goal", status: "pending" },
       { label: "Preparing resolvers", status: "pending" },
+      { label: "Joining circle", status: "pending" },
       { label: "Sending transaction", status: "pending" },
       { label: "Confirming on-chain", status: "pending" },
+      { label: "Saving goal", status: "pending" },
     ];
     setSteps(stepsToRun);
 
@@ -100,23 +135,138 @@ export default function ConfirmButton() {
 
     try {
       updateStep(stepIdx, "active");
+      let candidateAddresses: `0x${string}`[] = [];
+      if (store.resolvers.length > 0) {
+        try {
+          const membersRes = await circlesApi.members(store.circleId);
+          candidateAddresses = store.resolvers
+            .map((rid) => {
+              const m = membersRes.items?.find((item) => item.userId === rid);
+              return m?.user?.walletAddress as `0x${string}` | undefined;
+            })
+            .filter(Boolean) as `0x${string}`[];
+        } catch {}
+      }
 
-      const deadlineTimestamp = store.customDeadline
-        ? BigInt(Math.floor(new Date(store.customDeadline).getTime() / 1000))
-        : BigInt(Math.floor(Date.now() / 1000) + store.durationHours * 3600);
-      const minStake = store.stakeAmount
-        ? toUSDT(parseFloat(store.stakeAmount))
-        : toUSDT(1);
+      const memberChecks = await Promise.all(
+        candidateAddresses.map(async (addr) => {
+          try {
+            const ok = await publicClient.readContract({
+              address: circleFactoryContract.address,
+              abi: circleFactoryContract.abi,
+              functionName: "isCircleMember",
+              args: [BigInt(onChainId), addr],
+            });
+            return ok ? addr : null;
+          } catch {
+            return null;
+          }
+        }),
+      );
+      let resolverAddresses = memberChecks.filter(
+        (a): a is `0x${string}` => a !== null,
+      );
 
-      const metadataURI = JSON.stringify({
-        title: store.title,
-        description: store.description,
-        avatar: `${store.avatar.emoji}|${store.avatar.color}`,
-      });
+      if (resolverAddresses.length === 0) {
+        resolverAddresses = [address as `0x${string}`];
+      }
+      updateStep(stepIdx, "done");
+      stepIdx++;
 
+      updateStep(stepIdx, "active");
+      try {
+        const isMember = await publicClient.readContract({
+          address: circleFactoryContract.address,
+          abi: circleFactoryContract.abi,
+          functionName: "isCircleMember",
+          args: [BigInt(onChainId), address],
+        });
+
+        if (!isMember) {
+          const joinTx = await writeContractAsync({
+            address: circleFactoryContract.address,
+            abi: circleFactoryContract.abi,
+            functionName: "joinCircle",
+            args: [BigInt(onChainId)],
+          });
+          await publicClient.waitForTransactionReceipt({ hash: joinTx });
+        }
+        updateStep(stepIdx, "done");
+      } catch (err) {
+        updateStep(stepIdx, "error");
+        const message = err instanceof Error ? err.message : "";
+        if (message.includes("User rejected") || message.includes("denied")) {
+          toast("Transaction cancelled");
+        } else {
+          toast.error("Failed to join circle. Try again.");
+        }
+        setIsCreating(false);
+        return;
+      }
+      stepIdx++;
+
+      updateStep(stepIdx, "active");
+      let txHash: `0x${string}`;
+      let nextId = 0;
+      try {
+        try {
+          const result = await publicClient.readContract({
+            address: predictionPoolContract.address,
+            abi: predictionPoolContract.abi,
+            functionName: "nextGoalId",
+          });
+          nextId = Number(result);
+        } catch {}
+
+        txHash = await writeContractAsync({
+          address: predictionPoolContract.address,
+          abi: predictionPoolContract.abi,
+          functionName: "createGoal",
+          args: [
+            BigInt(onChainId),
+            store.outcomeType,
+            deadlineTimestamp,
+            minStake,
+            resolverAddresses,
+            metadataURI,
+          ],
+        });
+        updateStep(stepIdx, "done");
+      } catch (err) {
+        updateStep(stepIdx, "error");
+        const message = err instanceof Error ? err.message : "";
+        if (message.includes("User rejected") || message.includes("denied")) {
+          toast("Transaction cancelled");
+        } else {
+          toast.error("Failed to send transaction");
+        }
+        setIsCreating(false);
+        return;
+      }
+      stepIdx++;
+
+      updateStep(stepIdx, "active");
+      try {
+        const receipt = await publicClient.waitForTransactionReceipt({
+          hash: txHash,
+        });
+        if (receipt.status !== "success") {
+          updateStep(stepIdx, "error");
+          toast.error("Transaction reverted on-chain");
+          setIsCreating(false);
+          return;
+        }
+        updateStep(stepIdx, "done");
+      } catch {
+        updateStep(stepIdx, "error");
+        toast.error("Transaction may have failed");
+        setIsCreating(false);
+        return;
+      }
+      stepIdx++;
+
+      updateStep(stepIdx, "active");
       let backendGoalId = "";
-      let backendMetadataUri = metadataURI;
-
       try {
         const created = await goalsApi.create({
           circleId: store.circleId,
@@ -134,112 +284,16 @@ export default function ConfirmButton() {
           minStake: store.stakeAmount || "1",
           resolverIds: store.resolvers,
         });
-        const res = created as unknown as { id?: string; metadataUri?: string };
+        const res = created as unknown as { id?: string };
         backendGoalId = res.id || "";
-        backendMetadataUri = res.metadataUri || metadataURI;
-      } catch (err) {
-        updateStep(stepIdx, "error");
-        const message = err instanceof Error ? err.message : "";
-        toast.error(message.length > 100 ? "Failed to create goal" : message);
-        setIsCreating(false);
-        return;
-      }
+      } catch {}
 
-      updateStep(stepIdx, "done");
-      stepIdx++;
-
-      updateStep(stepIdx, "active");
-
-      let onChainId = store.circleChainId;
-      if (!onChainId) {
+      if (backendGoalId && nextId > 0) {
         try {
-          const detail = await circlesApi.detail(store.circleId);
-          onChainId = detail.chainId || "";
+          await goalsApi.confirm(backendGoalId, nextId, txHash);
         } catch {}
       }
-
-      let resolverAddresses: `0x${string}`[] = [];
-      if (store.circleId && store.resolvers.length > 0) {
-        try {
-          const membersRes = await circlesApi.members(store.circleId);
-          resolverAddresses = store.resolvers
-            .map((rid) => {
-              const m = membersRes.items?.find((item) => item.userId === rid);
-              return m?.user?.walletAddress as `0x${string}` | undefined;
-            })
-            .filter(Boolean) as `0x${string}`[];
-        } catch {}
-      }
-
-      if (resolverAddresses.length === 0 && address) {
-        resolverAddresses = [address as `0x${string}`];
-      }
-
       updateStep(stepIdx, "done");
-      stepIdx++;
-
-      if (onChainId) {
-        updateStep(stepIdx, "active");
-
-        try {
-          let nextId = 0;
-          if (publicClient) {
-            try {
-              const result = await publicClient.readContract({
-                address: predictionPoolContract.address,
-                abi: predictionPoolContract.abi,
-                functionName: "nextGoalId",
-              });
-              nextId = Number(result);
-            } catch {}
-          }
-
-          const txHash = await writeContractAsync({
-            address: predictionPoolContract.address,
-            abi: predictionPoolContract.abi,
-            functionName: "createGoal",
-            args: [
-              BigInt(onChainId),
-              store.outcomeType,
-              deadlineTimestamp,
-              minStake,
-              resolverAddresses,
-              backendMetadataUri,
-            ],
-          });
-
-          updateStep(stepIdx, "done");
-          stepIdx++;
-
-          updateStep(stepIdx, "active");
-
-          const onChainGoalId = nextId > 0 ? nextId : 0;
-
-          if (publicClient) {
-            try {
-              await publicClient.waitForTransactionReceipt({ hash: txHash });
-            } catch {}
-          }
-
-          if (backendGoalId && onChainGoalId > 0) {
-            try {
-              await goalsApi.confirm(backendGoalId, onChainGoalId, txHash);
-            } catch {}
-          }
-
-          updateStep(stepIdx, "done");
-        } catch (err) {
-          updateStep(stepIdx, "error");
-          const message = err instanceof Error ? err.message : "";
-          if (message.includes("User rejected") || message.includes("denied")) {
-            toast("Transaction cancelled. Goal saved as draft.");
-          }
-        }
-      } else {
-        updateStep(stepIdx, "done");
-        stepIdx++;
-        updateStep(stepIdx, "done");
-      }
 
       const circleIdForRedirect = store.circleId;
       store.reset();

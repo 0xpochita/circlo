@@ -60,7 +60,14 @@ function CircleDetailsContent() {
             <div className="h-5 w-16 rounded-md bg-gray-100" />
           </div>
           <div className="h-7 w-48 rounded-lg bg-gray-100 mb-2" />
-          <div className="h-4 w-64 rounded-lg bg-gray-100 mb-4" />
+          <div className="h-4 w-64 rounded-lg bg-gray-100 mb-3" />
+          <div className="flex items-center justify-between rounded-xl bg-gray-50 px-4 py-3 mb-4">
+            <div>
+              <div className="h-3 w-16 rounded-md bg-gray-100 mb-1.5" />
+              <div className="h-4 w-24 rounded-md bg-gray-100" />
+            </div>
+            <div className="h-7 w-16 rounded-full bg-white" />
+          </div>
           <div className="rounded-2xl bg-white p-2">
             <div className="rounded-2xl bg-gray-50 h-48" />
           </div>

@@ -4,12 +4,16 @@ import { useRouter } from "next/navigation";
 import { HiOutlineArrowRightOnRectangle } from "react-icons/hi2";
 import { toast } from "sonner";
 import { useDisconnect } from "wagmi";
+import { useMiniPay } from "@/hooks";
 import { useAuthStore } from "@/stores/authStore";
 
 export default function DisconnectButton() {
   const router = useRouter();
   const { disconnectAsync } = useDisconnect();
   const clearAuth = useAuthStore((s) => s.clearAuth);
+  const isMiniPayBrowser = useMiniPay();
+
+  if (isMiniPayBrowser) return null;
 
   async function handleDisconnect() {
     try {
