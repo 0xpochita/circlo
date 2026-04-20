@@ -23,13 +23,11 @@ contract PredictionPoolTest is Test {
 
     uint256 public circleId;
     uint64  public constant DEADLINE_OFFSET = 2 days;
-    uint128 public constant MIN_STAKE       = 1_000_000; // 1 USDT
+    uint128 public constant MIN_STAKE       = 1_000_000;
 
     function setUp() public {
-        // Deploy MockUSDT
         usdt = new MockUSDT();
 
-        // Deploy CircleFactory proxy
         vm.startPrank(admin);
         CircleFactory factoryImpl = new CircleFactory();
         factory = CircleFactory(address(new ERC1967Proxy(
@@ -37,14 +35,12 @@ contract PredictionPoolTest is Test {
             abi.encodeCall(CircleFactory.initialize, (admin))
         )));
 
-        // Deploy ResolutionModule proxy
         ResolutionModule resImpl = new ResolutionModule();
         resolution = ResolutionModule(address(new ERC1967Proxy(
             address(resImpl),
             abi.encodeCall(ResolutionModule.initialize, (admin, 51, 100, 259200))
         )));
 
-        // Deploy PredictionPool proxy
         PredictionPool poolImpl = new PredictionPool();
         pool = PredictionPool(address(new ERC1967Proxy(
             address(poolImpl),
@@ -56,13 +52,10 @@ contract PredictionPoolTest is Test {
             ))
         )));
 
-        // Wire up: resolution needs pool, pool needs resolution
         resolution.setPool(address(pool));
-        // pool already has resolution in initialize; update is idempotent
         pool.setResolutionModule(address(resolution));
         vm.stopPrank();
 
-        // Create a circle with alice as owner, add bob, charlie, dave
         vm.prank(alice);
         circleId = factory.createCircle(false, "ipfs://circle");
         vm.prank(bob);    factory.joinCircle(circleId);
@@ -70,18 +63,13 @@ contract PredictionPoolTest is Test {
         vm.prank(dave);   factory.joinCircle(circleId);
         vm.prank(eve);    factory.joinCircle(circleId);
 
-        // Mint & approve USDT for all test users
         address[5] memory users = [alice, bob, charlie, dave, eve];
         for (uint256 i = 0; i < users.length; i++) {
-            usdt.mint(users[i], 1_000 * 1e6); // 1000 USDT each
+            usdt.mint(users[i], 1_000 * 1e6);
             vm.prank(users[i]);
             usdt.approve(address(pool), type(uint256).max);
         }
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Helpers
-    // ─────────────────────────────────────────────────────────────────────────
 
     function _createGoal() internal returns (uint256 goalId) {
         address[] memory resolvers = new address[](1);
@@ -98,14 +86,9 @@ contract PredictionPoolTest is Test {
     }
 
     function _resolveGoal(uint256 goalId, uint8 winningSide) internal {
-        // alice is resolver; submit vote and auto-finalize (1 resolver, 51/100 quorum rounds to 1)
         vm.prank(alice);
         resolution.submitVote(goalId, winningSide);
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // createGoal tests
-    // ─────────────────────────────────────────────────────────────────────────
 
     function testCreateGoal_Success() public {
         uint256 goalId = _createGoal();
@@ -127,7 +110,7 @@ contract PredictionPoolTest is Test {
     function testCreateGoal_DeadlineTooSoonReverts() public {
         address[] memory resolvers = new address[](1);
         resolvers[0] = alice;
-        uint64 badDeadline = uint64(block.timestamp) + 30 minutes; // less than 1 hour
+        uint64 badDeadline = uint64(block.timestamp) + 30 minutes;
         vm.prank(alice);
         vm.expectRevert(PredictionPool.DeadlineTooSoon.selector);
         pool.createGoal(circleId, IPredictionPool.OutcomeType.Binary, badDeadline, MIN_STAKE, resolvers, "ipfs://goal");
@@ -143,9 +126,8 @@ contract PredictionPoolTest is Test {
 
     function testCreateGoal_TooManyResolversReverts() public {
         address[] memory resolvers = new address[](33);
-        // all must be members
         for (uint256 i = 0; i < resolvers.length; i++) {
-            resolvers[i] = alice; // reuse alice
+            resolvers[i] = alice;
         }
         uint64 deadline = uint64(block.timestamp) + DEADLINE_OFFSET;
         vm.prank(alice);
@@ -156,7 +138,7 @@ contract PredictionPoolTest is Test {
     function testCreateGoal_ResolverNotMemberReverts() public {
         address stranger = makeAddr("stranger");
         address[] memory resolvers = new address[](1);
-        resolvers[0] = stranger; // not a member
+        resolvers[0] = stranger;
         uint64 deadline = uint64(block.timestamp) + DEADLINE_OFFSET;
         vm.prank(alice);
         vm.expectRevert(PredictionPool.ResolverNotMember.selector);
@@ -173,14 +155,10 @@ contract PredictionPoolTest is Test {
         pool.createGoal(circleId, IPredictionPool.OutcomeType.Binary, deadline, MIN_STAKE, resolvers, "ipfs://goal");
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // stake tests
-    // ─────────────────────────────────────────────────────────────────────────
-
     function testStake_Success() public {
         uint256 goalId = _createGoal();
         vm.prank(bob);
-        pool.stake(goalId, 1, 5 * 1e6); // 5 USDT on Yes
+        pool.stake(goalId, 1, 5 * 1e6);
         assertEq(pool.stakeOf(goalId, bob, 1), 5 * 1e6);
         assertEq(pool.poolPerSide(goalId, 1), 5 * 1e6);
     }
@@ -209,7 +187,6 @@ contract PredictionPoolTest is Test {
         pool.stake(goalId, 0, 3 * 1e6);
         _lockGoal(goalId);
         _resolveGoal(goalId, 1);
-        // status is now PaidOut — try to stake
         vm.prank(charlie);
         vm.expectRevert(PredictionPool.GoalNotOpen.selector);
         pool.stake(goalId, 0, 5 * 1e6);
@@ -218,10 +195,10 @@ contract PredictionPoolTest is Test {
     function testStake_SwitchSidesReverts() public {
         uint256 goalId = _createGoal();
         vm.prank(bob);
-        pool.stake(goalId, 1, 5 * 1e6); // staked Yes
+        pool.stake(goalId, 1, 5 * 1e6);
         vm.prank(bob);
         vm.expectRevert(PredictionPool.CannotSwitchSides.selector);
-        pool.stake(goalId, 0, 5 * 1e6); // try to switch to No
+        pool.stake(goalId, 0, 5 * 1e6);
     }
 
     function testStake_NotMemberReverts() public {
@@ -242,10 +219,6 @@ contract PredictionPoolTest is Test {
         vm.prank(bob);
         pool.stake(goalId, 1, 5 * 1e6);
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // lockGoal tests
-    // ─────────────────────────────────────────────────────────────────────────
 
     function testLockGoal_Success() public {
         uint256 goalId = _createGoal();
@@ -269,19 +242,12 @@ contract PredictionPoolTest is Test {
         pool.lockGoal(goalId);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // claim tests
-    // ─────────────────────────────────────────────────────────────────────────
-
     function testClaim_TwoParticipantsCorrectMath() public {
-        // Bob stakes 10 USDT Yes, Dave stakes 5 USDT No
-        // winningPool=10, losingPool=5
-        // Bob payout = 10 + (10 * 5) / 10 = 10 + 5 = 15
         uint256 goalId = _createGoal();
         vm.prank(bob);  pool.stake(goalId, 1, 10 * 1e6);
         vm.prank(dave); pool.stake(goalId, 0, 5 * 1e6);
         _lockGoal(goalId);
-        _resolveGoal(goalId, 1); // Yes wins
+        _resolveGoal(goalId, 1);
 
         uint256 balBefore = usdt.balanceOf(bob);
         vm.prank(bob);
@@ -290,10 +256,6 @@ contract PredictionPoolTest is Test {
     }
 
     function testClaim_ThreeParticipantsCorrectMath() public {
-        // Bob 6 USDT Yes, Charlie 4 USDT Yes, Dave 10 USDT No → Yes wins
-        // winningPool=10, losingPool=10
-        // Bob payout = 6 + (6*10)/10 = 6 + 6 = 12
-        // Charlie payout = 4 + (4*10)/10 = 4 + 4 = 8
         uint256 goalId = _createGoal();
         vm.prank(bob);     pool.stake(goalId, 1, 6 * 1e6);
         vm.prank(charlie); pool.stake(goalId, 1, 4 * 1e6);
@@ -310,8 +272,6 @@ contract PredictionPoolTest is Test {
     }
 
     function testClaim_ManyParticipantsCorrectMath() public {
-        // Alice, Bob, Charlie each stake 3 USDT Yes; Dave 3 USDT No; Eve 6 USDT No
-        // winningPool=9, losingPool=9, each winner gets 3 + (3*9)/9 = 6
         uint256 goalId = _createGoal();
         vm.prank(alice);   pool.stake(goalId, 1, 3 * 1e6);
         vm.prank(bob);     pool.stake(goalId, 1, 3 * 1e6);
@@ -349,32 +309,24 @@ contract PredictionPoolTest is Test {
         vm.prank(dave); pool.stake(goalId, 0, 5 * 1e6);
         _lockGoal(goalId);
         _resolveGoal(goalId, 1);
-        vm.prank(dave); // dave staked No (losing side)
+        vm.prank(dave);
         vm.expectRevert(PredictionPool.NothingToClaim.selector);
         pool.claim(goalId);
     }
 
     function testClaim_WhenWinningPoolZero_RefundsLosingPool() public {
-        // Nobody stakes Yes; all stake No; resolution says Yes won
-        // Special case: winning pool is 0, losing stakers get refund
         uint256 goalId = _createGoal();
-        vm.prank(dave); pool.stake(goalId, 0, 10 * 1e6); // only No stakers
+        vm.prank(dave); pool.stake(goalId, 0, 10 * 1e6);
         _lockGoal(goalId);
-        // Directly set winner via resolution (alice is resolver; side 1 = Yes won but no one staked Yes)
         _resolveGoal(goalId, 1);
 
         uint256 balBefore = usdt.balanceOf(dave);
         vm.prank(dave);
-        pool.claim(goalId); // should refund 10 USDT
+        pool.claim(goalId);
         assertEq(usdt.balanceOf(dave) - balBefore, 10 * 1e6);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // refund tests
-    // ─────────────────────────────────────────────────────────────────────────
-
     function _createDisputedGoal() internal returns (uint256 goalId) {
-        // Create goal with 2 resolvers (alice and bob)
         address[] memory resolvers = new address[](2);
         resolvers[0] = alice;
         resolvers[1] = bob;
@@ -386,7 +338,6 @@ contract PredictionPoolTest is Test {
         vm.prank(dave);    pool.stake(goalId, 0, 5 * 1e6);
         _lockGoal(goalId);
 
-        // Let the vote window expire without any votes → 0 == 0 tie → Disputed
         vm.warp(block.timestamp + 259200 + 1);
         resolution.finalize(goalId);
     }
@@ -416,20 +367,15 @@ contract PredictionPoolTest is Test {
         vm.prank(bob);  pool.stake(goalId, 1, 10 * 1e6);
         vm.prank(dave); pool.stake(goalId, 0, 5 * 1e6);
         _lockGoal(goalId);
-        _resolveGoal(goalId, 1); // resolved, not disputed
+        _resolveGoal(goalId, 1);
         vm.prank(dave);
         vm.expectRevert(PredictionPool.GoalNotDisputed.selector);
         pool.refund(goalId);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Fuzz tests
-    // ─────────────────────────────────────────────────────────────────────────
-
-    /// @dev Fuzz test: any amount >= minStake should be stakeable
     function testFuzz_StakeRandomAmounts(uint128 amount) public {
         vm.assume(amount >= MIN_STAKE);
-        vm.assume(amount <= 500 * 1e6); // cap at 500 USDT to stay within minted balance
+        vm.assume(amount <= 500 * 1e6);
 
         uint256 goalId = _createGoal();
         vm.prank(bob);
@@ -437,13 +383,10 @@ contract PredictionPoolTest is Test {
         assertEq(pool.stakeOf(goalId, bob, 1), amount);
     }
 
-    /// @dev Fuzz test: payouts should sum to total pool (no leakage)
     function testFuzz_ClaimArbitraryDistribution(uint128[5] memory amounts) public {
-        // clamp amounts to [minStake, 100 USDT]
         for (uint256 i = 0; i < 5; i++) {
             amounts[i] = uint128(bound(uint256(amounts[i]), uint256(MIN_STAKE), 100 * 1e6));
         }
-        // First 3 stake Yes, last 2 stake No
         address[5] memory users = [alice, bob, charlie, dave, eve];
         uint256 goalId = _createGoal();
 
@@ -457,12 +400,11 @@ contract PredictionPoolTest is Test {
             else           losePool += amounts[i];
         }
 
-        if (winPool == 0) return; // skip edge case handled in other test
+        if (winPool == 0) return;
 
         _lockGoal(goalId);
-        _resolveGoal(goalId, 1); // Yes wins
+        _resolveGoal(goalId, 1);
 
-        // Sum all payouts and verify equals total pool
         uint256 totalPayout = 0;
         for (uint256 i = 0; i < 3; i++) {
             uint256 balBefore = usdt.balanceOf(users[i]);
@@ -470,9 +412,7 @@ contract PredictionPoolTest is Test {
             pool.claim(goalId);
             totalPayout += usdt.balanceOf(users[i]) - balBefore;
         }
-        // Due to integer division rounding, totalPayout may be <= totalPool
         assertLe(totalPayout, winPool + losePool);
-        // And at most 1 wei per winner lost to rounding
         assertGe(totalPayout + 3, winPool + losePool);
     }
 }
