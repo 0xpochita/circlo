@@ -10,7 +10,7 @@ import { useConnect, useDisconnect, useSignMessage } from "wagmi";
 import { injected } from "wagmi/connectors";
 import { useMiniPay } from "@/hooks";
 import { authApi } from "@/lib/api/endpoints";
-import { celoSepolia } from "@/lib/web3/config";
+import { NETWORK } from "@/lib/web3/network";
 import { useAuthStore } from "@/stores/authStore";
 
 type ConnectStepProps = {
@@ -44,7 +44,7 @@ export default function ConnectStep({ onNext, onBack }: ConnectStepProps) {
     try {
       const result = await connectAsync({
         connector: injected(),
-        chainId: celoSepolia.id,
+        chainId: NETWORK.id,
       });
 
       const walletAddress = result.accounts[0];
@@ -77,7 +77,7 @@ export default function ConnectStep({ onNext, onBack }: ConnectStepProps) {
             statement: "Sign in to Circlo",
             uri: window.location.origin,
             version: "1",
-            chainId: celoSepolia.id,
+            chainId: NETWORK.id,
             nonce,
           });
 

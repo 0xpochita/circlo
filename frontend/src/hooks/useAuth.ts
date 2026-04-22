@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import { SiweMessage } from "siwe";
 import { useAccount, useSignMessage } from "wagmi";
 import { authApi } from "@/lib/api/endpoints";
-import { celoSepolia } from "@/lib/web3/config";
+import { NETWORK } from "@/lib/web3/network";
 import { useAuthStore } from "@/stores/authStore";
 
 export function useAuth() {
@@ -33,7 +33,7 @@ export function useAuth() {
         statement: "Sign in to Circlo",
         uri: window.location.origin,
         version: "1",
-        chainId: celoSepolia.id,
+        chainId: NETWORK.id,
         nonce: nonceRes.nonce,
       });
 
