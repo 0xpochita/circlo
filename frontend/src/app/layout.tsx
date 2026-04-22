@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Toaster } from "sonner";
+import { NetworkBadge } from "@/components/shared";
 import { Web3Provider } from "@/providers/Web3Provider";
 
 export const viewport: Viewport = {
@@ -41,6 +42,7 @@ export default function RootLayout({
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col">
         <Web3Provider>{children}</Web3Provider>
+        <NetworkBadge />
         <Toaster
           position="top-center"
           toastOptions={{
