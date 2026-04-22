@@ -4,6 +4,7 @@ import { config } from "./config.js";
 import { prisma } from "./lib/prisma.js";
 import { redis } from "./lib/redis.js";
 import { startWorkers, scheduleCronJobs } from "./jobs/index.js";
+import { startIndexer } from "./indexer/index.js";
 
 async function main() {
   console.log(`[Server] Starting Circlo backend (${config.nodeEnv})...`);
@@ -17,6 +18,8 @@ async function main() {
   startWorkers();
   await scheduleCronJobs();
   console.log("[Server] Background workers started");
+
+  startIndexer().catch((err) => console.error("[Indexer] Fatal:", err));
 
   const app = await buildServer();
 

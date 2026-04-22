@@ -267,7 +267,7 @@ async function registerWatchers(
   console.log("[Indexer] All watchers registered");
 }
 
-async function main() {
+export async function startIndexer() {
   console.log("[Indexer] Starting...");
 
   const indexerClient = createIndexerClient(false);
@@ -312,7 +312,10 @@ async function main() {
   });
 }
 
-main().catch((err) => {
-  console.error("[Indexer] Fatal error:", err);
-  process.exit(1);
-});
+const argv1 = (process.argv[1] ?? "").replace(/\\/g, "/");
+if (argv1.includes("/indexer/index")) {
+  startIndexer().catch((err) => {
+    console.error("[Indexer] Fatal error:", err);
+    process.exit(1);
+  });
+}
