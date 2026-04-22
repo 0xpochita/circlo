@@ -5,6 +5,7 @@ import { EmojiAvatar, UsdtLabel } from "@/components/shared";
 import type { GoalResponse } from "@/lib/api/endpoints";
 import { circlesApi } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
+import { DEFAULT_MIN_STAKE } from "@/lib/web3/usdt";
 
 type Resolver = {
   userId: string;
@@ -54,7 +55,7 @@ export default function InfoSection({ goal }: InfoSectionProps) {
     { label: "Start date", value: createdDate },
     { label: "Deadline", value: deadlineDate },
     { label: "Outcome type", value: goal?.outcomeType || "binary" },
-    { label: "Minimum stake", value: goal?.minStake || "0.10", usdt: true },
+    { label: "Minimum stake", value: goal?.minStake || DEFAULT_MIN_STAKE, usdt: true },
   ];
 
   const resolvers = goal?.resolvers || [];

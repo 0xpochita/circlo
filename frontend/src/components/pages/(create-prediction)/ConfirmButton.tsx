@@ -13,7 +13,7 @@ import {
   circleFactoryContract,
   predictionPoolContract,
 } from "@/lib/web3/contracts";
-import { toUSDT } from "@/lib/web3/usdt";
+import { DEFAULT_MIN_STAKE, toUSDT } from "@/lib/web3/usdt";
 import { useCreateGoalStore } from "@/stores/createGoalStore";
 
 type StepStatus = "pending" | "active" | "done" | "error";
@@ -96,7 +96,7 @@ export default function ConfirmButton() {
       : BigInt(Math.floor(Date.now() / 1000) + store.durationHours * 3600);
     const minStake = store.stakeAmount
       ? toUSDT(parseFloat(store.stakeAmount))
-      : toUSDT(1);
+      : toUSDT(parseFloat(DEFAULT_MIN_STAKE));
     const metadataURI = JSON.stringify({
       title: store.title,
       description: store.description,
@@ -281,7 +281,7 @@ export default function ConfirmButton() {
                 ? "multi"
                 : "numeric",
           deadline: new Date(Number(deadlineTimestamp) * 1000).toISOString(),
-          minStake: store.stakeAmount || "1",
+          minStake: store.stakeAmount || DEFAULT_MIN_STAKE,
           resolverIds: store.resolvers,
         });
         const res = created as unknown as { id?: string };
@@ -318,7 +318,7 @@ export default function ConfirmButton() {
     { label: "Circle", value: store.circleName || "—" },
     { label: "Outcome type", value: getOutcomeLabel() },
     { label: "Deadline", value: getDeadlineDisplay() },
-    { label: "Minimum stake", value: `${store.stakeAmount || "1"} USDT` },
+    { label: "Minimum stake", value: `${store.stakeAmount || DEFAULT_MIN_STAKE} USDT` },
     {
       label: "Resolvers",
       value:
@@ -466,7 +466,7 @@ export default function ConfirmButton() {
                             <p className="text-sm font-medium text-main-text text-right max-w-[60%] truncate">
                               {row.label === "Minimum stake" ? (
                                 <span className="inline-flex items-center gap-1">
-                                  {store.stakeAmount || "1"}{" "}
+                                  {store.stakeAmount || DEFAULT_MIN_STAKE}{" "}
                                   <UsdtLabel size={12} />
                                 </span>
                               ) : (

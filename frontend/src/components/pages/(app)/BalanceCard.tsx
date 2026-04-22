@@ -20,6 +20,7 @@ import { DepositSheet, WithdrawSheet } from "@/components/pages/(profile)";
 import { UsdtLabel } from "@/components/shared";
 import { useSheetOverflow } from "@/hooks";
 import { mockUSDTContract } from "@/lib/web3/contracts";
+import { IS_MAINNET } from "@/lib/web3/network";
 import { fromUSDT } from "@/lib/web3/usdt";
 
 export default function BalanceCard() {
@@ -163,13 +164,15 @@ export default function BalanceCard() {
               <HiOutlinePaperAirplane className="w-4 h-4" />
               Send
             </button>
-            <button
-              type="button"
-              onClick={() => setFaucetOpen(true)}
-              className="flex items-center justify-center gap-1.5 rounded-xl bg-white/30 px-3 py-2.5 text-xs font-semibold text-white cursor-pointer transition-all duration-200 active:scale-[0.95]"
-            >
-              <HiOutlineBeaker className="w-4 h-4" />
-            </button>
+            {!IS_MAINNET && (
+              <button
+                type="button"
+                onClick={() => setFaucetOpen(true)}
+                className="flex items-center justify-center gap-1.5 rounded-xl bg-white/30 px-3 py-2.5 text-xs font-semibold text-white cursor-pointer transition-all duration-200 active:scale-[0.95]"
+              >
+                <HiOutlineBeaker className="w-4 h-4" />
+              </button>
+            )}
           </div>
         </div>
       </div>

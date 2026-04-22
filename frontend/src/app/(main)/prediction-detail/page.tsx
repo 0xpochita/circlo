@@ -20,7 +20,7 @@ import {
   circleFactoryContract,
   predictionPoolContract,
 } from "@/lib/web3/contracts";
-import { toUSDT } from "@/lib/web3/usdt";
+import { DEFAULT_MIN_STAKE, toUSDT } from "@/lib/web3/usdt";
 
 type GoalDetail = GoalResponse & {
   metadataUri?: string;
@@ -138,7 +138,7 @@ function PredictionDetailContent() {
       const deadline = BigInt(
         Math.floor(new Date(goal.deadline).getTime() / 1000),
       );
-      const minStake = toUSDT(parseFloat(goal.minStake || "0.1"));
+      const minStake = toUSDT(parseFloat(goal.minStake || DEFAULT_MIN_STAKE));
       const resolverAddresses = (goal.resolvers || [])
         .map((r) => r.user?.walletAddress)
         .filter(Boolean) as `0x${string}`[];

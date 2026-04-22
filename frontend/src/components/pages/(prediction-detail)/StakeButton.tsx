@@ -15,7 +15,7 @@ import {
   predictionPoolContract,
   resolutionModuleContract,
 } from "@/lib/web3/contracts";
-import { fromUSDT, toUSDT } from "@/lib/web3/usdt";
+import { DEFAULT_MIN_STAKE, fromUSDT, toUSDT } from "@/lib/web3/usdt";
 import { useAuthStore } from "@/stores/authStore";
 
 type ResolverInfo = {
@@ -345,7 +345,7 @@ export default function StakeButton({
         const deadline = BigInt(
           Math.floor(new Date(gd.deadline).getTime() / 1000),
         );
-        const minStake = toUSDT(parseFloat(gd.minStake || "0.1"));
+        const minStake = toUSDT(parseFloat(gd.minStake || DEFAULT_MIN_STAKE));
         const metadataURI =
           gd.metadataUri || JSON.stringify({ title: gd.title });
 

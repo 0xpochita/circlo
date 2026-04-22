@@ -180,9 +180,15 @@ export default function PredictionForm() {
             type="text"
             inputMode="numeric"
             value={store.stakeAmount}
-            onChange={(e) =>
-              store.setStakeAmount(e.target.value.replace(/[^0-9]/g, ""))
-            }
+            onChange={(e) => {
+              const cleaned = e.target.value.replace(/[^0-9.]/g, "");
+              const parts = cleaned.split(".");
+              const sanitized =
+                parts.length > 2
+                  ? `${parts[0]}.${parts.slice(1).join("")}`
+                  : cleaned;
+              store.setStakeAmount(sanitized);
+            }}
             placeholder="0"
             className="flex-1 bg-transparent text-sm text-main-text placeholder:text-muted outline-none"
           />
@@ -197,7 +203,7 @@ export default function PredictionForm() {
           </div>
         </div>
         <div className="flex gap-2 mt-3">
-          {["1", "5", "10", "50"].map((amount) => (
+          {["0.0001", "0.1", "1", "5"].map((amount) => (
             <button
               type="button"
               key={amount}
