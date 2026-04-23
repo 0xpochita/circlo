@@ -60,6 +60,46 @@ export default async function userRoutes(app: FastifyInstance) {
     }
   );
 
+  app.get(
+    "/me/stats",
+    { preHandler: requireAuth },
+    async (req, reply) => {
+      const [stakedAgg, claimedAgg] = await Promise.all([
+        prisma.goalParticipant.aggregate({
+          where: { user_id: req.jwtUser.sub },
+          _sum: { staked: true },
+        }),
+        prisma.goalParticipant.aggregate({
+          where: { user_id: req.jwtUser.sub, claimed: true },
+          _sum: { claimed_amount: true },
+        }),
+      ]);
+
+      const totalStaked = stakedAgg._sum.staked
+        ? Number(stakedAgg._sum.staked.toString())
+        : 0;
+      const totalClaimed = claimedAgg._sum.claimed_amount
+        ? Number(claimedAgg._sum.claimed_amount.toString())
+        : 0;
+      const pnl = totalClaimed - totalStaked;
+
+      const formatWithSign = (n: number, decimals: number): string => {
+        const abs = Math.abs(n).toFixed(decimals);
+        return n >= 0 ? `+${abs}` : `-${abs}`;
+      };
+
+      return reply.send({
+        totalStaked: totalStaked.toFixed(4),
+        totalClaimed: totalClaimed.toFixed(4),
+        pnl: formatWithSign(pnl, 4),
+        pnlPercentage:
+          totalStaked > 0
+            ? formatWithSign((pnl / totalStaked) * 100, 2)
+            : null,
+      });
+    }
+  );
+
   app.patch(
     "/me",
     { preHandler: requireAuth },

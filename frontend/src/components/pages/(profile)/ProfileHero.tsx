@@ -14,6 +14,7 @@ import { injected } from "wagmi/connectors";
 import { EmojiAvatar } from "@/components/shared";
 import { useAuth } from "@/hooks/useAuth";
 import { useUSDTBalance } from "@/hooks/useUSDT";
+import { usersApi } from "@/lib/api/endpoints";
 import { NETWORK } from "@/lib/web3/network";
 import { useAuthStore } from "@/stores/authStore";
 import { useNotificationStore } from "@/stores/notificationStore";
@@ -45,11 +46,25 @@ export default function ProfileHero() {
   const fetchNotifications = useNotificationStore((s) => s.fetchNotifications);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
+  const [stats, setStats] = useState<{
+    pnl: string;
+    pnlPercentage: string | null;
+  } | null>(null);
+
   useEffect(() => {
     if (isAuthenticated) {
       fetchNotifications();
+      usersApi
+        .myStats()
+        .then((res) =>
+          setStats({ pnl: res.pnl, pnlPercentage: res.pnlPercentage }),
+        )
+        .catch(() => setStats(null));
     }
   }, [isAuthenticated, fetchNotifications]);
+
+  const showPnl = isConnected && stats && stats.pnlPercentage !== null;
+  const isPositivePnl = stats?.pnl.startsWith("+");
 
   async function handleConnect() {
     setIsConnecting(true);
@@ -146,9 +161,13 @@ export default function ProfileHero() {
                 />
               </div>
             </div>
-            {isConnected && (
-              <p className="mt-1 text-sm font-medium text-emerald-300">
-                +2.30 (22.5%)
+            {showPnl && stats && (
+              <p
+                className={`mt-1 text-sm font-medium ${
+                  isPositivePnl ? "text-emerald-300" : "text-red-300"
+                }`}
+              >
+                {stats.pnl} ({stats.pnlPercentage}%)
               </p>
             )}
           </div>

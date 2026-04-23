@@ -88,7 +88,9 @@ export default function ActiveCircles() {
               <div className="flex items-center gap-1.5 px-2 py-2">
                 <p className="text-base font-bold text-main-text inline-flex items-center gap-1">
                   {c.memberCount}{" "}
-                  <span className="text-xs font-normal text-muted">members</span>
+                  <span className="text-xs font-normal text-muted">
+                    member{c.memberCount !== 1 ? "s" : ""}
+                  </span>
                 </p>
               </div>
             </Link>
@@ -169,7 +171,8 @@ export default function ActiveCircles() {
                               {c.name}
                             </p>
                             <p className="text-xs text-muted">
-                              {c.memberCount} members
+                              {c.memberCount} member
+                              {c.memberCount !== 1 ? "s" : ""}
                             </p>
                           </div>
                           <span className="text-xs font-medium text-muted rounded-full bg-white px-3 py-1">
