@@ -6,6 +6,7 @@ import { useAccount, useSignMessage } from "wagmi";
 import { authApi } from "@/lib/api/endpoints";
 import { NETWORK } from "@/lib/web3/network";
 import { useAuthStore } from "@/stores/authStore";
+import { useNotificationStore } from "@/stores/notificationStore";
 
 export function useAuth() {
   const { address } = useAccount();
@@ -55,6 +56,8 @@ export function useAuth() {
               : null,
           createdAt: u.createdAt,
         });
+
+        useNotificationStore.getState().fetchNotifications();
       } catch (error) {
         setLoading(false);
         throw error;
@@ -68,6 +71,7 @@ export function useAuth() {
       await authApi.logout();
     } finally {
       clearAuth();
+      useNotificationStore.getState().reset();
     }
   }, [clearAuth]);
 

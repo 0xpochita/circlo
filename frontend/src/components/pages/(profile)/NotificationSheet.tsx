@@ -2,12 +2,11 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { HiXMark } from "react-icons/hi2";
-import { toast } from "sonner";
 import { EmojiAvatar } from "@/components/shared";
 import type { NotificationResponse } from "@/lib/api/endpoints";
-import { notificationsApi } from "@/lib/api/endpoints";
+import { useNotificationStore } from "@/stores/notificationStore";
 import type { UserAvatar } from "@/types";
 
 const TYPE_AVATARS: Record<string, UserAvatar> = {
@@ -42,32 +41,24 @@ export default function NotificationSheet({
   onClose,
 }: NotificationSheetProps) {
   const router = useRouter();
-  const [notifications, setNotifications] = useState<NotificationResponse[]>(
-    [],
-  );
-  const [isLoading, setIsLoading] = useState(false);
+  const notifications = useNotificationStore((s) => s.notifications);
+  const unreadCount = useNotificationStore((s) => s.unreadCount);
+  const isLoading = useNotificationStore((s) => s.isLoading);
+  const fetchNotifications = useNotificationStore((s) => s.fetchNotifications);
+  const markAsRead = useNotificationStore((s) => s.markAsRead);
+  const markAllAsRead = useNotificationStore((s) => s.markAllAsRead);
 
   useEffect(() => {
     if (open) {
       document.body.style.overflow = "hidden";
-      setIsLoading(true);
-      notificationsApi
-        .list()
-        .then((res) => setNotifications(res.items))
-        .catch(() => {
-          toast.error("Failed to load notifications");
-          setNotifications([]);
-        })
-        .finally(() => setIsLoading(false));
+      fetchNotifications();
     } else {
       document.body.style.overflow = "";
     }
     return () => {
       document.body.style.overflow = "";
     };
-  }, [open]);
-
-  const unreadCount = notifications.filter((n) => n.unread).length;
+  }, [open, fetchNotifications]);
 
   function getNavigationPath(n: NotificationResponse): string | null {
     if (!n.entityId) return null;
@@ -82,16 +73,8 @@ export default function NotificationSheet({
 
   async function handleTap(n: NotificationResponse) {
     if (n.unread) {
-      setNotifications((prev) =>
-        prev.map((it) => (it.id === n.id ? { ...it, unread: false } : it)),
-      );
-      try {
-        await notificationsApi.markRead([n.id]);
-      } catch {
-        toast.error("Failed to mark as read");
-      }
+      await markAsRead(n.id);
     }
-
     const path = getNavigationPath(n);
     if (path) {
       onClose();
@@ -100,15 +83,7 @@ export default function NotificationSheet({
   }
 
   async function handleMarkAllRead() {
-    const unreadIds = notifications.filter((n) => n.unread).map((n) => n.id);
-    if (unreadIds.length === 0) return;
-
-    setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
-    try {
-      await notificationsApi.markRead(unreadIds);
-    } catch {
-      toast.error("Failed to mark all as read");
-    }
+    await markAllAsRead();
   }
 
   return (

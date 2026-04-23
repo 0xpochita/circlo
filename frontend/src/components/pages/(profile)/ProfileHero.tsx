@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   HiOutlineBell,
   HiOutlineMagnifyingGlass,
@@ -15,6 +15,8 @@ import { EmojiAvatar } from "@/components/shared";
 import { useAuth } from "@/hooks/useAuth";
 import { useUSDTBalance } from "@/hooks/useUSDT";
 import { NETWORK } from "@/lib/web3/network";
+import { useAuthStore } from "@/stores/authStore";
+import { useNotificationStore } from "@/stores/notificationStore";
 import { useUserStore } from "@/stores/userStore";
 import DepositSheet from "./DepositSheet";
 import EditProfileSheet from "./EditProfileSheet";
@@ -39,7 +41,15 @@ export default function ProfileHero() {
     useUSDTBalance(address);
 
   const displayBalance = isBalanceLoading ? "..." : usdtBalance.toFixed(2);
-  const unreadCount = 3;
+  const unreadCount = useNotificationStore((s) => s.unreadCount);
+  const fetchNotifications = useNotificationStore((s) => s.fetchNotifications);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchNotifications();
+    }
+  }, [isAuthenticated, fetchNotifications]);
 
   async function handleConnect() {
     setIsConnecting(true);
