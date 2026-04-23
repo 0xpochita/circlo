@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { HiOutlineLockClosed } from "react-icons/hi2";
 import { toast } from "sonner";
 import { usePublicClient, useWriteContract } from "wagmi";
@@ -16,20 +16,43 @@ type LockMarketButtonProps = {
 
 export default function LockMarketButton({
   goalChainId,
-  status,
   deadline,
   onLocked,
 }: LockMarketButtonProps) {
   const { writeContractAsync } = useWriteContract();
   const publicClient = usePublicClient();
   const [isLocking, setIsLocking] = useState(false);
+  const [scStatus, setScStatus] = useState<number | null>(null);
 
-  const isOpen = status === "open";
+  useEffect(() => {
+    if (!goalChainId || !publicClient) return;
+    let cancelled = false;
+    publicClient
+      .readContract({
+        address: predictionPoolContract.address,
+        abi: predictionPoolContract.abi,
+        functionName: "goals",
+        args: [BigInt(goalChainId)],
+      })
+      .then((result) => {
+        if (cancelled) return;
+        const tuple = result as readonly unknown[];
+        setScStatus(Number(tuple[3]));
+      })
+      .catch(() => {
+        if (!cancelled) setScStatus(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [goalChainId, publicClient]);
+
+  const isOpenOnChain = scStatus === 0;
   const deadlinePassed = deadline
     ? new Date(deadline).getTime() < Date.now()
     : false;
 
-  if (!isOpen || !deadlinePassed || !goalChainId) {
+  if (!isOpenOnChain || !deadlinePassed || !goalChainId) {
     return null;
   }
 
@@ -52,6 +75,7 @@ export default function LockMarketButton({
         }
       }
 
+      setScStatus(1);
       toast.success("Market locked!");
       onLocked?.();
     } catch (err) {
