@@ -109,6 +109,29 @@ async function backfillPredictionPool(client: any, fromBlock: bigint, toBlock: b
   }
 }
 
+function isSocketError(err: Error): boolean {
+  const name = err.name ?? "";
+  const msg = (err.message ?? "").toLowerCase();
+  return (
+    name === "SocketClosedError" ||
+    msg.includes("socket has been closed") ||
+    msg.includes("socket") ||
+    msg.includes("websocket")
+  );
+}
+
+function onWatcherError(
+  label: string,
+  indexerClient: ReturnType<typeof createIndexerClient>
+) {
+  return (err: Error) => {
+    console.error(`[${label}] Watcher error:`, err.message);
+    if (isSocketError(err)) {
+      indexerClient.triggerReconnect(5000);
+    }
+  };
+}
+
 async function registerWatchers(
   indexerClient: ReturnType<typeof createIndexerClient>
 ): Promise<void> {
@@ -126,7 +149,7 @@ async function registerWatchers(
         } catch (err) { console.error("[CircleFactory] CircleCreated error:", err); }
       }
     },
-    onError: (err: Error) => console.error("[CircleFactory] Watcher error:", err),
+    onError: onWatcherError("CircleFactory", indexerClient),
   });
 
   client.watchContractEvent({
@@ -141,7 +164,7 @@ async function registerWatchers(
         } catch (err) { console.error("[CircleFactory] CircleJoined error:", err); }
       }
     },
-    onError: (err: Error) => console.error("[CircleFactory] Watcher error:", err),
+    onError: onWatcherError("CircleFactory", indexerClient),
   });
 
   client.watchContractEvent({
@@ -156,7 +179,7 @@ async function registerWatchers(
         } catch (err) { console.error("[CircleFactory] CircleLeft error:", err); }
       }
     },
-    onError: (err: Error) => console.error("[CircleFactory] Watcher error:", err),
+    onError: onWatcherError("CircleFactory", indexerClient),
   });
 
   client.watchContractEvent({
@@ -171,7 +194,7 @@ async function registerWatchers(
         } catch (err) { console.error("[PredictionPool] GoalCreated error:", err); }
       }
     },
-    onError: (err: Error) => console.error("[PredictionPool] Watcher error:", err),
+    onError: onWatcherError("PredictionPool", indexerClient),
   });
 
   client.watchContractEvent({
@@ -186,7 +209,7 @@ async function registerWatchers(
         } catch (err) { console.error("[PredictionPool] Staked error:", err); }
       }
     },
-    onError: (err: Error) => console.error("[PredictionPool] Watcher error:", err),
+    onError: onWatcherError("PredictionPool", indexerClient),
   });
 
   client.watchContractEvent({
@@ -201,7 +224,7 @@ async function registerWatchers(
         } catch (err) { console.error("[PredictionPool] VoteSubmitted error:", err); }
       }
     },
-    onError: (err: Error) => console.error("[PredictionPool] Watcher error:", err),
+    onError: onWatcherError("PredictionPool", indexerClient),
   });
 
   client.watchContractEvent({
@@ -216,7 +239,7 @@ async function registerWatchers(
         } catch (err) { console.error("[PredictionPool] GoalLocked error:", err); }
       }
     },
-    onError: (err: Error) => console.error("[PredictionPool] Watcher error:", err),
+    onError: onWatcherError("PredictionPool", indexerClient),
   });
 
   client.watchContractEvent({
@@ -231,7 +254,7 @@ async function registerWatchers(
         } catch (err) { console.error("[PredictionPool] GoalResolved error:", err); }
       }
     },
-    onError: (err: Error) => console.error("[PredictionPool] Watcher error:", err),
+    onError: onWatcherError("PredictionPool", indexerClient),
   });
 
   client.watchContractEvent({
@@ -246,7 +269,7 @@ async function registerWatchers(
         } catch (err) { console.error("[PredictionPool] GoalRefunded error:", err); }
       }
     },
-    onError: (err: Error) => console.error("[PredictionPool] Watcher error:", err),
+    onError: onWatcherError("PredictionPool", indexerClient),
   });
 
   client.watchContractEvent({
@@ -261,7 +284,7 @@ async function registerWatchers(
         } catch (err) { console.error("[PredictionPool] Claimed error:", err); }
       }
     },
-    onError: (err: Error) => console.error("[PredictionPool] Watcher error:", err),
+    onError: onWatcherError("PredictionPool", indexerClient),
   });
 
   console.log("[Indexer] All watchers registered");
