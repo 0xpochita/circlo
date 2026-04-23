@@ -30,6 +30,16 @@ const STATUS_FILTERS = [
   { label: "Resolved", value: "resolved" },
 ];
 
+const ACTIVE_STATUSES = new Set(["open", "locked", "resolving"]);
+
+function isActiveGoal(g: GoalResponse): boolean {
+  if (!ACTIVE_STATUSES.has(g.status)) return false;
+  if (g.status === "open" && new Date(g.deadline).getTime() < Date.now()) {
+    return false;
+  }
+  return true;
+}
+
 const PREVIEW_COUNT = 3;
 
 function StatusBadge({ status }: { status: string }) {
@@ -130,15 +140,16 @@ export default function DetailsGoals({ circleId }: DetailsGoalsProps) {
     return goals.filter((g) => g.status === activeFilter);
   }, [goals, activeFilter]);
 
-  const previewGoals = goals.slice(0, PREVIEW_COUNT);
-  const hasMore = goals.length > PREVIEW_COUNT;
+  const activeGoals = useMemo(() => goals.filter(isActiveGoal), [goals]);
+  const previewGoals = activeGoals.slice(0, PREVIEW_COUNT);
+  const hasMore = activeGoals.length > PREVIEW_COUNT;
 
   return (
     <>
       <div className="px-4 py-2">
         <div className="flex items-center justify-between mb-3">
           <p className="text-base font-bold text-main-text">Active Goals</p>
-          {goals.length > PREVIEW_COUNT && (
+          {goals.length > 0 && (
             <button
               type="button"
               onClick={() => setSheetOpen(true)}
@@ -163,16 +174,18 @@ export default function DetailsGoals({ circleId }: DetailsGoalsProps) {
               </div>
             ))}
           </div>
-        ) : goals.length === 0 ? (
+        ) : activeGoals.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-2xl bg-white py-10 px-4">
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gray-50 mb-3">
               <TbTargetArrow className="w-6 h-6 text-muted" />
             </div>
             <p className="text-sm font-semibold text-main-text mb-1">
-              No goals yet
+              {goals.length === 0 ? "No goals yet" : "No active goals"}
             </p>
             <p className="text-xs text-muted text-center">
-              Create the first goal for this circle
+              {goals.length === 0
+                ? "Create the first goal for this circle"
+                : "All goals in this circle have ended"}
             </p>
           </div>
         ) : (

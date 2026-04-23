@@ -14,6 +14,16 @@ type GoalDetail = GoalResponse & {
   participationSummary?: { side: string; totalStaked: string; count: number }[];
 };
 
+const ACTIVE_STATUSES = new Set(["open", "locked", "resolving"]);
+
+function isActiveGoal(g: GoalResponse): boolean {
+  if (!ACTIVE_STATUSES.has(g.status)) return false;
+  if (g.status === "open" && new Date(g.deadline).getTime() < Date.now()) {
+    return false;
+  }
+  return true;
+}
+
 function formatStake(total: number): string {
   return parseFloat(total.toFixed(4)).toString();
 }
@@ -31,7 +41,7 @@ export default function DetailsStats({ circleId, circle }: DetailsStatsProps) {
     ]).then(async ([membersRes, goalsRes]) => {
       setMemberCount(membersRes?.items?.length ?? 0);
       const goals = goalsRes?.items ?? [];
-      setGoalCount(goals.length);
+      setGoalCount(goals.filter(isActiveGoal).length);
 
       const details = await Promise.all(
         goals.map((g) =>
