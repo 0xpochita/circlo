@@ -19,6 +19,17 @@ export function toAvatar(
   };
 }
 
+export function normalizeSide(
+  side: string | number | null | undefined,
+): 0 | 1 | null {
+  if (side === null || side === undefined) return null;
+  if (typeof side === "number") return side === 0 ? 0 : side === 1 ? 1 : null;
+  const lower = String(side).toLowerCase();
+  if (lower === "yes" || lower === "0") return 0;
+  if (lower === "no" || lower === "1") return 1;
+  return null;
+}
+
 export function formatTimeLeft(deadline: string): string {
   const diff = new Date(deadline).getTime() - Date.now();
   if (diff <= 0) return "Ended";

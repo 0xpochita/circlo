@@ -40,8 +40,16 @@ export default function OddsCard({ goalChainId }: OddsCardProps) {
   const noPercent = totalPool > 0 ? 100 - yesPercent : 50;
 
   const options = [
-    { label: "Yes", percentage: yesPercent, pool: String(Math.round(yesPool)) },
-    { label: "No", percentage: noPercent, pool: String(Math.round(noPool)) },
+    {
+      label: "Yes",
+      percentage: yesPercent,
+      pool: parseFloat(yesPool.toFixed(4)).toString(),
+    },
+    {
+      label: "No",
+      percentage: noPercent,
+      pool: parseFloat(noPool.toFixed(4)).toString(),
+    },
   ];
 
   return (
@@ -50,7 +58,8 @@ export default function OddsCard({ goalChainId }: OddsCardProps) {
         <div className="flex items-center justify-between mb-3">
           <p className="text-sm font-semibold text-main-text">Current Odds</p>
           <p className="text-xs text-muted inline-flex items-center gap-1">
-            Total pool: {String(Math.round(totalPool))} <UsdtLabel size={11} />
+            Total pool: {parseFloat(totalPool.toFixed(4)).toString()}{" "}
+            <UsdtLabel size={11} />
           </p>
         </div>
 

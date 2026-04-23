@@ -6,6 +6,7 @@ import { useAccount, useSignMessage } from "wagmi";
 import { authApi } from "@/lib/api/endpoints";
 import { NETWORK } from "@/lib/web3/network";
 import { useAuthStore } from "@/stores/authStore";
+import { useNotificationStore } from "@/stores/notificationStore";
 
 export function useAuth() {
   const { address } = useAccount();
@@ -20,50 +21,57 @@ export function useAuth() {
     user,
   } = useAuthStore();
 
-  const login = useCallback(async () => {
-    if (!address) throw new Error("Wallet not connected");
+  const login = useCallback(
+    async (addr?: string) => {
+      const walletAddr = addr ?? address;
+      if (!walletAddr) throw new Error("Wallet not connected");
 
-    setLoading(true);
-    try {
-      const nonceRes = await authApi.nonce(address);
+      setLoading(true);
+      try {
+        const nonceRes = await authApi.nonce(walletAddr);
 
-      const message = new SiweMessage({
-        domain: window.location.host,
-        address,
-        statement: "Sign in to Circlo",
-        uri: window.location.origin,
-        version: "1",
-        chainId: NETWORK.id,
-        nonce: nonceRes.nonce,
-      });
+        const message = new SiweMessage({
+          domain: window.location.host,
+          address: walletAddr,
+          statement: "Sign in to Circlo",
+          uri: window.location.origin,
+          version: "1",
+          chainId: NETWORK.id,
+          nonce: nonceRes.nonce,
+        });
 
-      const messageString = message.prepareMessage();
-      const signature = await signMessageAsync({ message: messageString });
-      const verifyRes = await authApi.verify(messageString, signature);
+        const messageString = message.prepareMessage();
+        const signature = await signMessageAsync({ message: messageString });
+        const verifyRes = await authApi.verify(messageString, signature);
 
-      const u = verifyRes.user;
-      setAuth(verifyRes.accessToken, verifyRes.refreshToken || null, {
-        id: u.id,
-        wallet: u.walletAddress,
-        username: u.username,
-        displayName: u.name,
-        avatar:
-          u.avatarEmoji && u.avatarColor
-            ? `${u.avatarEmoji}|${u.avatarColor}`
-            : null,
-        createdAt: u.createdAt,
-      });
-    } catch (error) {
-      setLoading(false);
-      throw error;
-    }
-  }, [address, signMessageAsync, setAuth, setLoading]);
+        const u = verifyRes.user;
+        setAuth(verifyRes.accessToken, verifyRes.refreshToken || null, {
+          id: u.id,
+          wallet: u.walletAddress,
+          username: u.username,
+          displayName: u.name,
+          avatar:
+            u.avatarEmoji && u.avatarColor
+              ? `${u.avatarEmoji}|${u.avatarColor}`
+              : null,
+          createdAt: u.createdAt,
+        });
+
+        useNotificationStore.getState().fetchNotifications();
+      } catch (error) {
+        setLoading(false);
+        throw error;
+      }
+    },
+    [address, signMessageAsync, setAuth, setLoading],
+  );
 
   const logout = useCallback(async () => {
     try {
       await authApi.logout();
     } finally {
       clearAuth();
+      useNotificationStore.getState().reset();
     }
   }, [clearAuth]);
 

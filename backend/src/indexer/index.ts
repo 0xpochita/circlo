@@ -83,19 +83,20 @@ async function backfillPredictionPool(client: any, fromBlock: bigint, toBlock: b
     });
 
     for (const log of logs) {
+      const txHash = (log.transactionHash ?? "") as string;
       try {
         if (log.eventName === "GoalCreated") {
-          await handleGoalCreated(log.args as { id: bigint; circleId: bigint; creator: string; deadline: bigint; minStake: bigint });
+          await handleGoalCreated(log.args as { id: bigint; circleId: bigint; creator: string; deadline: bigint; minStake: bigint }, txHash);
         } else if (log.eventName === "Staked") {
-          await handleStaked(log.args as { goalId: bigint; user: string; side: number; amount: bigint });
+          await handleStaked(log.args as { goalId: bigint; user: string; side: number; amount: bigint }, txHash);
         } else if (log.eventName === "VoteSubmitted") {
           await handleVoteSubmitted(log.args as { goalId: bigint; resolver: string; choice: number });
         } else if (log.eventName === "GoalLocked") {
-          await handleGoalLocked(log.args as { goalId: bigint });
+          await handleGoalLocked(log.args as { goalId: bigint }, txHash);
         } else if (log.eventName === "GoalResolved") {
-          await handleGoalResolved(log.args as { goalId: bigint; winningSide: number });
+          await handleGoalResolved(log.args as { goalId: bigint; winningSide: number }, txHash);
         } else if (log.eventName === "GoalRefunded") {
-          await handleGoalRefunded(log.args as { goalId: bigint });
+          await handleGoalRefunded(log.args as { goalId: bigint }, txHash);
         } else if (log.eventName === "Claimed") {
           await handleClaimed(log.args as { goalId: bigint; user: string; amount: bigint });
         }
@@ -189,7 +190,7 @@ async function registerWatchers(
     onLogs: async (logs: any[]) => {
       for (const log of logs) {
         try {
-          await handleGoalCreated(log.args as { id: bigint; circleId: bigint; creator: string; deadline: bigint; minStake: bigint });
+          await handleGoalCreated(log.args as { id: bigint; circleId: bigint; creator: string; deadline: bigint; minStake: bigint }, (log.transactionHash ?? "") as string);
           if (log.blockNumber) await setLastBlock(PREDICTION_POOL, log.blockNumber);
         } catch (err) { console.error("[PredictionPool] GoalCreated error:", err); }
       }
@@ -204,7 +205,7 @@ async function registerWatchers(
     onLogs: async (logs: any[]) => {
       for (const log of logs) {
         try {
-          await handleStaked(log.args as { goalId: bigint; user: string; side: number; amount: bigint });
+          await handleStaked(log.args as { goalId: bigint; user: string; side: number; amount: bigint }, (log.transactionHash ?? "") as string);
           if (log.blockNumber) await setLastBlock(PREDICTION_POOL, log.blockNumber);
         } catch (err) { console.error("[PredictionPool] Staked error:", err); }
       }
@@ -234,7 +235,7 @@ async function registerWatchers(
     onLogs: async (logs: any[]) => {
       for (const log of logs) {
         try {
-          await handleGoalLocked(log.args as { goalId: bigint });
+          await handleGoalLocked(log.args as { goalId: bigint }, (log.transactionHash ?? "") as string);
           if (log.blockNumber) await setLastBlock(PREDICTION_POOL, log.blockNumber);
         } catch (err) { console.error("[PredictionPool] GoalLocked error:", err); }
       }
@@ -249,7 +250,7 @@ async function registerWatchers(
     onLogs: async (logs: any[]) => {
       for (const log of logs) {
         try {
-          await handleGoalResolved(log.args as { goalId: bigint; winningSide: number });
+          await handleGoalResolved(log.args as { goalId: bigint; winningSide: number }, (log.transactionHash ?? "") as string);
           if (log.blockNumber) await setLastBlock(PREDICTION_POOL, log.blockNumber);
         } catch (err) { console.error("[PredictionPool] GoalResolved error:", err); }
       }
@@ -264,7 +265,7 @@ async function registerWatchers(
     onLogs: async (logs: any[]) => {
       for (const log of logs) {
         try {
-          await handleGoalRefunded(log.args as { goalId: bigint });
+          await handleGoalRefunded(log.args as { goalId: bigint }, (log.transactionHash ?? "") as string);
           if (log.blockNumber) await setLastBlock(PREDICTION_POOL, log.blockNumber);
         } catch (err) { console.error("[PredictionPool] GoalRefunded error:", err); }
       }

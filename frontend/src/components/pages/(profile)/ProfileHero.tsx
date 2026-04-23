@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   HiOutlineBell,
   HiOutlineMagnifyingGlass,
@@ -14,6 +14,9 @@ import { injected } from "wagmi/connectors";
 import { EmojiAvatar } from "@/components/shared";
 import { useAuth } from "@/hooks/useAuth";
 import { useUSDTBalance } from "@/hooks/useUSDT";
+import { NETWORK } from "@/lib/web3/network";
+import { useAuthStore } from "@/stores/authStore";
+import { useNotificationStore } from "@/stores/notificationStore";
 import { useUserStore } from "@/stores/userStore";
 import DepositSheet from "./DepositSheet";
 import EditProfileSheet from "./EditProfileSheet";
@@ -32,22 +35,43 @@ export default function ProfileHero() {
   const [isConnecting, setIsConnecting] = useState(false);
 
   const { address, isConnected } = useAccount();
-  const { connect } = useConnect();
+  const { connectAsync } = useConnect();
   const { login } = useAuth();
   const { formatted: usdtBalance, isLoading: isBalanceLoading } =
     useUSDTBalance(address);
 
   const displayBalance = isBalanceLoading ? "..." : usdtBalance.toFixed(2);
-  const unreadCount = 3;
+  const unreadCount = useNotificationStore((s) => s.unreadCount);
+  const fetchNotifications = useNotificationStore((s) => s.fetchNotifications);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchNotifications();
+    }
+  }, [isAuthenticated, fetchNotifications]);
 
   async function handleConnect() {
     setIsConnecting(true);
     try {
-      connect({ connector: injected() });
-      await login();
+      const result = await connectAsync({
+        connector: injected(),
+        chainId: NETWORK.id,
+      });
+      const walletAddress = result.accounts[0];
+      if (!walletAddress) {
+        toast.error("No account found");
+        return;
+      }
+      await login(walletAddress);
       toast.success("Wallet connected successfully");
-    } catch {
-      toast.error("Failed to connect wallet");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "";
+      if (msg.includes("User rejected") || msg.includes("denied")) {
+        toast("Connection cancelled");
+      } else {
+        toast.error("Failed to connect wallet");
+      }
     } finally {
       setIsConnecting(false);
     }
