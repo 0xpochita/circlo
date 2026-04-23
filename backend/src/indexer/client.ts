@@ -9,6 +9,7 @@ export type AnyPublicClient = any;
 export interface IndexerClient {
   getClient: () => AnyPublicClient;
   onReconnect: (cb: () => Promise<void>) => void;
+  triggerReconnect: (delayMs?: number) => void;
   destroy: () => void;
 }
 
@@ -21,6 +22,7 @@ export function createIndexerClient(testnet = false): IndexerClient {
   const reconnectCallbacks: Array<() => Promise<void>> = [];
   let backoffMs = 1000;
   let destroyed = false;
+  let reconnectScheduled = false;
 
   function makeClient(url: string, c: typeof celo | typeof celoSepolia) {
     return createPublicClient({
@@ -58,6 +60,18 @@ export function createIndexerClient(testnet = false): IndexerClient {
     console.log("[Indexer] Reconnected successfully");
   }
 
+  function triggerReconnect(delayMs = 5000) {
+    if (destroyed || reconnectScheduled) return;
+    reconnectScheduled = true;
+    console.log(`[Indexer] Reconnecting in ${delayMs}ms...`);
+    setTimeout(() => {
+      reconnectScheduled = false;
+      reconnect().catch((err) =>
+        console.error("[Indexer] Triggered reconnect error:", err)
+      );
+    }, delayMs);
+  }
+
   const proactiveInterval = setInterval(() => {
     reconnect().catch((err) =>
       console.error("[Indexer] Proactive reconnect error:", err)
@@ -70,6 +84,8 @@ export function createIndexerClient(testnet = false): IndexerClient {
     onReconnect: (cb: () => Promise<void>) => {
       reconnectCallbacks.push(cb);
     },
+
+    triggerReconnect,
 
     destroy: () => {
       destroyed = true;
