@@ -10,6 +10,7 @@ import {
   DetailHeader,
   DetailHero,
   InfoSection,
+  LockMarketButton,
   OddsCard,
   ParticipantList,
   StakeButton,
@@ -279,6 +280,12 @@ function PredictionDetailContent() {
         <ParticipantList
           goalId={goalId || undefined}
           goalChainId={goal?.chainId || undefined}
+        />
+        <LockMarketButton
+          goalChainId={goal?.chainId || undefined}
+          status={goal?.status}
+          deadline={goal?.deadline}
+          onLocked={refreshGoal}
         />
       </PageTransition>
       <StakeButton
