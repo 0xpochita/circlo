@@ -1,8 +1,9 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { HiOutlineBellAlert, HiXMark } from "react-icons/hi2";
+import { HiXMark } from "react-icons/hi2";
 import { toast } from "sonner";
 import { EmojiAvatar } from "@/components/shared";
 import type { NotificationResponse } from "@/lib/api/endpoints";
@@ -40,6 +41,7 @@ export default function NotificationSheet({
   open,
   onClose,
 }: NotificationSheetProps) {
+  const router = useRouter();
   const [notifications, setNotifications] = useState<NotificationResponse[]>(
     [],
   );
@@ -66,6 +68,48 @@ export default function NotificationSheet({
   }, [open]);
 
   const unreadCount = notifications.filter((n) => n.unread).length;
+
+  function getNavigationPath(n: NotificationResponse): string | null {
+    if (!n.entityId) return null;
+    if (n.type === "circle.joined" || n.type === "circle.invited") {
+      return `/circle-details?id=${n.entityId}`;
+    }
+    if (n.type === "goal.created" || n.type === "goal.resolved") {
+      return `/prediction-detail?id=${n.entityId}`;
+    }
+    return null;
+  }
+
+  async function handleTap(n: NotificationResponse) {
+    if (n.unread) {
+      setNotifications((prev) =>
+        prev.map((it) => (it.id === n.id ? { ...it, unread: false } : it)),
+      );
+      try {
+        await notificationsApi.markRead([n.id]);
+      } catch {
+        toast.error("Failed to mark as read");
+      }
+    }
+
+    const path = getNavigationPath(n);
+    if (path) {
+      onClose();
+      router.push(path);
+    }
+  }
+
+  async function handleMarkAllRead() {
+    const unreadIds = notifications.filter((n) => n.unread).map((n) => n.id);
+    if (unreadIds.length === 0) return;
+
+    setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
+    try {
+      await notificationsApi.markRead(unreadIds);
+    } catch {
+      toast.error("Failed to mark all as read");
+    }
+  }
 
   return (
     <AnimatePresence>
@@ -97,17 +141,28 @@ export default function NotificationSheet({
                 </h2>
                 <p className="mt-1 text-sm text-muted">
                   {unreadCount > 0
-                    ? `You have ${unreadCount} new notifications`
+                    ? `You have ${unreadCount} new notification${unreadCount !== 1 ? "s" : ""}`
                     : "You're all caught up"}
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gray-50 cursor-pointer transition-all duration-200 active:scale-[0.95]"
-              >
-                <HiXMark className="w-5 h-5 text-main-text" />
-              </button>
+              <div className="flex items-center gap-2 shrink-0">
+                {unreadCount > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleMarkAllRead}
+                    className="rounded-full bg-gray-50 px-3 py-2 text-xs font-semibold text-main-text cursor-pointer transition-all duration-200 active:scale-[0.95]"
+                  >
+                    Mark all as read
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-50 cursor-pointer transition-all duration-200 active:scale-[0.95]"
+                >
+                  <HiXMark className="w-5 h-5 text-main-text" />
+                </button>
+              </div>
             </div>
 
             <div className="flex-1 overflow-y-auto px-4 pb-8">
@@ -121,15 +176,15 @@ export default function NotificationSheet({
                   ))}
                 </div>
               ) : notifications.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-12">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-50 mb-4">
-                    <HiOutlineBellAlert className="w-7 h-7 text-muted" />
+                <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-50 mb-4 text-3xl">
+                    🔔
                   </div>
                   <p className="text-base font-semibold text-main-text mb-1">
-                    No notifications
+                    No notifications yet
                   </p>
                   <p className="text-sm text-muted">
-                    You&apos;re all caught up
+                    You&apos;ll see updates about your circles and goals here
                   </p>
                 </div>
               ) : (
@@ -137,10 +192,16 @@ export default function NotificationSheet({
                   {notifications.map((n, i) => (
                     <motion.div
                       key={n.id}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => handleTap(n)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") handleTap(n);
+                      }}
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3, delay: 0.05 * i }}
-                      className={`flex items-start gap-3 rounded-2xl p-3 cursor-pointer transition-all duration-200 ${
+                      className={`flex items-start gap-3 rounded-2xl p-3 cursor-pointer transition-all duration-200 active:scale-[0.98] ${
                         n.unread ? "bg-gray-50" : "bg-white"
                       }`}
                     >
