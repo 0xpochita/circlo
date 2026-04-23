@@ -43,12 +43,12 @@ export default function OddsCard({ goalChainId }: OddsCardProps) {
     {
       label: "Yes",
       percentage: yesPercent,
-      pool: yesPool < 1 ? yesPool.toFixed(4) : yesPool.toFixed(2),
+      pool: parseFloat(yesPool.toFixed(4)).toString(),
     },
     {
       label: "No",
       percentage: noPercent,
-      pool: noPool < 1 ? noPool.toFixed(4) : noPool.toFixed(2),
+      pool: parseFloat(noPool.toFixed(4)).toString(),
     },
   ];
 
@@ -58,8 +58,7 @@ export default function OddsCard({ goalChainId }: OddsCardProps) {
         <div className="flex items-center justify-between mb-3">
           <p className="text-sm font-semibold text-main-text">Current Odds</p>
           <p className="text-xs text-muted inline-flex items-center gap-1">
-            Total pool:{" "}
-            {totalPool < 1 ? totalPool.toFixed(4) : totalPool.toFixed(2)}{" "}
+            Total pool: {parseFloat(totalPool.toFixed(4)).toString()}{" "}
             <UsdtLabel size={11} />
           </p>
         </div>

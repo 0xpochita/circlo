@@ -15,7 +15,7 @@ type GoalDetail = GoalResponse & {
 };
 
 function formatStake(total: number): string {
-  return total < 1 ? total.toFixed(4) : total.toFixed(2);
+  return parseFloat(total.toFixed(4)).toString();
 }
 
 export default function DetailsStats({ circleId, circle }: DetailsStatsProps) {
