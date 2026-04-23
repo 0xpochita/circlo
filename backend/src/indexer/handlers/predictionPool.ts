@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
 import { prisma } from "../../lib/prisma.js";
 import { redis } from "../../lib/redis.js";
 import { goalJobQueue } from "../../jobs/index.js";
@@ -81,13 +80,16 @@ function formatUsdt(amount: bigint): string {
   return `${integer}.${decimal}`;
 }
 
-export async function handleGoalCreated(args: {
-  id: bigint;
-  circleId: bigint;
-  creator: string;
-  deadline: bigint;
-  minStake: bigint;
-}): Promise<void> {
+export async function handleGoalCreated(
+  args: {
+    id: bigint;
+    circleId: bigint;
+    creator: string;
+    deadline: bigint;
+    minStake: bigint;
+  },
+  txHash: string
+): Promise<void> {
   const creatorAddress = args.creator.toLowerCase();
 
   const [circle, user] = await Promise.all([
@@ -135,8 +137,9 @@ export async function handleGoalCreated(args: {
 
   await Promise.all(
     members.map(async (m) => {
+      const notifId = `goal.created:${args.id}:${m.user_id}:${txHash}`;
       const notification = {
-        id: uuidv4(),
+        id: notifId,
         userId: m.user_id,
         type: "goal.created",
         actorId: user.id,
@@ -149,9 +152,9 @@ export async function handleGoalCreated(args: {
       };
 
       await prisma.notification.upsert({
-        where: { id: notification.id },
+        where: { id: notifId },
         create: {
-          id: notification.id,
+          id: notifId,
           user_id: m.user_id,
           type: notification.type,
           actor_id: user.id,
@@ -172,12 +175,15 @@ export async function handleGoalCreated(args: {
   );
 }
 
-export async function handleStaked(args: {
-  goalId: bigint;
-  user: string;
-  side: number;
-  amount: bigint;
-}): Promise<void> {
+export async function handleStaked(
+  args: {
+    goalId: bigint;
+    user: string;
+    side: number;
+    amount: bigint;
+  },
+  txHash: string
+): Promise<void> {
   const userAddress = args.user.toLowerCase();
 
   const [goal, user] = await Promise.all([
@@ -220,8 +226,9 @@ export async function handleStaked(args: {
   }
 
   if (goal.creator_id !== user.id) {
+    const notifId = `goal.staked:${args.goalId}:${goal.creator_id}:${txHash}`;
     const notification = {
-      id: uuidv4(),
+      id: notifId,
       userId: goal.creator_id,
       type: "goal.staked",
       actorId: user.id,
@@ -234,9 +241,9 @@ export async function handleStaked(args: {
     };
 
     await prisma.notification.upsert({
-      where: { id: notification.id },
+      where: { id: notifId },
       create: {
-        id: notification.id,
+        id: notifId,
         user_id: goal.creator_id,
         type: notification.type,
         actor_id: user.id,
@@ -292,9 +299,12 @@ export async function handleVoteSubmitted(args: {
   );
 }
 
-export async function handleGoalLocked(args: {
-  goalId: bigint;
-}): Promise<void> {
+export async function handleGoalLocked(
+  args: {
+    goalId: bigint;
+  },
+  txHash: string
+): Promise<void> {
   const goal = await prisma.goal.findFirst({
     where: { chain_id: args.goalId },
     include: { resolvers: true },
@@ -312,8 +322,9 @@ export async function handleGoalLocked(args: {
 
   await Promise.all(
     goal.resolvers.map(async (r) => {
+      const notifId = `goal.resolution_needed:${args.goalId}:${r.user_id}:${txHash}`;
       const notification = {
-        id: uuidv4(),
+        id: notifId,
         userId: r.user_id,
         type: "goal.resolution_needed",
         entityType: "goal",
@@ -325,9 +336,9 @@ export async function handleGoalLocked(args: {
       };
 
       await prisma.notification.upsert({
-        where: { id: notification.id },
+        where: { id: notifId },
         create: {
-          id: notification.id,
+          id: notifId,
           user_id: r.user_id,
           type: notification.type,
           entity_type: "goal",
@@ -345,10 +356,13 @@ export async function handleGoalLocked(args: {
   console.log(`[PredictionPool] GoalLocked: goalId=${goal.id}`);
 }
 
-export async function handleGoalResolved(args: {
-  goalId: bigint;
-  winningSide: number;
-}): Promise<void> {
+export async function handleGoalResolved(
+  args: {
+    goalId: bigint;
+    winningSide: number;
+  },
+  txHash: string
+): Promise<void> {
   const goal = await prisma.goal.findFirst({
     where: { chain_id: args.goalId },
     include: { participants: true },
@@ -369,10 +383,12 @@ export async function handleGoalResolved(args: {
   await Promise.all(
     goal.participants.map(async (p) => {
       const won = p.side === winningSideStr;
+      const type = won ? "reward.claimable" : "goal.resolved";
+      const notifId = `${type}:${args.goalId}:${p.user_id}:${txHash}`;
       const notification = {
-        id: uuidv4(),
+        id: notifId,
         userId: p.user_id,
-        type: won ? "reward.claimable" : "goal.resolved",
+        type,
         entityType: "goal",
         entityId: goal.id,
         title: won ? "You Won! Claim Your Reward" : "Goal Resolved",
@@ -384,9 +400,9 @@ export async function handleGoalResolved(args: {
       };
 
       await prisma.notification.upsert({
-        where: { id: notification.id },
+        where: { id: notifId },
         create: {
-          id: notification.id,
+          id: notifId,
           user_id: p.user_id,
           type: notification.type,
           entity_type: "goal",
@@ -406,9 +422,12 @@ export async function handleGoalResolved(args: {
   );
 }
 
-export async function handleGoalRefunded(args: {
-  goalId: bigint;
-}): Promise<void> {
+export async function handleGoalRefunded(
+  args: {
+    goalId: bigint;
+  },
+  txHash: string
+): Promise<void> {
   const goal = await prisma.goal.findFirst({
     where: { chain_id: args.goalId },
     include: { participants: true },
@@ -426,8 +445,9 @@ export async function handleGoalRefunded(args: {
 
   await Promise.all(
     goal.participants.map(async (p) => {
+      const notifId = `goal.disputed:${args.goalId}:${p.user_id}:${txHash}`;
       const notification = {
-        id: uuidv4(),
+        id: notifId,
         userId: p.user_id,
         type: "goal.disputed",
         entityType: "goal",
@@ -439,9 +459,9 @@ export async function handleGoalRefunded(args: {
       };
 
       await prisma.notification.upsert({
-        where: { id: notification.id },
+        where: { id: notifId },
         create: {
-          id: notification.id,
+          id: notifId,
           user_id: p.user_id,
           type: notification.type,
           entity_type: "goal",

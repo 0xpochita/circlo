@@ -81,6 +81,7 @@ export default function StakeButton({
 
   const isOpen = !status || status === "open";
   const isResolved = status === "resolved" || status === "paidout";
+  const canResolve = status === "locked" || status === "resolving";
   const isResolver =
     resolvers?.some(
       (r) =>
@@ -695,6 +696,7 @@ export default function StakeButton({
 
         {isResolver &&
           !hasVoted &&
+          canResolve &&
           (deadlinePassed && hasParticipants === false ? (
             <div className="rounded-2xl bg-gray-50 ring-1 ring-gray-100 px-5 py-4 text-center">
               <p className="text-sm font-semibold text-main-text mb-1">
