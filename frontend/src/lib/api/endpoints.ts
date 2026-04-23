@@ -79,6 +79,14 @@ export const usersApi = {
         createdAt: string;
       }[]
     >(`/users/search?q=${encodeURIComponent(query)}`),
+
+  myStats: () =>
+    fetchApi<{
+      totalStaked: string;
+      totalClaimed: string;
+      pnl: string;
+      pnlPercentage: string | null;
+    }>("/users/me/stats"),
 };
 
 export const circlesApi = {
