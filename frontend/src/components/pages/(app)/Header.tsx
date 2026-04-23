@@ -8,24 +8,38 @@ import { useAccount, useConnect } from "wagmi";
 import { injected } from "wagmi/connectors";
 import { EmojiAvatar } from "@/components/shared";
 import { useAuth } from "@/hooks/useAuth";
+import { NETWORK } from "@/lib/web3/network";
 import { useUserStore } from "@/stores/userStore";
 
 export default function Header() {
   const avatar = useUserStore((s) => s.avatar);
   const userName = useUserStore((s) => s.name);
   const { isConnected } = useAccount();
-  const { connect } = useConnect();
+  const { connectAsync } = useConnect();
   const { login } = useAuth();
   const [isConnecting, setIsConnecting] = useState(false);
 
   async function handleConnect() {
     setIsConnecting(true);
     try {
-      connect({ connector: injected() });
-      await login();
+      const result = await connectAsync({
+        connector: injected(),
+        chainId: NETWORK.id,
+      });
+      const walletAddress = result.accounts[0];
+      if (!walletAddress) {
+        toast.error("No account found");
+        return;
+      }
+      await login(walletAddress);
       toast.success("Wallet connected");
-    } catch {
-      toast.error("Failed to connect wallet");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "";
+      if (msg.includes("User rejected") || msg.includes("denied")) {
+        toast("Connection cancelled");
+      } else {
+        toast.error("Failed to connect wallet");
+      }
     } finally {
       setIsConnecting(false);
     }

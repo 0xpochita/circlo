@@ -14,6 +14,7 @@ import { injected } from "wagmi/connectors";
 import { EmojiAvatar } from "@/components/shared";
 import { useAuth } from "@/hooks/useAuth";
 import { useUSDTBalance } from "@/hooks/useUSDT";
+import { NETWORK } from "@/lib/web3/network";
 import { useUserStore } from "@/stores/userStore";
 import DepositSheet from "./DepositSheet";
 import EditProfileSheet from "./EditProfileSheet";
@@ -32,7 +33,7 @@ export default function ProfileHero() {
   const [isConnecting, setIsConnecting] = useState(false);
 
   const { address, isConnected } = useAccount();
-  const { connect } = useConnect();
+  const { connectAsync } = useConnect();
   const { login } = useAuth();
   const { formatted: usdtBalance, isLoading: isBalanceLoading } =
     useUSDTBalance(address);
@@ -43,11 +44,24 @@ export default function ProfileHero() {
   async function handleConnect() {
     setIsConnecting(true);
     try {
-      connect({ connector: injected() });
-      await login();
+      const result = await connectAsync({
+        connector: injected(),
+        chainId: NETWORK.id,
+      });
+      const walletAddress = result.accounts[0];
+      if (!walletAddress) {
+        toast.error("No account found");
+        return;
+      }
+      await login(walletAddress);
       toast.success("Wallet connected successfully");
-    } catch {
-      toast.error("Failed to connect wallet");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "";
+      if (msg.includes("User rejected") || msg.includes("denied")) {
+        toast("Connection cancelled");
+      } else {
+        toast.error("Failed to connect wallet");
+      }
     } finally {
       setIsConnecting(false);
     }
