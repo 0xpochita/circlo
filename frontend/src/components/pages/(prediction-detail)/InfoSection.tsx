@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { EmojiAvatar, UsdtLabel } from "@/components/shared";
 import type { GoalResponse } from "@/lib/api/endpoints";
 import { circlesApi } from "@/lib/api/endpoints";
-import { toAvatar } from "@/lib/utils";
+import { normalizeSide, toAvatar } from "@/lib/utils";
 import { DEFAULT_MIN_STAKE } from "@/lib/web3/usdt";
 
 type Resolver = {
@@ -106,12 +106,12 @@ export default function InfoSection({ goal }: InfoSectionProps) {
                 {r.vote !== null ? (
                   <span
                     className={`rounded-full px-3 py-1 text-xs font-medium ${
-                      r.vote === 0
+                      normalizeSide(r.vote) === 0
                         ? "bg-emerald-50 text-emerald-500"
                         : "bg-red-50 text-red-400"
                     }`}
                   >
-                    Voted {r.vote === 0 ? "Yes" : "No"}
+                    Voted {normalizeSide(r.vote) === 0 ? "Yes" : "No"}
                   </span>
                 ) : (
                   <span className="rounded-full bg-gray-50 px-3 py-1 text-xs font-medium text-muted">

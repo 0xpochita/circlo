@@ -7,7 +7,7 @@ import { useAccount, useReadContract } from "wagmi";
 import { EmojiAvatar, UsdtLabel } from "@/components/shared";
 import type { ParticipantResponse } from "@/lib/api/endpoints";
 import { goalsApi } from "@/lib/api/endpoints";
-import { toAvatar } from "@/lib/utils";
+import { normalizeSide, toAvatar } from "@/lib/utils";
 import { predictionPoolContract } from "@/lib/web3/contracts";
 import { fromUSDT } from "@/lib/web3/usdt";
 import { useUserStore } from "@/stores/userStore";
@@ -120,7 +120,8 @@ export default function ParticipantList({
                   {userName || "You"}
                 </p>
                 <p className="text-xs text-muted inline-flex items-center gap-1">
-                  Staked {Math.round(myAmount)} <UsdtLabel size={11} />
+                  Staked {parseFloat(myAmount.toFixed(4)).toString()}{" "}
+                  <UsdtLabel size={11} />
                 </p>
               </div>
             </div>
@@ -159,19 +160,20 @@ export default function ParticipantList({
                     : p.user.walletAddress?.slice(0, 10)}
                 </p>
                 <p className="text-xs text-muted inline-flex items-center gap-1">
-                  Staked {Math.round(parseFloat(p.staked))}{" "}
+                  Staked{" "}
+                  {parseFloat(parseFloat(p.staked).toFixed(4)).toString()}{" "}
                   <UsdtLabel size={11} />
                 </p>
               </div>
             </div>
             <span
               className={`rounded-full px-3 py-1 text-xs font-medium ${
-                p.side === 0
+                normalizeSide(p.side) === 0
                   ? "bg-emerald-50 text-emerald-500"
                   : "bg-red-50 text-red-400"
               }`}
             >
-              {p.side === 0 ? "Yes" : "No"}
+              {normalizeSide(p.side) === 0 ? "Yes" : "No"}
             </span>
           </motion.div>
         ))}

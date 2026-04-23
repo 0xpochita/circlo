@@ -9,6 +9,7 @@ import { useAccount, usePublicClient, useWriteContract } from "wagmi";
 import { UsdtLabel } from "@/components/shared";
 import { useSheetOverflow } from "@/hooks";
 import { circlesApi, goalsApi } from "@/lib/api/endpoints";
+import { normalizeSide } from "@/lib/utils";
 import {
   circleFactoryContract,
   mockUSDTContract,
@@ -98,15 +99,11 @@ export default function StakeButton({
     : false;
   const hasStaked = myStake !== null;
 
-  const winningSideNum =
-    winningSide !== null && winningSide !== undefined
-      ? parseInt(winningSide, 10)
-      : null;
+  const normalizedWinningSide = normalizeSide(winningSide);
   const isWinner =
     hasStaked &&
-    winningSideNum !== null &&
-    !Number.isNaN(winningSideNum) &&
-    myStake.side === winningSideNum;
+    normalizedWinningSide !== null &&
+    normalizeSide(myStake.side) === normalizedWinningSide;
   const canClaim =
     isWinner && isResolved && !hasClaimed && !myStake.claimedAmount;
 
@@ -641,7 +638,7 @@ export default function StakeButton({
               </p>
               <p className="text-sm font-bold text-main-text inline-flex items-center gap-1">
                 {myStake.amount} <UsdtLabel size={12} /> on{" "}
-                {myStake.side === 0 ? "Yes" : "No"}
+                {normalizeSide(myStake.side) === 0 ? "Yes" : "No"}
               </p>
             </div>
             <span
@@ -652,7 +649,7 @@ export default function StakeButton({
                     ? "bg-amber-50 text-amber-500"
                     : isResolved && !isWinner
                       ? "bg-red-50 text-red-400"
-                      : myStake.side === 0
+                      : normalizeSide(myStake.side) === 0
                         ? "bg-emerald-50 text-emerald-500"
                         : "bg-red-50 text-red-400"
               }`}
