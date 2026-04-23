@@ -2,33 +2,60 @@
 
 import { useEffect, useState } from "react";
 import { UsdtLabel } from "@/components/shared";
-import type { CircleDetailResponse } from "@/lib/api/endpoints";
-import { circlesApi } from "@/lib/api/endpoints";
+import type { CircleDetailResponse, GoalResponse } from "@/lib/api/endpoints";
+import { circlesApi, goalsApi } from "@/lib/api/endpoints";
 
 type DetailsStatsProps = {
   circleId?: string;
   circle?: CircleDetailResponse;
 };
 
+type GoalDetail = GoalResponse & {
+  participationSummary?: { side: string; totalStaked: string; count: number }[];
+};
+
+function formatStake(total: number): string {
+  return total < 1 ? total.toFixed(4) : total.toFixed(2);
+}
+
 export default function DetailsStats({ circleId, circle }: DetailsStatsProps) {
   const [memberCount, setMemberCount] = useState(circle?.memberCount ?? 0);
   const [goalCount, setGoalCount] = useState(0);
+  const [totalStaked, setTotalStaked] = useState(0);
 
   useEffect(() => {
     if (!circleId) return;
     Promise.all([
       circlesApi.members(circleId).catch(() => null),
       circlesApi.goals(circleId).catch(() => null),
-    ]).then(([membersRes, goalsRes]) => {
+    ]).then(async ([membersRes, goalsRes]) => {
       setMemberCount(membersRes?.items?.length ?? 0);
-      setGoalCount(goalsRes?.items?.length ?? 0);
+      const goals = goalsRes?.items ?? [];
+      setGoalCount(goals.length);
+
+      const details = await Promise.all(
+        goals.map((g) =>
+          goalsApi.detail(g.id).catch(() => null) as Promise<GoalDetail | null>,
+        ),
+      );
+      const sum = details.reduce((acc, d) => {
+        if (!d?.participationSummary) return acc;
+        return (
+          acc +
+          d.participationSummary.reduce(
+            (s, p) => s + (parseFloat(p.totalStaked) || 0),
+            0,
+          )
+        );
+      }, 0);
+      setTotalStaked(sum);
     });
   }, [circleId]);
 
   const stats = [
     { value: String(memberCount), label: "Members", usdt: false },
     { value: String(goalCount), label: "Active goals", usdt: false },
-    { value: "0", label: "Total staked", usdt: true },
+    { value: formatStake(totalStaked), label: "Total staked", usdt: true },
   ];
 
   return (

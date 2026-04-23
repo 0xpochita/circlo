@@ -2,28 +2,57 @@
 
 import { useEffect, useState } from "react";
 import { UsdtLabel } from "@/components/shared";
-import { circlesApi } from "@/lib/api/endpoints";
+import type { GoalResponse } from "@/lib/api/endpoints";
+import { circlesApi, goalsApi } from "@/lib/api/endpoints";
 
 type CircleStatsProps = {
   circleId?: string | null;
 };
 
+type GoalDetail = GoalResponse & {
+  participationSummary?: { side: string; totalStaked: string; count: number }[];
+};
+
+function formatStake(total: number): string {
+  return total < 1 ? total.toFixed(4) : total.toFixed(2);
+}
+
 export default function CircleStats({ circleId }: CircleStatsProps) {
   const [memberCount, setMemberCount] = useState(0);
   const [goalCount, setGoalCount] = useState(0);
+  const [totalStaked, setTotalStaked] = useState(0);
 
   useEffect(() => {
     if (!circleId) return;
-    Promise.all([
-      circlesApi
-        .members(circleId)
-        .then((res) => setMemberCount(res.items?.length ?? 0))
-        .catch(() => {}),
-      circlesApi
-        .goals(circleId)
-        .then((res) => setGoalCount(res.items?.length ?? 0))
-        .catch(() => {}),
-    ]);
+    circlesApi
+      .members(circleId)
+      .then((res) => setMemberCount(res.items?.length ?? 0))
+      .catch(() => {});
+
+    circlesApi
+      .goals(circleId)
+      .then(async (res) => {
+        const goals = res.items ?? [];
+        setGoalCount(goals.length);
+
+        const details = await Promise.all(
+          goals.map((g) =>
+            goalsApi.detail(g.id).catch(() => null) as Promise<GoalDetail | null>,
+          ),
+        );
+        const sum = details.reduce((acc, d) => {
+          if (!d?.participationSummary) return acc;
+          return (
+            acc +
+            d.participationSummary.reduce(
+              (s, p) => s + (parseFloat(p.totalStaked) || 0),
+              0,
+            )
+          );
+        }, 0);
+        setTotalStaked(sum);
+      })
+      .catch(() => {});
   }, [circleId]);
 
   const stats = [
@@ -37,7 +66,7 @@ export default function CircleStats({ circleId }: CircleStatsProps) {
       label: "Predictions",
       usdt: false,
     },
-    { value: "0", label: "Total staked", usdt: true },
+    { value: formatStake(totalStaked), label: "Total staked", usdt: true },
   ];
 
   return (
