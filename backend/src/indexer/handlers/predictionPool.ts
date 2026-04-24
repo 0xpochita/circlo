@@ -63,6 +63,9 @@ export const PREDICTION_POOL_ABI = [
       { name: "amount", type: "uint256", indexed: false },
     ],
   },
+] as const;
+
+const STAKE_OF_ABI = [
   {
     type: "function",
     name: "stakeOf",
@@ -217,7 +220,7 @@ export async function handleStaked(
 
   const onChainStake = (await celoClient.readContract({
     address: config.contractPredictionPool as `0x${string}`,
-    abi: PREDICTION_POOL_ABI,
+    abi: STAKE_OF_ABI,
     functionName: "stakeOf",
     args: [args.goalId, args.user as `0x${string}`, args.side],
   })) as bigint;
