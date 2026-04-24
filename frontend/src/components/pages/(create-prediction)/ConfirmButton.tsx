@@ -91,9 +91,15 @@ export default function ConfirmButton() {
   async function handleConfirm() {
     setIsCreating(true);
 
+    const BUFFER_SECONDS = 300;
+
     const deadlineTimestamp = store.customDeadline
       ? BigInt(Math.floor(new Date(store.customDeadline).getTime() / 1000))
-      : BigInt(Math.floor(Date.now() / 1000) + store.durationHours * 3600);
+      : BigInt(
+          Math.floor(Date.now() / 1000) +
+            store.durationHours * 3600 +
+            BUFFER_SECONDS,
+        );
     const minStake = store.stakeAmount
       ? toUSDT(parseFloat(store.stakeAmount))
       : toUSDT(parseFloat(DEFAULT_MIN_STAKE));
@@ -233,6 +239,7 @@ export default function ConfirmButton() {
         });
         updateStep(stepIdx, "done");
       } catch (err) {
+        console.error("[createGoal] Transaction failed:", err);
         updateStep(stepIdx, "error");
         const message = err instanceof Error ? err.message : "";
         if (message.includes("User rejected") || message.includes("denied")) {
