@@ -7,12 +7,13 @@ import { HiCheck, HiXMark } from "react-icons/hi2";
 import { toast } from "sonner";
 import { useAccount, usePublicClient, useWriteContract } from "wagmi";
 import { EmojiAvatar, UsdtLabel } from "@/components/shared";
-import { useSheetOverflow } from "@/hooks";
+import { useMiniPay, useSheetOverflow } from "@/hooks";
 import { circlesApi, goalsApi } from "@/lib/api/endpoints";
 import {
   circleFactoryContract,
   predictionPoolContract,
 } from "@/lib/web3/contracts";
+import { NETWORK } from "@/lib/web3/network";
 import { DEFAULT_MIN_STAKE, toUSDT } from "@/lib/web3/usdt";
 import { useCreateGoalStore } from "@/stores/createGoalStore";
 
@@ -25,6 +26,10 @@ export default function ConfirmButton() {
   const store = useCreateGoalStore();
   const { writeContractAsync } = useWriteContract();
   const publicClient = usePublicClient();
+  const isMiniPayBrowser = useMiniPay();
+  const celoTxExtras = isMiniPayBrowser
+    ? { feeCurrency: NETWORK.contracts.usdt }
+    : {};
   const [sheetOpen, setSheetOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [steps, setSteps] = useState<Step[]>([]);
@@ -194,7 +199,8 @@ export default function ConfirmButton() {
             abi: circleFactoryContract.abi,
             functionName: "joinCircle",
             args: [BigInt(onChainId)],
-          });
+            ...celoTxExtras,
+          } as Parameters<typeof writeContractAsync>[0]);
           await publicClient.waitForTransactionReceipt({ hash: joinTx });
         }
         updateStep(stepIdx, "done");
@@ -236,7 +242,8 @@ export default function ConfirmButton() {
             resolverAddresses,
             metadataURI,
           ],
-        });
+          ...celoTxExtras,
+        } as Parameters<typeof writeContractAsync>[0]);
         updateStep(stepIdx, "done");
       } catch (err) {
         console.error("[createGoal] Transaction failed:", err);
