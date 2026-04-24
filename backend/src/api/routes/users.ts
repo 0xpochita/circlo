@@ -64,24 +64,21 @@ export default async function userRoutes(app: FastifyInstance) {
     "/me/stats",
     { preHandler: requireAuth },
     async (req, reply) => {
-      const [stakedAgg, claimedAgg] = await Promise.all([
-        prisma.goalParticipant.aggregate({
-          where: { user_id: req.jwtUser.sub },
-          _sum: { staked: true },
-        }),
-        prisma.goalParticipant.aggregate({
-          where: { user_id: req.jwtUser.sub, claimed: true },
-          _sum: { claimed_amount: true },
-        }),
-      ]);
+      const claimedParticipants = await prisma.goalParticipant.findMany({
+        where: { user_id: req.jwtUser.sub, claimed: true },
+        select: { staked: true, claimed_amount: true },
+      });
 
-      const totalStaked = stakedAgg._sum.staked
-        ? Number(stakedAgg._sum.staked.toString())
-        : 0;
-      const totalClaimed = claimedAgg._sum.claimed_amount
-        ? Number(claimedAgg._sum.claimed_amount.toString())
-        : 0;
-      const pnl = totalClaimed - totalStaked;
+      const stakedOnClaimed = claimedParticipants.reduce(
+        (acc, p) => acc + Number(p.staked.toString()),
+        0,
+      );
+      const totalClaimed = claimedParticipants.reduce(
+        (acc, p) =>
+          acc + (p.claimed_amount ? Number(p.claimed_amount.toString()) : 0),
+        0,
+      );
+      const pnl = totalClaimed - stakedOnClaimed;
 
       const formatWithSign = (n: number, decimals: number): string => {
         const abs = Math.abs(n).toFixed(decimals);
@@ -89,12 +86,12 @@ export default async function userRoutes(app: FastifyInstance) {
       };
 
       return reply.send({
-        totalStaked: totalStaked.toFixed(4),
+        totalStaked: stakedOnClaimed.toFixed(4),
         totalClaimed: totalClaimed.toFixed(4),
         pnl: formatWithSign(pnl, 4),
         pnlPercentage:
-          totalStaked > 0
-            ? formatWithSign((pnl / totalStaked) * 100, 2)
+          stakedOnClaimed > 0
+            ? formatWithSign((pnl / stakedOnClaimed) * 100, 2)
             : null,
       });
     }

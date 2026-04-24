@@ -46,25 +46,28 @@ export default function ProfileHero() {
   const fetchNotifications = useNotificationStore((s) => s.fetchNotifications);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
-  const [stats, setStats] = useState<{
-    pnl: string;
-    pnlPercentage: string | null;
-  } | null>(null);
+  const [stats, setStats] = useState<{ pnl: string } | null>(null);
 
   useEffect(() => {
     if (isAuthenticated) {
       fetchNotifications();
       usersApi
         .myStats()
-        .then((res) =>
-          setStats({ pnl: res.pnl, pnlPercentage: res.pnlPercentage }),
-        )
+        .then((res) => setStats({ pnl: res.pnl }))
         .catch(() => setStats(null));
     }
   }, [isAuthenticated, fetchNotifications]);
 
-  const showPnl = isConnected && stats && stats.pnlPercentage !== null;
-  const isPositivePnl = stats?.pnl.startsWith("+");
+  const pnlValue = stats ? parseFloat(stats.pnl) : 0;
+  const isPositivePnl = pnlValue >= 0;
+  const pnlPercentageNum =
+    stats && usdtBalance > 0 ? (pnlValue / usdtBalance) * 100 : null;
+  const formatSigned = (n: number, decimals: number) => {
+    const abs = Math.abs(n).toFixed(decimals);
+    return n >= 0 ? `+${abs}` : `-${abs}`;
+  };
+  const showPnl =
+    isConnected && stats && pnlValue !== 0 && pnlPercentageNum !== null;
 
   async function handleConnect() {
     setIsConnecting(true);
@@ -161,13 +164,13 @@ export default function ProfileHero() {
                 />
               </div>
             </div>
-            {showPnl && stats && (
+            {showPnl && stats && pnlPercentageNum !== null && (
               <p
                 className={`mt-1 text-sm font-medium ${
                   isPositivePnl ? "text-emerald-300" : "text-red-300"
                 }`}
               >
-                {stats.pnl} ({stats.pnlPercentage}%)
+                {stats.pnl} ({formatSigned(pnlPercentageNum, 2)}%)
               </p>
             )}
           </div>
