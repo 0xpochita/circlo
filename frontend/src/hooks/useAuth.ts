@@ -76,6 +76,16 @@ export function useAuth() {
           createdAt: u.createdAt,
         });
 
+        const userStore = useUserStore.getState();
+        userStore.setName(u.name ?? "");
+        userStore.setUsername(u.username ?? "");
+        if (u.avatarEmoji && u.avatarColor) {
+          userStore.setAvatar({
+            emoji: u.avatarEmoji,
+            color: u.avatarColor,
+          });
+        }
+
         useNotificationStore.getState().fetchNotifications();
       } catch (error) {
         setLoading(false);
