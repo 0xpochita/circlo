@@ -8,6 +8,7 @@ import { authApi } from "@/lib/api/endpoints";
 import { NETWORK } from "@/lib/web3/network";
 import { useAuthStore } from "@/stores/authStore";
 import { useNotificationStore } from "@/stores/notificationStore";
+import { useUserStore } from "@/stores/userStore";
 
 export function useAuth() {
   const router = useRouter();
@@ -30,6 +31,7 @@ export function useAuth() {
 
     clearAuth();
     useNotificationStore.getState().reset();
+    useUserStore.getState().reset();
     if (
       typeof window !== "undefined" &&
       window.location.pathname !== "/welcome"
