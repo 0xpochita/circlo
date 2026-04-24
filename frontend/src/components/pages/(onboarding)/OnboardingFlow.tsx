@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { usersApi } from "@/lib/api/endpoints";
 import ConnectStep from "./ConnectStep";
 import ProfileStep from "./ProfileStep";
@@ -36,14 +37,14 @@ export default function OnboardingFlow() {
   async function handleConnectNext() {
     try {
       const me = await usersApi.me();
-      if (me.name && me.username) {
+      if (me.name) {
         handleComplete();
         return;
       }
+      setStep(2);
     } catch {
-      // fall through to profile setup if check fails
+      toast.error("Couldn't load your profile. Please try again.");
     }
-    setStep(2);
   }
 
   return (

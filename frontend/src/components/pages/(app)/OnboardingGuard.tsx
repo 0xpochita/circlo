@@ -11,15 +11,15 @@ export default function OnboardingGuard({
   const [checked, setChecked] = useState(false);
   const accessToken = useAuthStore((s) => s.accessToken);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const user = useAuthStore((s) => s.user);
 
   useEffect(() => {
-    const completed = localStorage.getItem("circlo-onboarding-done");
-    if (completed !== "true") {
+    if (user?.displayName == null) {
       router.replace("/welcome");
       return;
     }
     setChecked(true);
-  }, [router.replace]);
+  }, [router.replace, user?.displayName]);
 
   useEffect(() => {
     if (!checked) return;
