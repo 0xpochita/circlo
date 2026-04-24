@@ -350,22 +350,30 @@ export async function startIndexer() {
     getLastBlock(RESOLUTION_MODULE),
   ]);
 
+  // Register realtime watchers FIRST so new events aren't missed during backfill.
+  // Handlers are idempotent (upsert, on-chain read for Staked, deterministic IDs for notifications)
+  // so overlap between backfill + realtime is safe.
+  await registerWatchers(indexerClient);
+
+  // Run all backfills in parallel — RM can take 10+ minutes from block 0
+  // while CF/PP only need a few batches. No blocking.
+  const backfills: Promise<void>[] = [];
   if (cfLastBlock < currentBlock) {
     console.log(`[Indexer] Backfilling CircleFactory from ${cfLastBlock} to ${currentBlock}`);
-    await backfillCircleFactory(httpClient, cfLastBlock, currentBlock);
+    backfills.push(backfillCircleFactory(httpClient, cfLastBlock, currentBlock));
   }
-
   if (ppLastBlock < currentBlock) {
     console.log(`[Indexer] Backfilling PredictionPool from ${ppLastBlock} to ${currentBlock}`);
-    await backfillPredictionPool(httpClient, ppLastBlock, currentBlock);
+    backfills.push(backfillPredictionPool(httpClient, ppLastBlock, currentBlock));
   }
-
   if (rmLastBlock < currentBlock) {
     console.log(`[Indexer] Backfilling ResolutionModule from ${rmLastBlock} to ${currentBlock}`);
-    await backfillResolutionModule(httpClient, rmLastBlock, currentBlock);
+    backfills.push(backfillResolutionModule(httpClient, rmLastBlock, currentBlock));
   }
 
-  await registerWatchers(indexerClient);
+  Promise.all(backfills)
+    .then(() => console.log("[Indexer] All backfills completed"))
+    .catch((err) => console.error("[Indexer] Backfill error:", err));
 
   console.log("[Indexer] Running. Press Ctrl+C to stop.");
 

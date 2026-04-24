@@ -558,6 +558,9 @@ export default function StakeButton({
         }
       }
       setHasClaimed(true);
+      setMyStake((prev) =>
+        prev ? { ...prev, claimedAmount: prev.amount } : prev,
+      );
       toast.success("Reward claimed!");
       if (onStaked) {
         const t = setTimeout(onStaked, 1000);
