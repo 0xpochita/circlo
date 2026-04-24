@@ -286,7 +286,18 @@ export default async function goalRoutes(app: FastifyInstance) {
         take: PAGE_SIZE + 1,
         ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
         orderBy: { created_at: "desc" },
-        include: { _count: { select: { participants: true } } },
+        include: {
+          _count: { select: { participants: true } },
+          participants: {
+            where: { user_id: req.jwtUser.sub },
+            select: {
+              side: true,
+              staked: true,
+              claimed: true,
+              claimed_amount: true,
+            },
+          },
+        },
       });
 
       const hasMore = goals.length > PAGE_SIZE;
@@ -296,6 +307,15 @@ export default async function goalRoutes(app: FastifyInstance) {
         items: items.map((g) => ({
           ...serializeGoal(g),
           participantCount: g._count.participants,
+          myStake: g.participants[0]
+            ? {
+                side: g.participants[0].side,
+                staked: g.participants[0].staked.toString(),
+                claimed: g.participants[0].claimed,
+                claimedAmount:
+                  g.participants[0].claimed_amount?.toString() ?? null,
+              }
+            : null,
         })),
         nextCursor: hasMore ? items[items.length - 1]?.id : null,
         hasMore,

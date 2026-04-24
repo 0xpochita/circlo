@@ -1,5 +1,9 @@
 import { create } from "zustand";
-import type { CircleResponse, GoalResponse } from "@/lib/api/endpoints";
+import type {
+  CircleResponse,
+  GoalResponse,
+  GoalWithMyStake,
+} from "@/lib/api/endpoints";
 import type { CircleWithCount } from "@/hooks/useCircles";
 
 const STALE_MS = 60_000;
@@ -9,7 +13,7 @@ type CacheKey = "myCircles" | "myGoals" | "feedGoal" | "publicCircles";
 type DataCacheState = {
   myCircles: CircleWithCount[];
   myCirclesAt: number;
-  myGoals: GoalResponse[];
+  myGoals: GoalWithMyStake[];
   myGoalsAt: number;
   feedGoal: GoalResponse | null;
   feedGoalAt: number;
@@ -17,7 +21,7 @@ type DataCacheState = {
   publicCirclesAt: number;
 
   setMyCircles: (circles: CircleWithCount[]) => void;
-  setMyGoals: (goals: GoalResponse[]) => void;
+  setMyGoals: (goals: GoalWithMyStake[]) => void;
   setFeedGoal: (goal: GoalResponse | null) => void;
   setPublicCircles: (circles: CircleResponse[]) => void;
 

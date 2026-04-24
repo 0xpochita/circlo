@@ -223,7 +223,7 @@ export const goalsApi = {
 
   mine: (cursor?: string) =>
     fetchApi<{
-      items: GoalResponse[];
+      items: GoalWithMyStake[];
       nextCursor: string | null;
       hasMore: boolean;
     }>(`/goals/mine${cursor ? `?cursor=${cursor}` : ""}`),
@@ -316,6 +316,15 @@ export type GoalResponse = {
   winningSide: string | null;
   participantCount: number;
   createdAt: string;
+};
+
+export type GoalWithMyStake = GoalResponse & {
+  myStake: {
+    side: string | number;
+    staked: string;
+    claimed: boolean;
+    claimedAmount: string | null;
+  } | null;
 };
 
 export type NotificationResponse = {
