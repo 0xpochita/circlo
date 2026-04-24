@@ -16,6 +16,7 @@ type AuthState = {
   ) => void;
   clearAuth: () => void;
   setToken: (token: string) => void;
+  setUser: (partial: Partial<AuthUser>) => void;
   setLoading: (loading: boolean) => void;
 };
 
@@ -47,6 +48,10 @@ export const useAuthStore = create<AuthState>()(
           isLoading: false,
         }),
       setToken: (accessToken) => set({ accessToken }),
+      setUser: (partial) =>
+        set((state) => ({
+          user: state.user ? { ...state.user, ...partial } : state.user,
+        })),
       setLoading: (loading) => set({ isLoading: loading }),
     }),
     {
