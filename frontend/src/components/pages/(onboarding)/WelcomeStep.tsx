@@ -72,6 +72,12 @@ export default function WelcomeStep({ onNext }: WelcomeStepProps) {
         transition={{ duration: 0.4, delay: 0.5 }}
         className="px-6 pb-8 pt-6"
       >
+        <div className="flex justify-center mb-25">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-[20px] font-semibold uppercase tracking-wider text-emerald-600">
+            <span className="h-3 w-3 rounded-full bg-emerald-500 animate-pulse" />
+            Beta
+          </span>
+        </div>
         <motion.button
           type="button"
           onClick={onNext}
