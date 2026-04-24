@@ -5,9 +5,7 @@ import { useEffect, useState } from "react";
 import { HiOutlineLockClosed } from "react-icons/hi2";
 import { toast } from "sonner";
 import { usePublicClient, useWriteContract } from "wagmi";
-import { useMiniPay } from "@/hooks";
 import { predictionPoolContract } from "@/lib/web3/contracts";
-import { NETWORK } from "@/lib/web3/network";
 
 type LockMarketButtonProps = {
   goalChainId?: string;
@@ -23,10 +21,6 @@ export default function LockMarketButton({
 }: LockMarketButtonProps) {
   const { writeContractAsync } = useWriteContract();
   const publicClient = usePublicClient();
-  const isMiniPayBrowser = useMiniPay();
-  const celoTxExtras = isMiniPayBrowser
-    ? { feeCurrency: NETWORK.contracts.usdt }
-    : {};
   const [isLocking, setIsLocking] = useState(false);
   const [scStatus, setScStatus] = useState<number | null>(null);
 
@@ -71,8 +65,7 @@ export default function LockMarketButton({
         abi: predictionPoolContract.abi,
         functionName: "lockGoal",
         args: [BigInt(goalChainId)],
-        ...celoTxExtras,
-      } as Parameters<typeof writeContractAsync>[0]);
+      });
 
       if (publicClient) {
         const receipt = await publicClient.waitForTransactionReceipt({ hash });

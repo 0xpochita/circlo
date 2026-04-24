@@ -7,7 +7,7 @@ import { HiCheck, HiXMark } from "react-icons/hi2";
 import { toast } from "sonner";
 import { useAccount, usePublicClient, useWriteContract } from "wagmi";
 import { UsdtLabel } from "@/components/shared";
-import { useMiniPay, useSheetOverflow } from "@/hooks";
+import { useSheetOverflow } from "@/hooks";
 import { circlesApi, goalsApi } from "@/lib/api/endpoints";
 import { normalizeSide } from "@/lib/utils";
 import { NETWORK } from "@/lib/web3/network";
@@ -75,11 +75,6 @@ export default function StakeButton({
   const [hasParticipants, setHasParticipants] = useState<boolean | null>(null);
   const { writeContractAsync } = useWriteContract();
   const publicClient = usePublicClient();
-  const isMiniPayBrowser = useMiniPay();
-
-  const celoTxExtras = isMiniPayBrowser
-    ? { feeCurrency: NETWORK.contracts.usdt }
-    : {};
 
   const timeoutRefs = useRef<NodeJS.Timeout[]>([]);
 
@@ -407,36 +402,12 @@ export default function StakeButton({
         });
 
         if (!isMember) {
-          const txCount = await publicClient.getTransactionCount({
-            address: address as `0x${string}`,
-          });
-          if (txCount === 0) {
-            console.warn(
-              "[Stake] Wallet has no tx history — Safe may need deployment",
-            );
-          }
-
-          try {
-            await publicClient.simulateContract({
-              address: circleFactoryContract.address,
-              abi: circleFactoryContract.abi,
-              functionName: "joinCircle",
-              args: [onChainCircleId],
-              account: address,
-            });
-          } catch (simErr) {
-            console.error("[Stake] joinCircle simulation failed:", simErr);
-            throw simErr;
-          }
-
           const joinTx = await writeContractAsync({
             address: circleFactoryContract.address,
             abi: circleFactoryContract.abi,
             functionName: "joinCircle",
             args: [onChainCircleId],
-            chainId: NETWORK.id,
-            ...celoTxExtras,
-          } as Parameters<typeof writeContractAsync>[0]);
+          });
           if (publicClient)
             await publicClient.waitForTransactionReceipt({ hash: joinTx });
         }
@@ -453,8 +424,7 @@ export default function StakeButton({
         abi: mockUSDTContract.abi,
         functionName: "approve",
         args: [predictionPoolContract.address, usdtAmount],
-        ...celoTxExtras,
-      } as Parameters<typeof writeContractAsync>[0]);
+      });
       if (publicClient)
         await publicClient.waitForTransactionReceipt({ hash: approveTx });
 
@@ -468,8 +438,7 @@ export default function StakeButton({
         abi: predictionPoolContract.abi,
         functionName: "stake",
         args: [goalOnChainId, selectedSide, usdtAmount],
-        ...celoTxExtras,
-      } as Parameters<typeof writeContractAsync>[0]);
+      });
 
       if (publicClient) {
         const receipt = await publicClient.waitForTransactionReceipt({
@@ -569,8 +538,7 @@ export default function StakeButton({
         abi: resolutionModuleContract.abi,
         functionName: "submitVote",
         args: [BigInt(goalChainId), resolveChoice],
-        ...celoTxExtras,
-      } as Parameters<typeof writeContractAsync>[0]);
+      });
       if (publicClient) {
         const receipt = await publicClient.waitForTransactionReceipt({
           hash: txHash,
@@ -612,8 +580,7 @@ export default function StakeButton({
         abi: predictionPoolContract.abi,
         functionName: "claim",
         args: [BigInt(goalChainId)],
-        ...celoTxExtras,
-      } as Parameters<typeof writeContractAsync>[0]);
+      });
       if (publicClient) {
         const receipt = await publicClient.waitForTransactionReceipt({
           hash: txHash,
