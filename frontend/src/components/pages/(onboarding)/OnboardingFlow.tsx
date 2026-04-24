@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { usersApi } from "@/lib/api/endpoints";
+import { useUserStore } from "@/stores/userStore";
 import ConnectStep from "./ConnectStep";
 import ProfileStep from "./ProfileStep";
 import WelcomeStep from "./WelcomeStep";
@@ -37,6 +38,16 @@ export default function OnboardingFlow() {
   async function handleConnectNext() {
     try {
       const me = await usersApi.me();
+
+      useUserStore.getState().setName(me.name ?? "");
+      useUserStore.getState().setUsername(me.username ?? "");
+      if (me.avatarEmoji && me.avatarColor) {
+        useUserStore.getState().setAvatar({
+          emoji: me.avatarEmoji,
+          color: me.avatarColor,
+        });
+      }
+
       if (me.username) {
         handleComplete();
         return;

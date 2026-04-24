@@ -12,6 +12,7 @@ import { useMiniPay } from "@/hooks";
 import { authApi } from "@/lib/api/endpoints";
 import { NETWORK } from "@/lib/web3/network";
 import { useAuthStore } from "@/stores/authStore";
+import { useUserStore } from "@/stores/userStore";
 
 type ConnectStepProps = {
   onNext: () => void;
@@ -116,6 +117,15 @@ export default function ConnectStep({ onNext, onBack }: ConnectStepProps) {
               : null,
           createdAt: u.createdAt,
         });
+
+        useUserStore.getState().setName(u.name ?? "");
+        useUserStore.getState().setUsername(u.username ?? "");
+        if (u.avatarEmoji && u.avatarColor) {
+          useUserStore.getState().setAvatar({
+            emoji: u.avatarEmoji,
+            color: u.avatarColor,
+          });
+        }
       } else {
         setAuth(walletAddress, null, {
           id: walletAddress,
