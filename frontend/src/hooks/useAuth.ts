@@ -101,6 +101,7 @@ export function useAuth() {
     } finally {
       clearAuth();
       useNotificationStore.getState().reset();
+      useUserStore.getState().reset();
     }
   }, [clearAuth]);
 
