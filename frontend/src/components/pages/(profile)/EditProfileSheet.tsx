@@ -27,6 +27,7 @@ export default function EditProfileSheet({
   const setUsername = useUserStore((s) => s.setUsername);
   const setAvatar = useUserStore((s) => s.setAvatar);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const setUser = useAuthStore((s) => s.setUser);
 
   const [name, setNameLocal] = useState(storeName);
   const [username, setUsernameLocal] = useState("");
@@ -70,6 +71,17 @@ export default function EditProfileSheet({
           avatarEmoji: avatar.emoji,
           avatarColor: avatar.color,
         });
+
+        try {
+          const updated = await usersApi.me();
+          setUser({
+            username: updated.username,
+            displayName: updated.name,
+          });
+          if (updated.name) setName(updated.name);
+          if (updated.username) setUsername(updated.username);
+        } catch {}
+
         toast("Profile updated");
       } catch (err) {
         const message = err instanceof Error ? err.message : "";

@@ -9,17 +9,23 @@ type UserState = {
   setAvatar: (avatar: UserAvatar) => void;
   setName: (name: string) => void;
   setUsername: (username: string) => void;
+  reset: () => void;
+};
+
+const initialState = {
+  name: "Player",
+  username: "",
+  avatar: { emoji: "🚀", color: "#ec4899" } as UserAvatar,
 };
 
 export const useUserStore = create<UserState>()(
   persist(
     (set) => ({
-      name: "Player",
-      username: "",
-      avatar: { emoji: "🚀", color: "#ec4899" },
+      ...initialState,
       setAvatar: (avatar) => set({ avatar }),
       setName: (name) => set({ name }),
       setUsername: (username) => set({ username }),
+      reset: () => set(initialState),
     }),
     {
       name: "circlo-user",

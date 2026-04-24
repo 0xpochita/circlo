@@ -1,14 +1,17 @@
 "use client";
 
-import { useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect } from "react";
 import { SiweMessage } from "siwe";
 import { useAccount, useSignMessage } from "wagmi";
 import { authApi } from "@/lib/api/endpoints";
 import { NETWORK } from "@/lib/web3/network";
 import { useAuthStore } from "@/stores/authStore";
 import { useNotificationStore } from "@/stores/notificationStore";
+import { useUserStore } from "@/stores/userStore";
 
 export function useAuth() {
+  const router = useRouter();
   const { address } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const {
@@ -20,6 +23,22 @@ export function useAuth() {
     isAuthenticated,
     user,
   } = useAuthStore();
+  const storedWallet = useAuthStore((s) => s.wallet);
+
+  useEffect(() => {
+    if (!address || !storedWallet) return;
+    if (address.toLowerCase() === storedWallet.toLowerCase()) return;
+
+    clearAuth();
+    useNotificationStore.getState().reset();
+    useUserStore.getState().reset();
+    if (
+      typeof window !== "undefined" &&
+      window.location.pathname !== "/welcome"
+    ) {
+      router.replace("/welcome");
+    }
+  }, [address, storedWallet, clearAuth, router]);
 
   const login = useCallback(
     async (addr?: string) => {
@@ -56,6 +75,16 @@ export function useAuth() {
               : null,
           createdAt: u.createdAt,
         });
+
+        const userStore = useUserStore.getState();
+        userStore.setName(u.name ?? "");
+        userStore.setUsername(u.username ?? "");
+        if (u.avatarEmoji && u.avatarColor) {
+          userStore.setAvatar({
+            emoji: u.avatarEmoji,
+            color: u.avatarColor,
+          });
+        }
 
         useNotificationStore.getState().fetchNotifications();
       } catch (error) {
