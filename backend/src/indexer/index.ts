@@ -21,8 +21,21 @@ import {
 
 const CIRCLE_FACTORY = config.contractCircleFactory as `0x${string}`;
 const PREDICTION_POOL = config.contractPredictionPool as `0x${string}`;
+const RESOLUTION_MODULE = config.contractResolutionModule as `0x${string}`;
 
 const BATCH_SIZE = 1000n;
+
+const RESOLUTION_MODULE_ABI = [
+  {
+    type: "event",
+    name: "VoteSubmitted",
+    inputs: [
+      { name: "goalId", type: "uint256", indexed: true },
+      { name: "resolver", type: "address", indexed: true },
+      { name: "choice", type: "uint8", indexed: false },
+    ],
+  },
+] as const;
 
 async function getLastBlock(contract: string): Promise<bigint> {
   const state = await prisma.indexerState.findUnique({ where: { contract } });
@@ -69,6 +82,34 @@ async function backfillCircleFactory(client: any, fromBlock: bigint, toBlock: bi
   }
 }
 
+async function backfillResolutionModule(client: any, fromBlock: bigint, toBlock: bigint): Promise<void> {
+  let current = fromBlock;
+  while (current <= toBlock) {
+    const end = current + BATCH_SIZE - 1n < toBlock ? current + BATCH_SIZE - 1n : toBlock;
+    console.log(`[ResolutionModule Backfill] Fetching logs ${current}–${end}`);
+
+    const logs: any[] = await client.getLogs({
+      address: RESOLUTION_MODULE,
+      events: RESOLUTION_MODULE_ABI,
+      fromBlock: current,
+      toBlock: end,
+    });
+
+    for (const log of logs) {
+      try {
+        if (log.eventName === "VoteSubmitted") {
+          await handleVoteSubmitted(log.args as { goalId: bigint; resolver: string; choice: number });
+        }
+      } catch (err) {
+        console.error("[ResolutionModule Backfill] Handler error:", err);
+      }
+    }
+
+    await setLastBlock(RESOLUTION_MODULE, end);
+    current = end + 1n;
+  }
+}
+
 async function backfillPredictionPool(client: any, fromBlock: bigint, toBlock: bigint): Promise<void> {
   let current = fromBlock;
   while (current <= toBlock) {
@@ -89,8 +130,6 @@ async function backfillPredictionPool(client: any, fromBlock: bigint, toBlock: b
           await handleGoalCreated(log.args as { id: bigint; circleId: bigint; creator: string; deadline: bigint; minStake: bigint }, txHash);
         } else if (log.eventName === "Staked") {
           await handleStaked(log.args as { goalId: bigint; user: string; side: number; amount: bigint }, txHash);
-        } else if (log.eventName === "VoteSubmitted") {
-          await handleVoteSubmitted(log.args as { goalId: bigint; resolver: string; choice: number });
         } else if (log.eventName === "GoalLocked") {
           await handleGoalLocked(log.args as { goalId: bigint }, txHash);
         } else if (log.eventName === "GoalResolved") {
@@ -214,18 +253,18 @@ async function registerWatchers(
   });
 
   client.watchContractEvent({
-    address: PREDICTION_POOL,
-    abi: PREDICTION_POOL_ABI,
+    address: RESOLUTION_MODULE,
+    abi: RESOLUTION_MODULE_ABI,
     eventName: "VoteSubmitted",
     onLogs: async (logs: any[]) => {
       for (const log of logs) {
         try {
           await handleVoteSubmitted(log.args as { goalId: bigint; resolver: string; choice: number });
-          if (log.blockNumber) await setLastBlock(PREDICTION_POOL, log.blockNumber);
-        } catch (err) { console.error("[PredictionPool] VoteSubmitted error:", err); }
+          if (log.blockNumber) await setLastBlock(RESOLUTION_MODULE, log.blockNumber);
+        } catch (err) { console.error("[ResolutionModule] VoteSubmitted error:", err); }
       }
     },
-    onError: onWatcherError("PredictionPool", indexerClient),
+    onError: onWatcherError("ResolutionModule", indexerClient),
   });
 
   client.watchContractEvent({
@@ -305,9 +344,10 @@ export async function startIndexer() {
   const currentBlock: bigint = await httpClient.getBlockNumber();
   console.log(`[Indexer] Current block: ${currentBlock}`);
 
-  const [cfLastBlock, ppLastBlock] = await Promise.all([
+  const [cfLastBlock, ppLastBlock, rmLastBlock] = await Promise.all([
     getLastBlock(CIRCLE_FACTORY),
     getLastBlock(PREDICTION_POOL),
+    getLastBlock(RESOLUTION_MODULE),
   ]);
 
   if (cfLastBlock < currentBlock) {
@@ -318,6 +358,11 @@ export async function startIndexer() {
   if (ppLastBlock < currentBlock) {
     console.log(`[Indexer] Backfilling PredictionPool from ${ppLastBlock} to ${currentBlock}`);
     await backfillPredictionPool(httpClient, ppLastBlock, currentBlock);
+  }
+
+  if (rmLastBlock < currentBlock) {
+    console.log(`[Indexer] Backfilling ResolutionModule from ${rmLastBlock} to ${currentBlock}`);
+    await backfillResolutionModule(httpClient, rmLastBlock, currentBlock);
   }
 
   await registerWatchers(indexerClient);
