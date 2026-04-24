@@ -20,37 +20,39 @@ export default function EditProfileSheet({
   open,
   onClose,
 }: EditProfileSheetProps) {
-  const storeName = useUserStore((s) => s.name);
-  const storeUsername = useUserStore((s) => s.username);
-  const storeAvatar = useUserStore((s) => s.avatar);
   const setName = useUserStore((s) => s.setName);
   const setUsername = useUserStore((s) => s.setUsername);
   const setAvatar = useUserStore((s) => s.setAvatar);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const setUser = useAuthStore((s) => s.setUser);
 
-  const [name, setNameLocal] = useState(storeName);
+  const [name, setNameLocal] = useState("");
   const [username, setUsernameLocal] = useState("");
-  const [avatar, setAvatarLocal] = useState<UserAvatar>(storeAvatar);
+  const [avatar, setAvatarLocal] = useState<UserAvatar>({
+    emoji: "🚀",
+    color: "#ec4899",
+  });
   const [pickerOpen, setPickerOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    if (open) {
-      setNameLocal(storeName);
-      setUsernameLocal(storeUsername.replace(/^@/, ""));
-      setAvatarLocal(storeAvatar);
-      if (isAuthenticated) {
-        usersApi
-          .me()
-          .then((user) => {
-            if (user.username) setUsernameLocal(user.username);
-            if (user.name) setNameLocal(user.name);
-          })
-          .catch(() => {});
-      }
+    if (!open) return;
+
+    const current = useUserStore.getState();
+    setNameLocal(current.name);
+    setUsernameLocal(current.username.replace(/^@/, ""));
+    setAvatarLocal(current.avatar);
+
+    if (isAuthenticated) {
+      usersApi
+        .me()
+        .then((user) => {
+          if (user.name) setNameLocal(user.name);
+          if (user.username) setUsernameLocal(user.username);
+        })
+        .catch(() => {});
     }
-  }, [open, storeName, storeUsername, storeAvatar, isAuthenticated]);
+  }, [open, isAuthenticated]);
 
   useSheetOverflow(open);
 
@@ -59,28 +61,22 @@ export default function EditProfileSheet({
     const trimmedUsername = username.trim();
     setIsSaving(true);
 
-    setName(trimmedName);
-    setAvatar(avatar);
-    if (trimmedUsername) setUsername(trimmedUsername);
-
     if (isAuthenticated) {
       try {
-        await usersApi.update({
+        const updated = await usersApi.update({
           name: trimmedName,
           ...(trimmedUsername ? { username: trimmedUsername } : {}),
           avatarEmoji: avatar.emoji,
           avatarColor: avatar.color,
         });
 
-        try {
-          const updated = await usersApi.me();
-          setUser({
-            username: updated.username,
-            displayName: updated.name,
-          });
-          if (updated.name) setName(updated.name);
-          if (updated.username) setUsername(updated.username);
-        } catch {}
+        setUser({
+          username: updated.username,
+          displayName: updated.name,
+        });
+        setName(updated.name ?? "");
+        setUsername(updated.username ?? "");
+        setAvatar(avatar);
 
         toast("Profile updated");
       } catch (err) {
@@ -93,6 +89,10 @@ export default function EditProfileSheet({
         setIsSaving(false);
         return;
       }
+    } else {
+      setName(trimmedName);
+      setUsername(trimmedUsername);
+      setAvatar(avatar);
     }
 
     setIsSaving(false);
