@@ -8,6 +8,7 @@ import { EmojiAvatar, EmojiPicker } from "@/components/shared";
 import { useCreateGoalStore } from "@/stores/createGoalStore";
 
 const durations = [
+  { label: "1H", full: "1 Hour", hours: 1 },
   { label: "1D", full: "1 Day", hours: 24 },
   { label: "3D", full: "3 Days", hours: 72 },
   { label: "7D", full: "7 Days", hours: 168 },
