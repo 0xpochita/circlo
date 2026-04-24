@@ -472,15 +472,38 @@ export default function StakeButton({
       timeoutRefs.current.push(t1);
     } catch (err) {
       console.error("[Stake] Transaction failed:", err);
-      const message = err instanceof Error ? err.message : "";
-      if (message.includes("User rejected") || message.includes("denied")) {
+      const errObj = err as {
+        shortMessage?: string;
+        message?: string;
+        name?: string;
+        code?: number | string;
+        cause?: { shortMessage?: string; message?: string };
+      };
+      const shortMsg =
+        errObj?.shortMessage ||
+        errObj?.cause?.shortMessage ||
+        errObj?.cause?.message ||
+        errObj?.message ||
+        "Unknown error";
+      const message = shortMsg;
+
+      if (
+        message.includes("User rejected") ||
+        message.includes("User denied") ||
+        errObj?.name === "UserRejectedRequestError"
+      ) {
         toast("Transaction cancelled");
       } else if (message.includes("CircleIsPrivate")) {
         toast.error("This is a private circle — you need an invite");
-      } else if (message.includes("insufficient funds")) {
+      } else if (
+        message.includes("insufficient funds") ||
+        message.includes("insufficient balance")
+      ) {
         toast.error("Insufficient CELO for gas");
+      } else if (message.includes("AlreadyMember")) {
+        toast.error("Already a circle member — try again");
       } else {
-        toast.error("Failed to stake. Try again.");
+        toast.error(`Failed: ${message.slice(0, 120)}`);
       }
       setSteps((prev) =>
         prev.map((s) =>
