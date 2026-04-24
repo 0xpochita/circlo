@@ -6,6 +6,8 @@ import { toast } from "sonner";
 import { useDisconnect } from "wagmi";
 import { useMiniPay } from "@/hooks";
 import { useAuthStore } from "@/stores/authStore";
+import { useNotificationStore } from "@/stores/notificationStore";
+import { useUserStore } from "@/stores/userStore";
 
 export default function DisconnectButton() {
   const router = useRouter();
@@ -20,6 +22,8 @@ export default function DisconnectButton() {
       await disconnectAsync();
     } catch {}
     clearAuth();
+    useNotificationStore.getState().reset();
+    useUserStore.getState().reset();
     localStorage.removeItem("circlo-onboarding-done");
     toast("Wallet disconnected");
     router.replace("/welcome");
