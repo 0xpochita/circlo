@@ -264,7 +264,7 @@ export default function StakeButton({
     if (needsDeploy) {
       stepsToRun.push({ label: "Deploy goal on-chain", status: "pending" });
     }
-    stepsToRun.push({ label: "Check circle membership", status: "pending" });
+    stepsToRun.push({ label: "Join circle (if needed)", status: "pending" });
     stepsToRun.push({ label: "Approve USDT", status: "pending" });
     stepsToRun.push({ label: "Place stake", status: "pending" });
 
@@ -471,9 +471,14 @@ export default function StakeButton({
       }, 1500);
       timeoutRefs.current.push(t1);
     } catch (err) {
+      console.error("[Stake] Transaction failed:", err);
       const message = err instanceof Error ? err.message : "";
       if (message.includes("User rejected") || message.includes("denied")) {
         toast("Transaction cancelled");
+      } else if (message.includes("CircleIsPrivate")) {
+        toast.error("This is a private circle — you need an invite");
+      } else if (message.includes("insufficient funds")) {
+        toast.error("Insufficient CELO for gas");
       } else {
         toast.error("Failed to stake. Try again.");
       }
