@@ -10,6 +10,7 @@ import { UsdtLabel } from "@/components/shared";
 import { useSheetOverflow } from "@/hooks";
 import { circlesApi, goalsApi } from "@/lib/api/endpoints";
 import { normalizeSide } from "@/lib/utils";
+import { NETWORK } from "@/lib/web3/network";
 import {
   circleFactoryContract,
   mockUSDTContract,
@@ -401,11 +402,25 @@ export default function StakeButton({
         });
 
         if (!isMember) {
+          try {
+            await publicClient.simulateContract({
+              address: circleFactoryContract.address,
+              abi: circleFactoryContract.abi,
+              functionName: "joinCircle",
+              args: [onChainCircleId],
+              account: address,
+            });
+          } catch (simErr) {
+            console.error("[Stake] joinCircle simulation failed:", simErr);
+            throw simErr;
+          }
+
           const joinTx = await writeContractAsync({
             address: circleFactoryContract.address,
             abi: circleFactoryContract.abi,
             functionName: "joinCircle",
             args: [onChainCircleId],
+            chainId: NETWORK.id,
           });
           if (publicClient)
             await publicClient.waitForTransactionReceipt({ hash: joinTx });
@@ -502,6 +517,11 @@ export default function StakeButton({
         toast.error("Insufficient CELO for gas");
       } else if (message.includes("AlreadyMember")) {
         toast.error("Already a circle member — try again");
+      } else if (
+        message.includes("unknown RPC error") ||
+        message.includes("Internal JSON-RPC")
+      ) {
+        toast.error("Wallet/RPC error — try disconnect + reconnect wallet");
       } else {
         toast.error(`Failed: ${message.slice(0, 120)}`);
       }
