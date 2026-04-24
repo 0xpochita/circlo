@@ -6,18 +6,24 @@ import { useEffect, useState } from "react";
 import { HiOutlineChartBar, HiXMark } from "react-icons/hi2";
 import { EmojiAvatar, UsdtLabel } from "@/components/shared";
 import { useSheetOverflow } from "@/hooks";
-import type { GoalResponse } from "@/lib/api/endpoints";
+import type { GoalWithMyStake } from "@/lib/api/endpoints";
 import { goalsApi } from "@/lib/api/endpoints";
-import { toAvatar } from "@/lib/utils";
+import { normalizeSide, toAvatar } from "@/lib/utils";
 import { useDataCache } from "@/stores/dataCache";
 
-function getResultLabel(goal: GoalResponse): {
+function getResultLabel(goal: GoalWithMyStake): {
   label: string;
   positive: boolean;
 } {
-  if (goal.status === "resolved" || goal.status === "claimed") {
-    if (goal.winningSide === "yes") return { label: "Won", positive: true };
-    return { label: "Lost", positive: false };
+  if (goal.status === "resolved" || goal.status === "paidout") {
+    const mySide = normalizeSide(goal.myStake?.side);
+    const winningSide = normalizeSide(goal.winningSide);
+    if (mySide === null || winningSide === null) {
+      return { label: "Resolved", positive: true };
+    }
+    return mySide === winningSide
+      ? { label: "Won", positive: true }
+      : { label: "Lost", positive: false };
   }
   return { label: "Active", positive: true };
 }
@@ -27,7 +33,7 @@ export default function RecentPredictions() {
   const isStale = useDataCache((s) => s.isStale);
   const setMyGoals = useDataCache((s) => s.setMyGoals);
   const hasCached = cached.length > 0;
-  const [goals, setGoals] = useState<GoalResponse[]>(cached);
+  const [goals, setGoals] = useState<GoalWithMyStake[]>(cached);
   const [isLoading, setIsLoading] = useState(!hasCached);
   const [sheetOpen, setSheetOpen] = useState(false);
 
