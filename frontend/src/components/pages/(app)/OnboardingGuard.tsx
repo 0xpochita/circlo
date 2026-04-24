@@ -14,12 +14,12 @@ export default function OnboardingGuard({
   const user = useAuthStore((s) => s.user);
 
   useEffect(() => {
-    if (user?.displayName == null) {
+    if (user?.username == null) {
       router.replace("/welcome");
       return;
     }
     setChecked(true);
-  }, [router.replace, user?.displayName]);
+  }, [router.replace, user?.username]);
 
   useEffect(() => {
     if (!checked) return;

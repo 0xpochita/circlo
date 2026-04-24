@@ -16,11 +16,12 @@ type ProfileStepProps = {
 };
 
 export default function ProfileStep({ onNext, onBack }: ProfileStepProps) {
-  const setName = useUserStore((s) => s.setName);
+  const setUsernameStore = useUserStore((s) => s.setUsername);
   const setAvatar = useUserStore((s) => s.setAvatar);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const setUser = useAuthStore((s) => s.setUser);
 
-  const [name, setNameLocal] = useState("");
+  const [username, setUsernameLocal] = useState("");
   const [avatar, setAvatarLocal] = useState<UserAvatar>({
     emoji: "🚀",
     color: "#ec4899",
@@ -29,19 +30,20 @@ export default function ProfileStep({ onNext, onBack }: ProfileStepProps) {
   const [isSaving, setIsSaving] = useState(false);
 
   async function handleComplete() {
-    const trimmed = name.trim() || "Player";
+    const trimmed = username.trim() || "Player";
     setIsSaving(true);
 
-    setName(trimmed);
+    setUsernameStore(trimmed);
     setAvatar(avatar);
 
     if (isAuthenticated) {
       try {
         await usersApi.update({
-          name: trimmed,
+          username: trimmed,
           avatarEmoji: avatar.emoji,
           avatarColor: avatar.color,
         });
+        setUser({ username: trimmed });
       } catch {}
     }
 
@@ -112,14 +114,14 @@ export default function ProfileStep({ onNext, onBack }: ProfileStepProps) {
 
           <div className="rounded-2xl bg-white p-4 mb-3">
             <label className="text-sm font-medium text-main-text mb-2 block">
-              Display name
+              Username
             </label>
             <input
               type="text"
-              value={name}
-              onChange={(e) => setNameLocal(e.target.value)}
-              placeholder="How should we call you?"
-              maxLength={30}
+              value={username}
+              onChange={(e) => setUsernameLocal(e.target.value)}
+              placeholder="Your username"
+              maxLength={20}
               className="w-full rounded-xl bg-gray-50 px-4 py-3 text-sm text-main-text placeholder:text-muted outline-none transition-all duration-200 focus:ring-2 focus:ring-brand"
             />
           </div>
@@ -154,8 +156,8 @@ export default function ProfileStep({ onNext, onBack }: ProfileStepProps) {
         >
           {isSaving
             ? "Saving..."
-            : name.trim()
-              ? `Continue as ${name.trim()}`
+            : username.trim()
+              ? `Continue as ${username.trim()}`
               : "Continue as Player"}
         </motion.button>
         <button

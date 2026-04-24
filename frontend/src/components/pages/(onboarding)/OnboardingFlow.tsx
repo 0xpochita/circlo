@@ -37,7 +37,7 @@ export default function OnboardingFlow() {
   async function handleConnectNext() {
     try {
       const me = await usersApi.me();
-      if (me.name) {
+      if (me.username) {
         handleComplete();
         return;
       }
