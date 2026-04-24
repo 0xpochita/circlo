@@ -1,5 +1,8 @@
+import { formatUnits } from "viem";
+import { config } from "../../config.js";
 import { prisma } from "../../lib/prisma.js";
 import { redis } from "../../lib/redis.js";
+import { celoClient } from "../../lib/viem.js";
 import { goalJobQueue } from "../../jobs/index.js";
 
 export const PREDICTION_POOL_ABI = [
@@ -59,6 +62,17 @@ export const PREDICTION_POOL_ABI = [
       { name: "user", type: "address", indexed: true },
       { name: "amount", type: "uint256", indexed: false },
     ],
+  },
+  {
+    type: "function",
+    name: "stakeOf",
+    stateMutability: "view",
+    inputs: [
+      { name: "", type: "uint256" },
+      { name: "", type: "address" },
+      { name: "", type: "uint8" },
+    ],
+    outputs: [{ name: "", type: "uint256" }],
   },
 ] as const;
 
@@ -201,29 +215,28 @@ export async function handleStaked(
   const sideStr = sideToString(args.side);
   const amountStr = formatUsdt(args.amount);
 
-  const existing = await prisma.goalParticipant.findUnique({
+  const onChainStake = (await celoClient.readContract({
+    address: config.contractPredictionPool as `0x${string}`,
+    abi: PREDICTION_POOL_ABI,
+    functionName: "stakeOf",
+    args: [args.goalId, args.user as `0x${string}`, args.side],
+  })) as bigint;
+  const stakedAmount = formatUnits(onChainStake, 6);
+
+  await prisma.goalParticipant.upsert({
     where: {
       goal_id_user_id: { goal_id: goal.id, user_id: user.id },
     },
+    create: {
+      goal_id: goal.id,
+      user_id: user.id,
+      side: sideStr,
+      staked: stakedAmount,
+    },
+    update: {
+      staked: stakedAmount,
+    },
   });
-
-  if (existing) {
-    await prisma.goalParticipant.update({
-      where: { goal_id_user_id: { goal_id: goal.id, user_id: user.id } },
-      data: {
-        staked: { increment: parseFloat(amountStr) },
-      },
-    });
-  } else {
-    await prisma.goalParticipant.create({
-      data: {
-        goal_id: goal.id,
-        user_id: user.id,
-        side: sideStr,
-        staked: amountStr,
-      },
-    });
-  }
 
   if (goal.creator_id !== user.id) {
     const notifId = `goal.staked:${args.goalId}:${goal.creator_id}:${txHash}`;
