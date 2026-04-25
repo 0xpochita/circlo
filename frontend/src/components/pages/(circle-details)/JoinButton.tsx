@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { useAccount, useWriteContract } from "wagmi";
 import { circlesApi } from "@/lib/api/endpoints";
 import { circleFactoryContract } from "@/lib/web3/contracts";
+import { NETWORK } from "@/lib/web3/network";
 import { useAuthStore } from "@/stores/authStore";
 
 type JoinButtonProps = {
@@ -41,6 +42,8 @@ export default function JoinButton({
         abi: circleFactoryContract.abi,
         functionName: "joinCircle",
         args: [BigInt(circleId)],
+        chainId: NETWORK.id,
+        type: "legacy",
       });
 
       if (circleBackendId) {
