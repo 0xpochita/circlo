@@ -317,6 +317,8 @@ export default function StakeButton({
               abi: circleFactoryContract.abi,
               functionName: "createCircle",
               args: [circlePrivacy, JSON.stringify({ name: circleName })],
+              chainId: NETWORK.id,
+              type: "legacy",
             });
             circleChainId = String(nextCircle);
           }
@@ -360,6 +362,8 @@ export default function StakeButton({
             [address as `0x${string}`],
             metadataURI,
           ],
+          chainId: NETWORK.id,
+          type: "legacy",
         });
 
         if (publicClient)
@@ -407,6 +411,8 @@ export default function StakeButton({
             abi: circleFactoryContract.abi,
             functionName: "joinCircle",
             args: [onChainCircleId],
+            chainId: NETWORK.id,
+            type: "legacy",
           });
           if (publicClient)
             await publicClient.waitForTransactionReceipt({ hash: joinTx });
@@ -424,6 +430,8 @@ export default function StakeButton({
         abi: mockUSDTContract.abi,
         functionName: "approve",
         args: [predictionPoolContract.address, usdtAmount],
+        chainId: NETWORK.id,
+        type: "legacy",
       });
       if (publicClient)
         await publicClient.waitForTransactionReceipt({ hash: approveTx });
@@ -438,6 +446,8 @@ export default function StakeButton({
         abi: predictionPoolContract.abi,
         functionName: "stake",
         args: [goalOnChainId, selectedSide, usdtAmount],
+        chainId: NETWORK.id,
+        type: "legacy",
       });
 
       if (publicClient) {
@@ -472,7 +482,7 @@ export default function StakeButton({
       }, 1500);
       timeoutRefs.current.push(t1);
     } catch (err) {
-      console.error("[Stake] Transaction failed:", err);
+      console.error("[Stake] Full error:", err);
       const errObj = err as {
         shortMessage?: string;
         message?: string;
@@ -480,6 +490,10 @@ export default function StakeButton({
         code?: number | string;
         cause?: { shortMessage?: string; message?: string };
       };
+      console.error("[Stake] Error name:", errObj?.name);
+      console.error("[Stake] Error cause:", errObj?.cause);
+      console.error("[Stake] Error code:", errObj?.code);
+      console.error("[Stake] Error shortMessage:", errObj?.shortMessage);
       const shortMsg =
         errObj?.shortMessage ||
         errObj?.cause?.shortMessage ||
@@ -538,6 +552,8 @@ export default function StakeButton({
         abi: resolutionModuleContract.abi,
         functionName: "submitVote",
         args: [BigInt(goalChainId), resolveChoice],
+        chainId: NETWORK.id,
+        type: "legacy",
       });
       if (publicClient) {
         const receipt = await publicClient.waitForTransactionReceipt({
@@ -556,6 +572,16 @@ export default function StakeButton({
         timeoutRefs.current.push(t);
       }
     } catch (err) {
+      console.error("[SubmitVote] Full error:", err);
+      const errObj = err as {
+        name?: string;
+        code?: number | string;
+        cause?: unknown;
+        message?: string;
+      };
+      console.error("[SubmitVote] Error name:", errObj?.name);
+      console.error("[SubmitVote] Error cause:", errObj?.cause);
+      console.error("[SubmitVote] Error code:", errObj?.code);
       const msg = err instanceof Error ? err.message : "";
       if (msg.includes("User rejected") || msg.includes("denied")) {
         toast("Transaction cancelled");
@@ -580,6 +606,8 @@ export default function StakeButton({
         abi: predictionPoolContract.abi,
         functionName: "claim",
         args: [BigInt(goalChainId)],
+        chainId: NETWORK.id,
+        type: "legacy",
       });
       if (publicClient) {
         const receipt = await publicClient.waitForTransactionReceipt({
@@ -601,6 +629,16 @@ export default function StakeButton({
         timeoutRefs.current.push(t);
       }
     } catch (err) {
+      console.error("[Claim] Full error:", err);
+      const errObj = err as {
+        name?: string;
+        code?: number | string;
+        cause?: unknown;
+        message?: string;
+      };
+      console.error("[Claim] Error name:", errObj?.name);
+      console.error("[Claim] Error cause:", errObj?.cause);
+      console.error("[Claim] Error code:", errObj?.code);
       const msg = err instanceof Error ? err.message : "";
       if (msg.includes("User rejected") || msg.includes("denied")) {
         toast("Transaction cancelled");
