@@ -6,6 +6,7 @@ import { HiOutlineLockClosed } from "react-icons/hi2";
 import { toast } from "sonner";
 import { usePublicClient, useWriteContract } from "wagmi";
 import { predictionPoolContract } from "@/lib/web3/contracts";
+import { NETWORK } from "@/lib/web3/network";
 
 type LockMarketButtonProps = {
   goalChainId?: string;
@@ -65,6 +66,8 @@ export default function LockMarketButton({
         abi: predictionPoolContract.abi,
         functionName: "lockGoal",
         args: [BigInt(goalChainId)],
+        chainId: NETWORK.id,
+        type: "legacy",
       });
 
       if (publicClient) {

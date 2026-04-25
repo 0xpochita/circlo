@@ -13,6 +13,7 @@ import {
   circleFactoryContract,
   predictionPoolContract,
 } from "@/lib/web3/contracts";
+import { NETWORK } from "@/lib/web3/network";
 import { DEFAULT_MIN_STAKE, toUSDT } from "@/lib/web3/usdt";
 import { useCreateGoalStore } from "@/stores/createGoalStore";
 
@@ -194,6 +195,8 @@ export default function ConfirmButton() {
             abi: circleFactoryContract.abi,
             functionName: "joinCircle",
             args: [BigInt(onChainId)],
+            chainId: NETWORK.id,
+            type: "legacy",
           });
           await publicClient.waitForTransactionReceipt({ hash: joinTx });
         }
@@ -236,6 +239,8 @@ export default function ConfirmButton() {
             resolverAddresses,
             metadataURI,
           ],
+          chainId: NETWORK.id,
+          type: "legacy",
         });
         updateStep(stepIdx, "done");
       } catch (err) {
