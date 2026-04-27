@@ -5,7 +5,7 @@
 
   **On-chain social prediction game — tokenize your circle of friends, turn personal goals into prediction markets, and hold each other accountable on Celo blockchain.**
 
-  [Live Demo](https://circlo-celo.vercel.app) · [CeloScan](https://celoscan.io/address/0x6cB74ce06E35caEfaFA1491769DeeeA46aebe6Ab)
+  [Live Demo](https://circlo-celo.vercel.app) · [Video Demo](https://youtu.be/15PSqWPL3IY) · [CeloScan](https://celoscan.io/address/0x6cB74ce06E35caEfaFA1491769DeeeA46aebe6Ab)
 </div>
 
 Circlo is a decentralized social accountability platform built on Celo. Friends form circles, create prediction markets around personal goals (workout streaks, project deadlines, learning milestones), and stake USDT on outcomes. When the deadline hits, friends-as-resolvers vote on the truth — winners split the pool, losers learn the cost of breaking commitments. All transparent, all on-chain, all in your pocket via MiniPay.
