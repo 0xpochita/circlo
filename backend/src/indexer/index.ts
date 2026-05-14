@@ -149,196 +149,60 @@ async function backfillPredictionPool(client: any, fromBlock: bigint, toBlock: b
   }
 }
 
-function isSocketError(err: Error): boolean {
-  const name = err.name ?? "";
-  const msg = (err.message ?? "").toLowerCase();
-  return (
-    name === "SocketClosedError" ||
-    msg.includes("socket has been closed") ||
-    msg.includes("socket") ||
-    msg.includes("websocket")
-  );
+const REALTIME_POLL_MS = 6_000;
+
+async function pollOnce(client: any): Promise<void> {
+  let latest: bigint;
+  try {
+    latest = await client.getBlockNumber();
+  } catch (err) {
+    console.error("[Indexer] getBlockNumber error:", (err as Error).message);
+    return;
+  }
+
+  const [cf, pp, rm] = await Promise.all([
+    getLastBlock(CIRCLE_FACTORY),
+    getLastBlock(PREDICTION_POOL),
+    getLastBlock(RESOLUTION_MODULE),
+  ]);
+
+  await Promise.all([
+    cf < latest
+      ? backfillCircleFactory(client, cf + 1n, latest).catch((err) =>
+          console.error("[CircleFactory] poll error:", (err as Error).message),
+        )
+      : Promise.resolve(),
+    pp < latest
+      ? backfillPredictionPool(client, pp + 1n, latest).catch((err) =>
+          console.error("[PredictionPool] poll error:", (err as Error).message),
+        )
+      : Promise.resolve(),
+    rm < latest
+      ? backfillResolutionModule(client, rm + 1n, latest).catch((err) =>
+          console.error("[ResolutionModule] poll error:", (err as Error).message),
+        )
+      : Promise.resolve(),
+  ]);
 }
 
-function onWatcherError(
-  label: string,
-  indexerClient: ReturnType<typeof createIndexerClient>
-) {
-  return (err: Error) => {
-    console.error(`[${label}] Watcher error:`, err.message);
-    if (isSocketError(err)) {
-      indexerClient.triggerReconnect(5000);
+function startRealtimePolling(client: any): void {
+  console.log(`[Indexer] Realtime polling every ${REALTIME_POLL_MS}ms`);
+  let running = false;
+  setInterval(async () => {
+    if (running) return; // skip overlap
+    running = true;
+    try {
+      await pollOnce(client);
+    } finally {
+      running = false;
     }
-  };
-}
-
-async function registerWatchers(
-  indexerClient: ReturnType<typeof createIndexerClient>
-): Promise<void> {
-  const client = indexerClient.getClient();
-
-  client.watchContractEvent({
-    address: CIRCLE_FACTORY,
-    abi: CIRCLE_FACTORY_ABI,
-    eventName: "CircleCreated",
-    onLogs: async (logs: any[]) => {
-      for (const log of logs) {
-        try {
-          await handleCircleCreated(log.args as { id: bigint; owner: string; isPrivate: boolean; metadataURI: string });
-          if (log.blockNumber) await setLastBlock(CIRCLE_FACTORY, log.blockNumber);
-        } catch (err) { console.error("[CircleFactory] CircleCreated error:", err); }
-      }
-    },
-    onError: onWatcherError("CircleFactory", indexerClient),
-  });
-
-  client.watchContractEvent({
-    address: CIRCLE_FACTORY,
-    abi: CIRCLE_FACTORY_ABI,
-    eventName: "CircleJoined",
-    onLogs: async (logs: any[]) => {
-      for (const log of logs) {
-        try {
-          await handleCircleJoined(log.args as { id: bigint; member: string });
-          if (log.blockNumber) await setLastBlock(CIRCLE_FACTORY, log.blockNumber);
-        } catch (err) { console.error("[CircleFactory] CircleJoined error:", err); }
-      }
-    },
-    onError: onWatcherError("CircleFactory", indexerClient),
-  });
-
-  client.watchContractEvent({
-    address: CIRCLE_FACTORY,
-    abi: CIRCLE_FACTORY_ABI,
-    eventName: "CircleLeft",
-    onLogs: async (logs: any[]) => {
-      for (const log of logs) {
-        try {
-          await handleCircleLeft(log.args as { id: bigint; member: string });
-          if (log.blockNumber) await setLastBlock(CIRCLE_FACTORY, log.blockNumber);
-        } catch (err) { console.error("[CircleFactory] CircleLeft error:", err); }
-      }
-    },
-    onError: onWatcherError("CircleFactory", indexerClient),
-  });
-
-  client.watchContractEvent({
-    address: PREDICTION_POOL,
-    abi: PREDICTION_POOL_ABI,
-    eventName: "GoalCreated",
-    onLogs: async (logs: any[]) => {
-      for (const log of logs) {
-        try {
-          await handleGoalCreated(log.args as { id: bigint; circleId: bigint; creator: string; deadline: bigint; minStake: bigint }, (log.transactionHash ?? "") as string);
-          if (log.blockNumber) await setLastBlock(PREDICTION_POOL, log.blockNumber);
-        } catch (err) { console.error("[PredictionPool] GoalCreated error:", err); }
-      }
-    },
-    onError: onWatcherError("PredictionPool", indexerClient),
-  });
-
-  client.watchContractEvent({
-    address: PREDICTION_POOL,
-    abi: PREDICTION_POOL_ABI,
-    eventName: "Staked",
-    onLogs: async (logs: any[]) => {
-      for (const log of logs) {
-        try {
-          await handleStaked(log.args as { goalId: bigint; user: string; side: number; amount: bigint }, (log.transactionHash ?? "") as string);
-          if (log.blockNumber) await setLastBlock(PREDICTION_POOL, log.blockNumber);
-        } catch (err) { console.error("[PredictionPool] Staked error:", err); }
-      }
-    },
-    onError: onWatcherError("PredictionPool", indexerClient),
-  });
-
-  client.watchContractEvent({
-    address: RESOLUTION_MODULE,
-    abi: RESOLUTION_MODULE_ABI,
-    eventName: "VoteSubmitted",
-    onLogs: async (logs: any[]) => {
-      for (const log of logs) {
-        try {
-          await handleVoteSubmitted(log.args as { goalId: bigint; resolver: string; choice: number });
-          if (log.blockNumber) await setLastBlock(RESOLUTION_MODULE, log.blockNumber);
-        } catch (err) { console.error("[ResolutionModule] VoteSubmitted error:", err); }
-      }
-    },
-    onError: onWatcherError("ResolutionModule", indexerClient),
-  });
-
-  client.watchContractEvent({
-    address: PREDICTION_POOL,
-    abi: PREDICTION_POOL_ABI,
-    eventName: "GoalLocked",
-    onLogs: async (logs: any[]) => {
-      for (const log of logs) {
-        try {
-          await handleGoalLocked(log.args as { goalId: bigint }, (log.transactionHash ?? "") as string);
-          if (log.blockNumber) await setLastBlock(PREDICTION_POOL, log.blockNumber);
-        } catch (err) { console.error("[PredictionPool] GoalLocked error:", err); }
-      }
-    },
-    onError: onWatcherError("PredictionPool", indexerClient),
-  });
-
-  client.watchContractEvent({
-    address: PREDICTION_POOL,
-    abi: PREDICTION_POOL_ABI,
-    eventName: "GoalResolved",
-    onLogs: async (logs: any[]) => {
-      for (const log of logs) {
-        try {
-          await handleGoalResolved(log.args as { goalId: bigint; winningSide: number }, (log.transactionHash ?? "") as string);
-          if (log.blockNumber) await setLastBlock(PREDICTION_POOL, log.blockNumber);
-        } catch (err) { console.error("[PredictionPool] GoalResolved error:", err); }
-      }
-    },
-    onError: onWatcherError("PredictionPool", indexerClient),
-  });
-
-  client.watchContractEvent({
-    address: PREDICTION_POOL,
-    abi: PREDICTION_POOL_ABI,
-    eventName: "GoalRefunded",
-    onLogs: async (logs: any[]) => {
-      for (const log of logs) {
-        try {
-          await handleGoalRefunded(log.args as { goalId: bigint }, (log.transactionHash ?? "") as string);
-          if (log.blockNumber) await setLastBlock(PREDICTION_POOL, log.blockNumber);
-        } catch (err) { console.error("[PredictionPool] GoalRefunded error:", err); }
-      }
-    },
-    onError: onWatcherError("PredictionPool", indexerClient),
-  });
-
-  client.watchContractEvent({
-    address: PREDICTION_POOL,
-    abi: PREDICTION_POOL_ABI,
-    eventName: "Claimed",
-    onLogs: async (logs: any[]) => {
-      for (const log of logs) {
-        try {
-          await handleClaimed(log.args as { goalId: bigint; user: string; amount: bigint });
-          if (log.blockNumber) await setLastBlock(PREDICTION_POOL, log.blockNumber);
-        } catch (err) { console.error("[PredictionPool] Claimed error:", err); }
-      }
-    },
-    onError: onWatcherError("PredictionPool", indexerClient),
-  });
-
-  console.log("[Indexer] All watchers registered");
+  }, REALTIME_POLL_MS);
 }
 
 export async function startIndexer() {
   console.log("[Indexer] Starting...");
 
   const indexerClient = createIndexerClient(false);
-
-  indexerClient.onReconnect(async () => {
-    await registerWatchers(indexerClient);
-  });
-
   const httpClient = indexerClient.getClient();
 
   const currentBlock: bigint = await httpClient.getBlockNumber();
@@ -350,13 +214,8 @@ export async function startIndexer() {
     getLastBlock(RESOLUTION_MODULE),
   ]);
 
-  // Register realtime watchers FIRST so new events aren't missed during backfill.
-  // Handlers are idempotent (upsert, on-chain read for Staked, deterministic IDs for notifications)
-  // so overlap between backfill + realtime is safe.
-  await registerWatchers(indexerClient);
-
-  // Run all backfills in parallel — RM can take 10+ minutes from block 0
-  // while CF/PP only need a few batches. No blocking.
+  // Backfill in parallel, then start realtime polling once each backfill finishes.
+  // Handlers are idempotent so overlap is safe.
   const backfills: Promise<void>[] = [];
   if (cfLastBlock < currentBlock) {
     console.log(`[Indexer] Backfilling CircleFactory from ${cfLastBlock} to ${currentBlock}`);
@@ -371,9 +230,18 @@ export async function startIndexer() {
     backfills.push(backfillResolutionModule(httpClient, rmLastBlock, currentBlock));
   }
 
+  // Wait for backfills, then start realtime polling. Backfill+realtime overlap
+  // would duplicate work since both call getLogs over the same range.
   Promise.all(backfills)
-    .then(() => console.log("[Indexer] All backfills completed"))
-    .catch((err) => console.error("[Indexer] Backfill error:", err));
+    .then(() => {
+      console.log("[Indexer] All backfills completed");
+      startRealtimePolling(httpClient);
+    })
+    .catch((err) => {
+      console.error("[Indexer] Backfill error:", err);
+      // Still start realtime polling so we don't get stuck on backfill failure.
+      startRealtimePolling(httpClient);
+    });
 
   console.log("[Indexer] Running. Press Ctrl+C to stop.");
 
