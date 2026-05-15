@@ -13,6 +13,7 @@ import {
   InviteMemberButton,
   DetailsStats,
   JoinButton,
+  LeaveButton,
 } from "@/components/pages/(circle-details)";
 import { ShareSheet } from "@/components/shared";
 import type { CircleDetailResponse } from "@/lib/api/endpoints";
@@ -28,11 +29,16 @@ function CircleDetailsContent() {
   const [shareOpen, setShareOpen] = useState(false);
   const userId = useAuthStore((s) => s.user?.id);
 
+  const isOwner = useMemo(() => {
+    if (!circle || !userId) return false;
+    return circle.ownerId === userId;
+  }, [circle, userId]);
+
   const isMember = useMemo(() => {
     if (!circle || !userId) return false;
-    if (circle.ownerId === userId) return true;
+    if (isOwner) return true;
     return circle.membersPreview?.some((m) => m.userId === userId) ?? false;
-  }, [circle, userId]);
+  }, [circle, userId, isOwner]);
 
   useEffect(() => {
     if (!circleId) {
@@ -147,6 +153,13 @@ function CircleDetailsContent() {
               </Link>
             </div>
             <InviteMemberButton circleId={circleId || undefined} />
+            {!isOwner && (
+              <LeaveButton
+                circleId={circle?.chainId ? Number(circle.chainId) : undefined}
+                circleBackendId={circleId || undefined}
+                circleName={circle?.name}
+              />
+            )}
           </>
         )}
         <DetailsGoals circleId={circleId || undefined} />
