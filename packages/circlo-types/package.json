@@ -1,0 +1,53 @@
+{
+  "name": "circlo-types",
+  "version": "0.1.0",
+  "description": "TypeScript types, ABIs, and contract addresses for Circlo — a social prediction game on Celo Mainnet.",
+  "keywords": [
+    "circlo",
+    "celo",
+    "prediction-market",
+    "web3",
+    "defi",
+    "types",
+    "abi",
+    "viem",
+    "ethereum"
+  ],
+  "homepage": "https://github.com/alventendrawan123/circlo",
+  "bugs": "https://github.com/alventendrawan123/circlo/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alventendrawan123/circlo.git",
+    "directory": "packages/circlo-types"
+  },
+  "license": "MIT",
+  "author": "Alven Tendrawan <efrantemmanuel@gmail.com>",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
