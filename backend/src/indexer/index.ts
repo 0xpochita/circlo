@@ -127,7 +127,7 @@ async function backfillPredictionPool(client: any, fromBlock: bigint, toBlock: b
       const txHash = (log.transactionHash ?? "") as string;
       try {
         if (log.eventName === "GoalCreated") {
-          await handleGoalCreated(log.args as { id: bigint; circleId: bigint; creator: string; deadline: bigint; minStake: bigint }, txHash);
+          await handleGoalCreated(log.args as { id: bigint; circleId: bigint; creator: string; outcomeType: number; deadline: bigint; minStake: bigint; resolvers: readonly string[]; metadataURI: string }, txHash);
         } else if (log.eventName === "Staked") {
           await handleStaked(log.args as { goalId: bigint; user: string; side: number; amount: bigint }, txHash);
         } else if (log.eventName === "GoalLocked") {

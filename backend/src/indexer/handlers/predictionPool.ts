@@ -13,8 +13,11 @@ export const PREDICTION_POOL_ABI = [
       { name: "id", type: "uint256", indexed: true },
       { name: "circleId", type: "uint256", indexed: true },
       { name: "creator", type: "address", indexed: true },
-      { name: "deadline", type: "uint256", indexed: false },
-      { name: "minStake", type: "uint256", indexed: false },
+      { name: "outcomeType", type: "uint8", indexed: false },
+      { name: "deadline", type: "uint64", indexed: false },
+      { name: "minStake", type: "uint128", indexed: false },
+      { name: "resolvers", type: "address[]", indexed: false },
+      { name: "metadataURI", type: "string", indexed: false },
     ],
   },
   {
@@ -86,6 +89,54 @@ async function publishNotification(
   await redis.publish(`notifications:${userId}`, JSON.stringify(notification));
 }
 
+async function ensureUser(walletAddress: string) {
+  const addr = walletAddress.toLowerCase();
+  return prisma.user.upsert({
+    where: { wallet_address: addr },
+    create: { wallet_address: addr },
+    update: {},
+  });
+}
+
+function outcomeTypeToString(t: number): string {
+  return t === 0 ? "binary" : t === 1 ? "multi" : "numeric";
+}
+
+function parseGoalMetadata(uri: string): {
+  title: string;
+  description: string;
+  avatarEmoji: string;
+  avatarColor: string;
+} {
+  const fallback = {
+    title: "Goal",
+    description: "",
+    avatarEmoji: "🎯",
+    avatarColor: "#ec4899",
+  };
+  try {
+    const p = JSON.parse(uri);
+    // Bot uses single "avatar" field as "emoji|color"; frontend uses split fields.
+    let avatarEmoji = fallback.avatarEmoji;
+    let avatarColor = fallback.avatarColor;
+    if (typeof p.avatar === "string" && p.avatar.includes("|")) {
+      const [emoji, color] = p.avatar.split("|");
+      avatarEmoji = emoji || fallback.avatarEmoji;
+      avatarColor = color || fallback.avatarColor;
+    }
+    if (typeof p.avatarEmoji === "string") avatarEmoji = p.avatarEmoji;
+    if (typeof p.avatarColor === "string") avatarColor = p.avatarColor;
+    return {
+      title: typeof p.title === "string" ? p.title : fallback.title,
+      description: typeof p.description === "string" ? p.description : fallback.description,
+      avatarEmoji,
+      avatarColor,
+    };
+  } catch {
+    return fallback;
+  }
+}
+
 function sideToString(side: number): string {
   return side === 0 ? "yes" : side === 1 ? "no" : `choice_${side}`;
 }
@@ -102,52 +153,84 @@ export async function handleGoalCreated(
     id: bigint;
     circleId: bigint;
     creator: string;
+    outcomeType: number;
     deadline: bigint;
     minStake: bigint;
+    resolvers: readonly string[];
+    metadataURI: string;
   },
   txHash: string
 ): Promise<void> {
-  const creatorAddress = args.creator.toLowerCase();
+  const user = await ensureUser(args.creator);
 
-  const [circle, user] = await Promise.all([
-    prisma.circle.findFirst({ where: { chain_id: args.circleId } }),
-    prisma.user.findUnique({ where: { wallet_address: creatorAddress } }),
-  ]);
+  const circle = await prisma.circle.findFirst({
+    where: { chain_id: args.circleId },
+  });
 
-  if (!circle || !user) {
+  if (!circle) {
     console.warn(
-      `[PredictionPool] GoalCreated: circle or user not found (circleChainId=${args.circleId}, creator=${creatorAddress})`
+      `[PredictionPool] GoalCreated: circle not found for chain_id=${args.circleId}. CircleFactory backfill may not have reached it yet.`
     );
     return;
   }
 
+  // Idempotency: if this goal's chain_id is already in DB, do nothing.
   const alreadyIndexed = await prisma.goal.findFirst({
     where: { chain_id: args.id },
   });
-
   if (alreadyIndexed) {
-    console.log(
-      `[PredictionPool] GoalCreated: chain_id=${args.id} already indexed, skipping`
-    );
     return;
   }
 
-  const existingGoal = await prisma.goal.findFirst({
-    where: {
-      creator_id: user.id,
-      circle_id: circle.id,
-      chain_id: null,
-    },
+  // Normal flow: frontend created Goal via API with chain_id=null; attach chain_id.
+  const pending = await prisma.goal.findFirst({
+    where: { creator_id: user.id, circle_id: circle.id, chain_id: null },
     orderBy: { created_at: "desc" },
   });
 
-  if (existingGoal) {
+  let goalId: string;
+  if (pending) {
     await prisma.goal.update({
-      where: { id: existingGoal.id },
-      data: { chain_id: args.id, status: "open" },
+      where: { id: pending.id },
+      data: { chain_id: args.id, status: "open", tx_hash: txHash },
+    });
+    goalId = pending.id;
+  } else {
+    // Direct-on-chain flow: create Goal from event data.
+    const meta = parseGoalMetadata(args.metadataURI);
+    const created = await prisma.goal.create({
+      data: {
+        chain_id: args.id,
+        circle_id: circle.id,
+        creator_id: user.id,
+        title: meta.title,
+        description: meta.description || null,
+        avatar_emoji: meta.avatarEmoji,
+        avatar_color: meta.avatarColor,
+        outcome_type: outcomeTypeToString(args.outcomeType),
+        deadline: new Date(Number(args.deadline) * 1000),
+        min_stake: formatUnits(args.minStake, 6),
+        status: "open",
+        metadata_uri: args.metadataURI,
+        tx_hash: txHash,
+      },
+    });
+    goalId = created.id;
+  }
+
+  // Register resolvers from event (each resolver must already exist as User).
+  for (const resolverAddr of args.resolvers) {
+    const resolverUser = await ensureUser(resolverAddr);
+    await prisma.goalResolver.upsert({
+      where: {
+        goal_id_user_id: { goal_id: goalId, user_id: resolverUser.id },
+      },
+      create: { goal_id: goalId, user_id: resolverUser.id },
+      update: {},
     });
   }
 
+  // Notify other circle members.
   const members = await prisma.circleMember.findMany({
     where: { circle_id: circle.id, user_id: { not: user.id } },
   });
@@ -161,7 +244,7 @@ export async function handleGoalCreated(
         type: "goal.created",
         actorId: user.id,
         entityType: "goal",
-        entityId: existingGoal?.id ?? null,
+        entityId: goalId,
         title: "New Goal",
         description: `A new prediction goal was created in "${circle.name}"`,
         unread: true,
@@ -176,7 +259,7 @@ export async function handleGoalCreated(
           type: notification.type,
           actor_id: user.id,
           entity_type: "goal",
-          entity_id: existingGoal?.id ?? undefined,
+          entity_id: goalId,
           title: notification.title,
           description: notification.description,
         },
@@ -188,7 +271,7 @@ export async function handleGoalCreated(
   );
 
   console.log(
-    `[PredictionPool] GoalCreated: chain_id=${args.id}, circle=${circle.id}`
+    `[PredictionPool] GoalCreated: chain_id=${args.id} (${pending ? pending.title : parseGoalMetadata(args.metadataURI).title}) circle=${circle.chain_id}`
   );
 }
 
@@ -201,16 +284,12 @@ export async function handleStaked(
   },
   txHash: string
 ): Promise<void> {
-  const userAddress = args.user.toLowerCase();
+  const user = await ensureUser(args.user);
 
-  const [goal, user] = await Promise.all([
-    prisma.goal.findFirst({ where: { chain_id: args.goalId } }),
-    prisma.user.findUnique({ where: { wallet_address: userAddress } }),
-  ]);
-
-  if (!goal || !user) {
+  const goal = await prisma.goal.findFirst({ where: { chain_id: args.goalId } });
+  if (!goal) {
     console.warn(
-      `[PredictionPool] Staked: goal or user not found (goalChainId=${args.goalId}, user=${userAddress})`
+      `[PredictionPool] Staked: goal not found for chain_id=${args.goalId}. GoalCreated event missed?`
     );
     return;
   }
@@ -280,7 +359,7 @@ export async function handleStaked(
   });
 
   console.log(
-    `[PredictionPool] Staked: goalId=${goal.id}, user=${userAddress}, side=${sideStr}, amount=${amountStr}`
+    `[PredictionPool] Staked: goalId=${goal.id}, user=${user.wallet_address}, side=${sideStr}, amount=${amountStr}`
   );
 }
 
@@ -289,29 +368,32 @@ export async function handleVoteSubmitted(args: {
   resolver: string;
   choice: number;
 }): Promise<void> {
-  const resolverAddress = args.resolver.toLowerCase();
+  const user = await ensureUser(args.resolver);
 
-  const [goal, user] = await Promise.all([
-    prisma.goal.findFirst({ where: { chain_id: args.goalId } }),
-    prisma.user.findUnique({ where: { wallet_address: resolverAddress } }),
-  ]);
-
-  if (!goal || !user) {
+  const goal = await prisma.goal.findFirst({ where: { chain_id: args.goalId } });
+  if (!goal) {
     console.warn(
-      `[PredictionPool] VoteSubmitted: goal or resolver not found`
+      `[PredictionPool] VoteSubmitted: goal not found for chain_id=${args.goalId}`
     );
     return;
   }
 
   const choiceStr = sideToString(args.choice);
 
-  await prisma.goalResolver.updateMany({
-    where: { goal_id: goal.id, user_id: user.id },
-    data: { vote: choiceStr, voted_at: new Date() },
+  // Ensure resolver row exists (in case GoalCreated didn't register it for some reason).
+  await prisma.goalResolver.upsert({
+    where: { goal_id_user_id: { goal_id: goal.id, user_id: user.id } },
+    create: {
+      goal_id: goal.id,
+      user_id: user.id,
+      vote: choiceStr,
+      voted_at: new Date(),
+    },
+    update: { vote: choiceStr, voted_at: new Date() },
   });
 
   console.log(
-    `[PredictionPool] VoteSubmitted: goalId=${goal.id}, resolver=${resolverAddress}, choice=${choiceStr}`
+    `[PredictionPool] VoteSubmitted: goalId=${goal.id}, resolver=${user.wallet_address}, choice=${choiceStr}`
   );
 }
 
@@ -500,15 +582,11 @@ export async function handleClaimed(args: {
   user: string;
   amount: bigint;
 }): Promise<void> {
-  const userAddress = args.user.toLowerCase();
+  const user = await ensureUser(args.user);
 
-  const [goal, user] = await Promise.all([
-    prisma.goal.findFirst({ where: { chain_id: args.goalId } }),
-    prisma.user.findUnique({ where: { wallet_address: userAddress } }),
-  ]);
-
-  if (!goal || !user) {
-    console.warn(`[PredictionPool] Claimed: goal or user not found`);
+  const goal = await prisma.goal.findFirst({ where: { chain_id: args.goalId } });
+  if (!goal) {
+    console.warn(`[PredictionPool] Claimed: goal not found for chain_id=${args.goalId}`);
     return;
   }
 
@@ -520,6 +598,6 @@ export async function handleClaimed(args: {
   });
 
   console.log(
-    `[PredictionPool] Claimed: goalId=${goal.id}, user=${userAddress}, amount=${amountStr}`
+    `[PredictionPool] Claimed: goalId=${goal.id}, user=${user.wallet_address}, amount=${amountStr}`
   );
 }
