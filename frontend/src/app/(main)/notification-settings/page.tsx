@@ -116,8 +116,8 @@ export default function NotificationSettingsPage() {
                 }
               >
                 <span
-                  className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-200 ${
-                    allEnabled ? "translate-x-6" : "translate-x-1"
+                  className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow-md transition-all duration-200 ${
+                    allEnabled ? "left-6" : "left-1"
                   }`}
                 />
               </button>
@@ -167,8 +167,8 @@ export default function NotificationSettingsPage() {
                       aria-label={`${enabled ? "Disable" : "Enable"} ${cat.title}`}
                     >
                       <span
-                        className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow-md transition-transform duration-200 ${
-                          enabled ? "translate-x-6" : "translate-x-1"
+                        className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow-md transition-all duration-200 ${
+                          enabled ? "left-6" : "left-1"
                         }`}
                       />
                     </button>
