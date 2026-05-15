@@ -33,3 +33,19 @@ Thumbs.db
 # IDE
 .vscode/settings.json
 sc/broadcast/
+
+# Claude Code session
+.claude/
+
+# Local bot orchestration scripts (do not publish)
+scripts/
+
+# Internal strategy / planning docs (do not publish)
+CAMPAIGN_TRACKER.md
+LEADERBOARD_TODO.md
+
+# One-off DB seed/maintenance scripts (kept locally only)
+backend/name-bots.mjs
+backend/*.local.mjs
+backend/check-data.mjs
+backend/diagnose-*.mjs
