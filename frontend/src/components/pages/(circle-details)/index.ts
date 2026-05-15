@@ -6,3 +6,4 @@ export { default as DetailsStats } from "./DetailsStats";
 export { default as InviteMemberButton } from "./InviteMemberButton";
 export { default as JoinButton } from "./JoinButton";
 export { default as LeaveButton } from "./LeaveButton";
+export { default as GenerateInviteSheet } from "./GenerateInviteSheet";

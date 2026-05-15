@@ -10,6 +10,7 @@ import {
   DetailsHeader,
   DetailsHero,
   DetailsMembers,
+  GenerateInviteSheet,
   InviteMemberButton,
   DetailsStats,
   JoinButton,
@@ -27,6 +28,7 @@ function CircleDetailsContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [inviteOpen, setInviteOpen] = useState(false);
   const userId = useAuthStore((s) => s.user?.id);
 
   const isOwner = useMemo(() => {
@@ -153,6 +155,18 @@ function CircleDetailsContent() {
               </Link>
             </div>
             <InviteMemberButton circleId={circleId || undefined} />
+            {isOwner && circle?.privacy === "private" && circle?.chainId && (
+              <div className="px-4 py-2">
+                <button
+                  type="button"
+                  onClick={() => setInviteOpen(true)}
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white py-3 text-sm font-medium text-main-text cursor-pointer transition-all duration-200 active:scale-[0.98]"
+                >
+                  <span className="inline-flex h-5 w-5 items-center justify-center">🔗</span>
+                  Generate invite link
+                </button>
+              </div>
+            )}
             {!isOwner && (
               <LeaveButton
                 circleId={circle?.chainId ? Number(circle.chainId) : undefined}
@@ -179,6 +193,13 @@ function CircleDetailsContent() {
         inviteCode={circle?.inviteCode}
         avatarEmoji={circle?.avatarEmoji}
         avatarColor={circle?.avatarColor}
+      />
+      <GenerateInviteSheet
+        open={inviteOpen}
+        onClose={() => setInviteOpen(false)}
+        circleId={circleId}
+        chainId={circle?.chainId ? BigInt(circle.chainId) : undefined}
+        circleName={circle?.name}
       />
     </div>
   );
