@@ -7,6 +7,7 @@ import { Web3Provider } from "@/providers/Web3Provider";
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover",
   themeColor: "#ffffff",
 };
 

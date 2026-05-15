@@ -26,7 +26,7 @@ export default function ExplorePage() {
   const [sortBy, setSortBy] = useState<ExploreSortKey>("newest");
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-main-bg pb-28">
+    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-main-bg pb-safe">
       <PageTransition>
         <ExploreHeader sortBy={sortBy} onSortChange={setSortBy} />
         <div className="px-4 py-2">

@@ -29,4 +29,20 @@ body {
     -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Snappier taps on touch devices (removes 300ms double-tap-to-zoom delay). */
+  touch-action: manipulation;
+  /* Prevent rubber-band scrolling background bleed on iOS. */
+  overscroll-behavior-y: none;
+}
+
+/* Safe-area utilities for iOS notch + home indicator devices.
+   Use with viewport-fit=cover (set in layout.tsx). */
+@utility pt-safe {
+  padding-top: max(3.5rem, env(safe-area-inset-top));
+}
+@utility pb-safe {
+  padding-bottom: max(7rem, calc(env(safe-area-inset-bottom) + 6rem));
+}
+@utility bottom-safe {
+  bottom: max(1.5rem, calc(env(safe-area-inset-bottom) + 0.5rem));
 }

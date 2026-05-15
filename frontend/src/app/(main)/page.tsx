@@ -11,7 +11,7 @@ import {
 
 export default function Home() {
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-main-bg pb-28">
+    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-main-bg pb-safe">
       <PageTransition>
         <HomeHero />
         <ActivePredictionCard />
