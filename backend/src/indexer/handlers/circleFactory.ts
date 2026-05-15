@@ -38,43 +38,115 @@ async function publishNotification(
   await redis.publish(`notifications:${userId}`, JSON.stringify(notification));
 }
 
+/**
+ * Find or create a User row for a wallet address.
+ * Used when on-chain events reference an address that hasn't logged in via SIWE
+ * (e.g. direct contract interaction from a script).
+ */
+async function ensureUser(walletAddress: string) {
+  const addr = walletAddress.toLowerCase();
+  return prisma.user.upsert({
+    where: { wallet_address: addr },
+    create: { wallet_address: addr },
+    update: {},
+  });
+}
+
+interface CircleMetadata {
+  name: string;
+  description: string;
+  category: string;
+  avatarEmoji: string;
+  avatarColor: string;
+}
+
+function parseCircleMetadata(uri: string): CircleMetadata {
+  const fallback: CircleMetadata = {
+    name: "Circle",
+    description: "",
+    category: "general",
+    avatarEmoji: "✨",
+    avatarColor: "#fbbf24",
+  };
+  try {
+    const parsed = JSON.parse(uri);
+    return {
+      name: typeof parsed.name === "string" ? parsed.name : fallback.name,
+      description: typeof parsed.description === "string" ? parsed.description : fallback.description,
+      category: typeof parsed.category === "string" ? parsed.category : fallback.category,
+      avatarEmoji: typeof parsed.avatarEmoji === "string" ? parsed.avatarEmoji : fallback.avatarEmoji,
+      avatarColor: typeof parsed.avatarColor === "string" ? parsed.avatarColor : fallback.avatarColor,
+    };
+  } catch {
+    return fallback;
+  }
+}
+
 export async function handleCircleCreated(args: {
   id: bigint;
   owner: string;
   isPrivate: boolean;
   metadataURI: string;
 }): Promise<void> {
-  const owner = args.owner.toLowerCase();
+  const owner = await ensureUser(args.owner);
 
-  const user = await prisma.user.findUnique({
-    where: { wallet_address: owner },
+  // Idempotency: if a circle already exists for this chain_id, skip.
+  const existingByChainId = await prisma.circle.findFirst({
+    where: { chain_id: args.id },
   });
-
-  if (!user) {
-    console.warn(
-      `[CircleFactory] CircleCreated: user not found for owner ${owner}`
-    );
+  if (existingByChainId) {
     return;
   }
 
-  const circle = await prisma.circle.findFirst({
-    where: { owner_id: user.id, chain_id: null },
+  // Normal flow: frontend created a Circle row via API before the on-chain tx.
+  // Match it by owner + chain_id=null and attach the chain_id.
+  const pending = await prisma.circle.findFirst({
+    where: { owner_id: owner.id, chain_id: null },
     orderBy: { created_at: "desc" },
   });
 
-  if (circle) {
+  let circleId: string;
+  let circleName: string;
+
+  if (pending) {
     await prisma.circle.update({
-      where: { id: circle.id },
+      where: { id: pending.id },
       data: { chain_id: args.id },
     });
+    circleId = pending.id;
+    circleName = pending.name;
+  } else {
+    // Direct-on-chain flow (e.g. bot script): no pending row. Create one from metadata.
+    const meta = parseCircleMetadata(args.metadataURI);
+    const created = await prisma.circle.create({
+      data: {
+        chain_id: args.id,
+        owner_id: owner.id,
+        name: meta.name,
+        description: meta.description || null,
+        category: meta.category,
+        privacy: args.isPrivate ? "private" : "public",
+        avatar_emoji: meta.avatarEmoji,
+        avatar_color: meta.avatarColor,
+      },
+    });
+    circleId = created.id;
+    circleName = created.name;
   }
+
+  // Owner is auto-added as a member on-chain. Mirror that in DB.
+  await prisma.circleMember.upsert({
+    where: { circle_id_user_id: { circle_id: circleId, user_id: owner.id } },
+    create: { circle_id: circleId, user_id: owner.id, role: "owner" },
+    update: {},
+  });
 
   const notification = {
     id: uuidv4(),
-    userId: user.id,
+    userId: owner.id,
     type: "circle.active",
     entityType: "circle",
-    entityId: circle?.id ?? null,
+    entityId: circleId,
     title: "Circle Active On-Chain",
     description: "Your circle is now active on the blockchain",
     unread: true,
@@ -84,19 +156,19 @@ export async function handleCircleCreated(args: {
   await prisma.notification.create({
     data: {
       id: notification.id,
-      user_id: user.id,
+      user_id: owner.id,
       type: notification.type,
       entity_type: "circle",
-      entity_id: circle?.id ?? undefined,
+      entity_id: circleId,
       title: notification.title,
       description: notification.description,
     },
   });
 
-  await publishNotification(user.id, notification);
+  await publishNotification(owner.id, notification);
 
   console.log(
-    `[CircleFactory] CircleCreated: chain_id=${args.id}, owner=${owner}`
+    `[CircleFactory] CircleCreated: chain_id=${args.id} (${circleName}) owner=${owner.wallet_address}`
   );
 }
 
@@ -104,16 +176,12 @@ export async function handleCircleJoined(args: {
   id: bigint;
   member: string;
 }): Promise<void> {
-  const memberAddress = args.member.toLowerCase();
+  const user = await ensureUser(args.member);
 
-  const [circle, user] = await Promise.all([
-    prisma.circle.findFirst({ where: { chain_id: args.id } }),
-    prisma.user.findUnique({ where: { wallet_address: memberAddress } }),
-  ]);
-
-  if (!circle || !user) {
+  const circle = await prisma.circle.findFirst({ where: { chain_id: args.id } });
+  if (!circle) {
     console.warn(
-      `[CircleFactory] CircleJoined: circle or user not found (chainId=${args.id}, member=${memberAddress})`
+      `[CircleFactory] CircleJoined: circle not found for chain_id=${args.id} (member=${user.wallet_address}). Indexer race?`
     );
     return;
   }
@@ -161,7 +229,7 @@ export async function handleCircleJoined(args: {
   await publishNotification(circle.owner_id, notification);
 
   console.log(
-    `[CircleFactory] CircleJoined: circleId=${circle.id}, member=${memberAddress}`
+    `[CircleFactory] CircleJoined: circleId=${circle.id} member=${user.wallet_address}`
   );
 }
 
