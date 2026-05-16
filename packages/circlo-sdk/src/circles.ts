@@ -109,3 +109,85 @@ export async function isCircleMember(
     args: [circleId, user],
   });
 }
+
+/**
+ * Join a public circle. Reverts if the circle is private — use
+ * `joinPrivateCircle` with a signed inviteProof instead.
+ */
+export async function joinCircle(
+  wallet: WalletClient,
+  circleId: bigint,
+): Promise<Hash> {
+  if (!wallet.account) {
+    throw new Error("joinCircle: walletClient must be configured with an account");
+  }
+  return wallet.writeContract({
+    address: CIRCLO_CONTRACTS.CircleFactory,
+    abi: CIRCLE_FACTORY_ABI,
+    functionName: "joinCircle",
+    args: [circleId],
+    account: wallet.account as Account,
+    chain: wallet.chain as Chain,
+  });
+}
+
+/**
+ * Join a private circle using a signed EIP-712 inviteProof issued by
+ * the circle owner. The proof bytes layout is defined by the
+ * CircleFactory contract; build it with the helper in your dapp.
+ */
+export async function joinPrivateCircle(
+  wallet: WalletClient,
+  circleId: bigint,
+  inviteProof: `0x${string}`,
+): Promise<Hash> {
+  if (!wallet.account) {
+    throw new Error("joinPrivateCircle: walletClient must be configured with an account");
+  }
+  return wallet.writeContract({
+    address: CIRCLO_CONTRACTS.CircleFactory,
+    abi: CIRCLE_FACTORY_ABI,
+    functionName: "joinCirclePrivate",
+    args: [circleId, inviteProof],
+    account: wallet.account as Account,
+    chain: wallet.chain as Chain,
+  });
+}
+
+/**
+ * Leave a circle the caller is currently a member of.
+ * The circle owner cannot leave — they must transfer ownership first.
+ */
+export async function leaveCircle(
+  wallet: WalletClient,
+  circleId: bigint,
+): Promise<Hash> {
+  if (!wallet.account) {
+    throw new Error("leaveCircle: walletClient must be configured with an account");
+  }
+  return wallet.writeContract({
+    address: CIRCLO_CONTRACTS.CircleFactory,
+    abi: CIRCLE_FACTORY_ABI,
+    functionName: "leaveCircle",
+    args: [circleId],
+    account: wallet.account as Account,
+    chain: wallet.chain as Chain,
+  });
+}
+
+/**
+ * Read a page of circle members. Cursor-paginated by offset/limit.
+ */
+export async function getCircleMembers(
+  client: PublicClient,
+  circleId: bigint,
+  offset = 0n,
+  limit = 100n,
+): Promise<readonly Address[]> {
+  return client.readContract({
+    address: CIRCLO_CONTRACTS.CircleFactory,
+    abi: CIRCLE_FACTORY_ABI,
+    functionName: "getMembers",
+    args: [circleId, offset, limit],
+  });
+}

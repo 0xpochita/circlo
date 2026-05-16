@@ -2,7 +2,11 @@ import type { Address, PublicClient, WalletClient } from "viem";
 import { CIRCLO_CONTRACTS, CELO_MAINNET_CHAIN_ID } from "circlo-types";
 import {
   createCircle,
+  getCircleMembers,
   isCircleMember,
+  joinCircle,
+  joinPrivateCircle,
+  leaveCircle,
   type CreateCircleParams,
   type CreateCircleResult,
 } from "./circles.js";
@@ -41,8 +45,16 @@ export type CircloClient = {
 
   /** Create a new circle. Requires a configured walletClient. */
   createCircle(params: CreateCircleParams): Promise<CreateCircleResult>;
+  /** Join a public circle. Returns the tx hash. */
+  joinCircle(circleId: bigint): Promise<`0x${string}`>;
+  /** Join a private circle with a signed inviteProof. */
+  joinPrivateCircle(circleId: bigint, inviteProof: `0x${string}`): Promise<`0x${string}`>;
+  /** Leave a circle the caller is a member of. */
+  leaveCircle(circleId: bigint): Promise<`0x${string}`>;
   /** Check if an address is a member of a circle. */
   isCircleMember(circleId: bigint, user: Address): Promise<boolean>;
+  /** Read a paginated list of circle members. */
+  getCircleMembers(circleId: bigint, offset?: bigint, limit?: bigint): Promise<readonly Address[]>;
 };
 
 export function createCircloClient(config: CircloClientConfig = {}): CircloClient {
@@ -66,7 +78,15 @@ export function createCircloClient(config: CircloClientConfig = {}): CircloClien
 
     createCircle: (params) =>
       createCircle(requireWallet("createCircle"), params, config.publicClient),
+    joinCircle: (circleId) =>
+      joinCircle(requireWallet("joinCircle"), circleId),
+    joinPrivateCircle: (circleId, inviteProof) =>
+      joinPrivateCircle(requireWallet("joinPrivateCircle"), circleId, inviteProof),
+    leaveCircle: (circleId) =>
+      leaveCircle(requireWallet("leaveCircle"), circleId),
     isCircleMember: (circleId, user) =>
       isCircleMember(requirePublic("isCircleMember"), circleId, user),
+    getCircleMembers: (circleId, offset, limit) =>
+      getCircleMembers(requirePublic("getCircleMembers"), circleId, offset, limit),
   };
 }
