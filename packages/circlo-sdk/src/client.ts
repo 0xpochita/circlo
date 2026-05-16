@@ -25,6 +25,7 @@ import {
   type StakeResult,
 } from "./stakes.js";
 import { claim, refund } from "./claims.js";
+import { finalize, submitVote, getTally } from "./resolution.js";
 import type { Side } from "circlo-types";
 
 export type CircloClientConfig = {
@@ -93,6 +94,13 @@ export type CircloClient = {
   claim(goalId: bigint): Promise<`0x${string}`>;
   /** Refund a stake when a goal was cancelled / unresolvable. */
   refund(goalId: bigint): Promise<`0x${string}`>;
+
+  /** Submit a resolver vote (0 = NO, 1 = YES). Auto-finalizes at quorum. */
+  submitVote(goalId: bigint, choice: 0 | 1): Promise<`0x${string}`>;
+  /** Force-finalize a goal whose tally reached quorum without auto-finalize. */
+  finalize(goalId: bigint): Promise<`0x${string}`>;
+  /** Read the current resolver vote tally on a goal. */
+  getTally(goalId: bigint): Promise<{ counts: readonly bigint[]; total: bigint }>;
 };
 
 export function createCircloClient(config: CircloClientConfig = {}): CircloClient {
@@ -143,5 +151,12 @@ export function createCircloClient(config: CircloClientConfig = {}): CircloClien
 
     claim: async (goalId) => claim(requireWallet("claim"), goalId),
     refund: async (goalId) => refund(requireWallet("refund"), goalId),
+
+    submitVote: async (goalId, choice) =>
+      submitVote(requireWallet("submitVote"), goalId, choice),
+    finalize: async (goalId) =>
+      finalize(requireWallet("finalize"), goalId),
+    getTally: async (goalId) =>
+      getTally(requirePublic("getTally"), goalId),
   };
 }
