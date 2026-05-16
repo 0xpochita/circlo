@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { usersApi } from "@/lib/api/endpoints";
+import { useAuthStore } from "@/stores/authStore";
 import { useUserStore } from "@/stores/userStore";
 import ConnectStep from "./ConnectStep";
 import ProfileStep from "./ProfileStep";
@@ -17,9 +18,19 @@ export default function OnboardingFlow() {
   useEffect(() => {
     const completed = localStorage.getItem("circlo-onboarding-done");
     const hasRedirect = localStorage.getItem("circlo-redirect-after-login");
-    if (completed === "true" && !hasRedirect) {
+
+    // Don't redirect to "/" unless user is actually authenticated — otherwise
+    // OnboardingGuard will bounce them right back here, causing a flicker loop.
+    const isAuthed = useAuthStore.persist.hasHydrated()
+      ? useAuthStore.getState().isAuthenticated
+      : false;
+
+    if (completed === "true" && !hasRedirect && isAuthed) {
       router.replace("/");
     } else if (completed === "true" && hasRedirect) {
+      setStep(1);
+    } else if (completed === "true" && !isAuthed) {
+      // Onboarding flag stale — auth got cleared. Send to connect step to re-auth.
       setStep(1);
     }
   }, [router]);
