@@ -29,12 +29,14 @@ export { createCircloClient, type CircloClient, type CircloClientConfig } from "
 
 export {
   createCircle,
+  getCircleInfo,
   getCircleMembers,
   getCircleNextId,
   isCircleMember,
   joinCircle,
   joinPrivateCircle,
   leaveCircle,
+  type CircleInfo,
   type CreateCircleParams,
   type CreateCircleResult,
 } from "./circles.js";

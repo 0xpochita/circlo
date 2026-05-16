@@ -2,12 +2,14 @@ import type { Address, PublicClient, WalletClient } from "viem";
 import { CIRCLO_CONTRACTS, CELO_MAINNET_CHAIN_ID } from "circlo-types";
 import {
   createCircle,
+  getCircleInfo,
   getCircleMembers,
   getCircleNextId,
   isCircleMember,
   joinCircle,
   joinPrivateCircle,
   leaveCircle,
+  type CircleInfo,
   type CreateCircleParams,
   type CreateCircleResult,
 } from "./circles.js";
@@ -76,6 +78,8 @@ export type CircloClient = {
   getCircleMembers(circleId: bigint, offset?: bigint, limit?: bigint): Promise<readonly Address[]>;
   /** Read the id that the next-created circle will receive. */
   getCircleNextId(): Promise<bigint>;
+  /** Read on-chain info for a circle: owner, privacy, createdAt, metadataURI. */
+  getCircleInfo(circleId: bigint): Promise<CircleInfo>;
 
   /** Create a goal inside a circle. Requires a configured walletClient. */
   createGoal(params: CreateGoalParams): Promise<CreateGoalResult>;
@@ -142,6 +146,8 @@ export function createCircloClient(config: CircloClientConfig = {}): CircloClien
       getCircleMembers(requirePublic("getCircleMembers"), circleId, offset, limit),
     getCircleNextId: async () =>
       getCircleNextId(requirePublic("getCircleNextId")),
+    getCircleInfo: async (circleId) =>
+      getCircleInfo(requirePublic("getCircleInfo"), circleId),
 
     createGoal: async (params) =>
       createGoal(requireWallet("createGoal"), params, config.publicClient),

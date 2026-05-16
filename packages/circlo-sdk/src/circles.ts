@@ -198,3 +198,58 @@ export async function getCircleNextId(client: PublicClient): Promise<bigint> {
     functionName: "nextCircleId",
   });
 }
+
+/**
+ * Inline ABI for getCircle — not in the minimal circlo-types ABI yet.
+ * Will be promoted to circlo-types in a follow-up bump; keeping it here
+ * avoids forcing a circlo-types release just to expose one read.
+ */
+const GET_CIRCLE_ABI = [
+  {
+    type: "function",
+    name: "getCircle",
+    stateMutability: "view",
+    inputs: [{ name: "circleId", type: "uint256" }],
+    outputs: [
+      {
+        type: "tuple",
+        components: [
+          { name: "owner", type: "address" },
+          { name: "isPrivate", type: "bool" },
+          { name: "createdAt", type: "uint64" },
+          { name: "metadataURI", type: "string" },
+        ],
+      },
+    ],
+  },
+] as const;
+
+export type CircleInfo = {
+  owner: Address;
+  isPrivate: boolean;
+  createdAt: bigint;
+  metadataURI: string;
+};
+
+/**
+ * Read the on-chain info for a single circle: owner, privacy, createdAt,
+ * and the raw metadataURI string. Pair with `parseCircleMetadata` from
+ * circlo-types to decode the JSON.
+ */
+export async function getCircleInfo(
+  client: PublicClient,
+  circleId: bigint,
+): Promise<CircleInfo> {
+  const result = await client.readContract({
+    address: CIRCLO_CONTRACTS.CircleFactory,
+    abi: GET_CIRCLE_ABI,
+    functionName: "getCircle",
+    args: [circleId],
+  });
+  return {
+    owner: result.owner,
+    isPrivate: result.isPrivate,
+    createdAt: result.createdAt,
+    metadataURI: result.metadataURI,
+  };
+}
