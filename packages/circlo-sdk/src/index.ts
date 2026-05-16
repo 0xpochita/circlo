@@ -26,3 +26,10 @@
  */
 
 export { createCircloClient, type CircloClient, type CircloClientConfig } from "./client.js";
+
+export {
+  createCircle,
+  isCircleMember,
+  type CreateCircleParams,
+  type CreateCircleResult,
+} from "./circles.js";

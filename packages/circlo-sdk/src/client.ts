@@ -1,5 +1,11 @@
-import type { PublicClient, WalletClient } from "viem";
+import type { Address, PublicClient, WalletClient } from "viem";
 import { CIRCLO_CONTRACTS, CELO_MAINNET_CHAIN_ID } from "circlo-types";
+import {
+  createCircle,
+  isCircleMember,
+  type CreateCircleParams,
+  type CreateCircleResult,
+} from "./circles.js";
 
 export type CircloClientConfig = {
   /**
@@ -32,13 +38,35 @@ export type CircloClient = {
   readonly walletClient: WalletClient | undefined;
   /** The public client used for reads. */
   readonly publicClient: PublicClient | undefined;
+
+  /** Create a new circle. Requires a configured walletClient. */
+  createCircle(params: CreateCircleParams): Promise<CreateCircleResult>;
+  /** Check if an address is a member of a circle. */
+  isCircleMember(circleId: bigint, user: Address): Promise<boolean>;
 };
 
 export function createCircloClient(config: CircloClientConfig = {}): CircloClient {
+  const requireWallet = (op: string): WalletClient => {
+    if (!config.walletClient) {
+      throw new Error(`${op}: CircloClient was created without a walletClient — pass one to createCircloClient(...) to send writes`);
+    }
+    return config.walletClient;
+  };
+
+  const requirePublic = (op: string): PublicClient => {
+    if (config.publicClient) return config.publicClient;
+    throw new Error(`${op}: CircloClient was created without a publicClient and the read path needs one`);
+  };
+
   return {
     contracts: CIRCLO_CONTRACTS,
     chainId: CELO_MAINNET_CHAIN_ID,
     walletClient: config.walletClient,
     publicClient: config.publicClient,
+
+    createCircle: (params) =>
+      createCircle(requireWallet("createCircle"), params, config.publicClient),
+    isCircleMember: (circleId, user) =>
+      isCircleMember(requirePublic("isCircleMember"), circleId, user),
   };
 }
