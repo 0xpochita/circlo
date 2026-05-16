@@ -61,3 +61,10 @@ export {
   watchGoalCreated,
   watchStaked,
 } from "./events.js";
+
+export {
+  buildCircleMetadata,
+  buildGoalMetadata,
+  type CircleMetadataInput,
+  type GoalMetadataInput,
+} from "./metadata.js";

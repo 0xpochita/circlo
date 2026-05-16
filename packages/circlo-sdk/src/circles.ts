@@ -1,6 +1,7 @@
 import type { Address, Hash, WalletClient, PublicClient, Account, Chain } from "viem";
 import { decodeEventLog, publicActions } from "viem";
 import { CIRCLE_FACTORY_ABI, CIRCLO_CONTRACTS } from "circlo-types";
+import { buildCircleMetadata } from "./metadata.js";
 
 export type CreateCircleParams = {
   /** Human-readable name for the circle (e.g. "Gym Squad"). */
@@ -46,14 +47,7 @@ export async function createCircle(
     throw new Error("createCircle: walletClient must be configured with an account");
   }
 
-  const metadataURI = JSON.stringify({
-    name: params.name,
-    ...(params.description && { description: params.description }),
-    ...(params.category && { category: params.category }),
-    avatarEmoji: params.avatarEmoji ?? "🎯",
-    ...(params.avatarColor && { avatarColor: params.avatarColor }),
-    ...params.extra,
-  });
+  const metadataURI = buildCircleMetadata(params);
 
   const hash = await wallet.writeContract({
     address: CIRCLO_CONTRACTS.CircleFactory,

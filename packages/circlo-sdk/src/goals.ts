@@ -5,6 +5,7 @@ import {
   PREDICTION_POOL_ABI,
   OutcomeType,
 } from "circlo-types";
+import { buildGoalMetadata } from "./metadata.js";
 
 export type CreateGoalParams = {
   /** Circle this goal lives in. Caller must be a member. */
@@ -54,13 +55,7 @@ export async function createGoal(
     throw new Error("createGoal: walletClient must be configured with an account");
   }
 
-  const metadataURI = JSON.stringify({
-    question: params.question,
-    ...(params.description && { description: params.description }),
-    ...(params.category && { category: params.category }),
-    ...(params.emoji && { emoji: params.emoji }),
-    ...params.extra,
-  });
+  const metadataURI = buildGoalMetadata(params);
 
   const hash = await wallet.writeContract({
     address: CIRCLO_CONTRACTS.PredictionPool,
