@@ -10,6 +10,13 @@ import {
   type CreateCircleParams,
   type CreateCircleResult,
 } from "./circles.js";
+import {
+  createGoal,
+  getGoal,
+  lockGoal,
+  type CreateGoalParams,
+  type CreateGoalResult,
+} from "./goals.js";
 
 export type CircloClientConfig = {
   /**
@@ -55,6 +62,13 @@ export type CircloClient = {
   isCircleMember(circleId: bigint, user: Address): Promise<boolean>;
   /** Read a paginated list of circle members. */
   getCircleMembers(circleId: bigint, offset?: bigint, limit?: bigint): Promise<readonly Address[]>;
+
+  /** Create a goal inside a circle. Requires a configured walletClient. */
+  createGoal(params: CreateGoalParams): Promise<CreateGoalResult>;
+  /** Lock a goal after its deadline so resolvers can vote. */
+  lockGoal(goalId: bigint): Promise<`0x${string}`>;
+  /** Read the full goal tuple from the PredictionPool contract. */
+  getGoal(goalId: bigint): ReturnType<typeof getGoal>;
 };
 
 export function createCircloClient(config: CircloClientConfig = {}): CircloClient {
@@ -88,5 +102,12 @@ export function createCircloClient(config: CircloClientConfig = {}): CircloClien
       isCircleMember(requirePublic("isCircleMember"), circleId, user),
     getCircleMembers: (circleId, offset, limit) =>
       getCircleMembers(requirePublic("getCircleMembers"), circleId, offset, limit),
+
+    createGoal: (params) =>
+      createGoal(requireWallet("createGoal"), params, config.publicClient),
+    lockGoal: (goalId) =>
+      lockGoal(requireWallet("lockGoal"), goalId),
+    getGoal: (goalId) =>
+      getGoal(requirePublic("getGoal"), goalId),
   };
 }

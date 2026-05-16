@@ -37,3 +37,11 @@ export {
   type CreateCircleParams,
   type CreateCircleResult,
 } from "./circles.js";
+
+export {
+  createGoal,
+  getGoal,
+  lockGoal,
+  type CreateGoalParams,
+  type CreateGoalResult,
+} from "./goals.js";
