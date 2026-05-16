@@ -53,3 +53,5 @@ export {
   type StakeParams,
   type StakeResult,
 } from "./stakes.js";
+
+export { claim, refund } from "./claims.js";

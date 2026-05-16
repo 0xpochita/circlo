@@ -24,6 +24,7 @@ import {
   type StakeParams,
   type StakeResult,
 } from "./stakes.js";
+import { claim, refund } from "./claims.js";
 import type { Side } from "circlo-types";
 
 export type CircloClientConfig = {
@@ -87,6 +88,11 @@ export type CircloClient = {
   getStakeOf(goalId: bigint, user: Address, side: Side): Promise<bigint>;
   /** Read the total pool on a given side of a goal. */
   getPoolPerSide(goalId: bigint, side: Side): Promise<bigint>;
+
+  /** Claim a winning payout from a resolved goal. */
+  claim(goalId: bigint): Promise<`0x${string}`>;
+  /** Refund a stake when a goal was cancelled / unresolvable. */
+  refund(goalId: bigint): Promise<`0x${string}`>;
 };
 
 export function createCircloClient(config: CircloClientConfig = {}): CircloClient {
@@ -134,5 +140,8 @@ export function createCircloClient(config: CircloClientConfig = {}): CircloClien
       getStakeOf(requirePublic("getStakeOf"), goalId, user, side),
     getPoolPerSide: (goalId, side) =>
       getPoolPerSide(requirePublic("getPoolPerSide"), goalId, side),
+
+    claim: (goalId) => claim(requireWallet("claim"), goalId),
+    refund: (goalId) => refund(requireWallet("refund"), goalId),
   };
 }
