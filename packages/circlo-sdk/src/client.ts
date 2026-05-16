@@ -3,6 +3,7 @@ import { CIRCLO_CONTRACTS, CELO_MAINNET_CHAIN_ID } from "circlo-types";
 import {
   createCircle,
   getCircleMembers,
+  getCircleNextId,
   isCircleMember,
   joinCircle,
   joinPrivateCircle,
@@ -13,6 +14,7 @@ import {
 import {
   createGoal,
   getGoal,
+  getGoalNextId,
   lockGoal,
   type CreateGoalParams,
   type CreateGoalResult,
@@ -72,6 +74,8 @@ export type CircloClient = {
   isCircleMember(circleId: bigint, user: Address): Promise<boolean>;
   /** Read a paginated list of circle members. */
   getCircleMembers(circleId: bigint, offset?: bigint, limit?: bigint): Promise<readonly Address[]>;
+  /** Read the id that the next-created circle will receive. */
+  getCircleNextId(): Promise<bigint>;
 
   /** Create a goal inside a circle. Requires a configured walletClient. */
   createGoal(params: CreateGoalParams): Promise<CreateGoalResult>;
@@ -79,6 +83,8 @@ export type CircloClient = {
   lockGoal(goalId: bigint): Promise<`0x${string}`>;
   /** Read the full goal tuple from the PredictionPool contract. */
   getGoal(goalId: bigint): ReturnType<typeof getGoal>;
+  /** Read the id that the next-created goal will receive. */
+  getGoalNextId(): Promise<bigint>;
 
   /**
    * Stake USDT on a goal. Handles USDT approval automatically (unless
@@ -134,6 +140,8 @@ export function createCircloClient(config: CircloClientConfig = {}): CircloClien
       isCircleMember(requirePublic("isCircleMember"), circleId, user),
     getCircleMembers: async (circleId, offset, limit) =>
       getCircleMembers(requirePublic("getCircleMembers"), circleId, offset, limit),
+    getCircleNextId: async () =>
+      getCircleNextId(requirePublic("getCircleNextId")),
 
     createGoal: async (params) =>
       createGoal(requireWallet("createGoal"), params, config.publicClient),
@@ -141,6 +149,8 @@ export function createCircloClient(config: CircloClientConfig = {}): CircloClien
       lockGoal(requireWallet("lockGoal"), goalId),
     getGoal: async (goalId) =>
       getGoal(requirePublic("getGoal"), goalId),
+    getGoalNextId: async () =>
+      getGoalNextId(requirePublic("getGoalNextId")),
 
     stake: async (params) =>
       stake(requireWallet("stake"), params, config.publicClient),

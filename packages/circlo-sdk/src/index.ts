@@ -30,6 +30,7 @@ export { createCircloClient, type CircloClient, type CircloClientConfig } from "
 export {
   createCircle,
   getCircleMembers,
+  getCircleNextId,
   isCircleMember,
   joinCircle,
   joinPrivateCircle,
@@ -41,6 +42,7 @@ export {
 export {
   createGoal,
   getGoal,
+  getGoalNextId,
   lockGoal,
   type CreateGoalParams,
   type CreateGoalResult,

@@ -185,3 +185,16 @@ export async function getCircleMembers(
     args: [circleId, offset, limit],
   });
 }
+
+/**
+ * Read the id that will be assigned to the next circle created.
+ * Equals `(total circles ever created) + 1` — useful for indexers
+ * that want to know how many circles exist.
+ */
+export async function getCircleNextId(client: PublicClient): Promise<bigint> {
+  return client.readContract({
+    address: CIRCLO_CONTRACTS.CircleFactory,
+    abi: CIRCLE_FACTORY_ABI,
+    functionName: "nextCircleId",
+  });
+}
