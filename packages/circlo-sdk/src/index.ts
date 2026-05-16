@@ -87,3 +87,10 @@ export {
   type CircleMetadata,
   type GoalMetadata,
 } from "circlo-types";
+
+export {
+  CircloSdkError,
+  NotConfiguredError,
+  EventNotFoundError,
+  TxRevertedError,
+} from "./errors.js";
