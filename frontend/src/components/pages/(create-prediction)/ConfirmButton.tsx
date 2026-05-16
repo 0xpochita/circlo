@@ -244,11 +244,17 @@ export default function ConfirmButton() {
         });
         updateStep(stepIdx, "done");
       } catch (err) {
-        console.error("[createGoal] Transaction failed:", err);
+        console.error("[createGoal] Full error:", err);
+        const errObj = err as { name?: string; code?: number | string; cause?: unknown };
+        console.error("[createGoal] Error name:", errObj?.name);
+        console.error("[createGoal] Error code:", errObj?.code);
+        console.error("[createGoal] Error cause:", errObj?.cause);
         updateStep(stepIdx, "error");
         const message = err instanceof Error ? err.message : "";
         if (message.includes("User rejected") || message.includes("denied")) {
-          toast("Transaction cancelled");
+          toast(`Cancelled [${errObj?.name ?? "?"}|${errObj?.code ?? "?"}]`, {
+            duration: 8000,
+          });
         } else {
           toast.error("Failed to send transaction");
         }
