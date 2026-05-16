@@ -17,6 +17,14 @@ import {
   type CreateGoalParams,
   type CreateGoalResult,
 } from "./goals.js";
+import {
+  getPoolPerSide,
+  getStakeOf,
+  stake,
+  type StakeParams,
+  type StakeResult,
+} from "./stakes.js";
+import type { Side } from "circlo-types";
 
 export type CircloClientConfig = {
   /**
@@ -69,6 +77,16 @@ export type CircloClient = {
   lockGoal(goalId: bigint): Promise<`0x${string}`>;
   /** Read the full goal tuple from the PredictionPool contract. */
   getGoal(goalId: bigint): ReturnType<typeof getGoal>;
+
+  /**
+   * Stake USDT on a goal. Handles USDT approval automatically (unless
+   * autoApprove is false). Waits for both approve + stake receipts.
+   */
+  stake(params: StakeParams): Promise<StakeResult>;
+  /** Read a user's stake on a given side. */
+  getStakeOf(goalId: bigint, user: Address, side: Side): Promise<bigint>;
+  /** Read the total pool on a given side of a goal. */
+  getPoolPerSide(goalId: bigint, side: Side): Promise<bigint>;
 };
 
 export function createCircloClient(config: CircloClientConfig = {}): CircloClient {
@@ -109,5 +127,12 @@ export function createCircloClient(config: CircloClientConfig = {}): CircloClien
       lockGoal(requireWallet("lockGoal"), goalId),
     getGoal: (goalId) =>
       getGoal(requirePublic("getGoal"), goalId),
+
+    stake: (params) =>
+      stake(requireWallet("stake"), params, config.publicClient),
+    getStakeOf: (goalId, user, side) =>
+      getStakeOf(requirePublic("getStakeOf"), goalId, user, side),
+    getPoolPerSide: (goalId, side) =>
+      getPoolPerSide(requirePublic("getPoolPerSide"), goalId, side),
   };
 }

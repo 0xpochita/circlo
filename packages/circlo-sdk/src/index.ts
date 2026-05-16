@@ -45,3 +45,11 @@ export {
   type CreateGoalParams,
   type CreateGoalResult,
 } from "./goals.js";
+
+export {
+  getPoolPerSide,
+  getStakeOf,
+  stake,
+  type StakeParams,
+  type StakeResult,
+} from "./stakes.js";
