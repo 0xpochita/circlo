@@ -521,9 +521,14 @@ export default function StakeButton({
         message.includes("unknown RPC error") ||
         message.includes("Internal JSON-RPC")
       ) {
-        toast.error("Wallet/RPC error — try disconnect + reconnect wallet");
+        toast.error(
+          `RPC Error | name: ${errObj?.name ?? "?"} | code: ${errObj?.code ?? "?"} — disconnect+reconnect wallet`,
+          { duration: 10000 },
+        );
       } else {
-        toast.error(`Failed: ${message.slice(0, 120)}`);
+        toast.error(`Failed [${errObj?.name ?? "?"}]: ${message.slice(0, 100)}`, {
+          duration: 10000,
+        });
       }
       setSteps((prev) =>
         prev.map((s) =>
