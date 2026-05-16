@@ -114,34 +114,34 @@ export function createCircloClient(config: CircloClientConfig = {}): CircloClien
     walletClient: config.walletClient,
     publicClient: config.publicClient,
 
-    createCircle: (params) =>
+    createCircle: async (params) =>
       createCircle(requireWallet("createCircle"), params, config.publicClient),
-    joinCircle: (circleId) =>
+    joinCircle: async (circleId) =>
       joinCircle(requireWallet("joinCircle"), circleId),
-    joinPrivateCircle: (circleId, inviteProof) =>
+    joinPrivateCircle: async (circleId, inviteProof) =>
       joinPrivateCircle(requireWallet("joinPrivateCircle"), circleId, inviteProof),
-    leaveCircle: (circleId) =>
+    leaveCircle: async (circleId) =>
       leaveCircle(requireWallet("leaveCircle"), circleId),
-    isCircleMember: (circleId, user) =>
+    isCircleMember: async (circleId, user) =>
       isCircleMember(requirePublic("isCircleMember"), circleId, user),
-    getCircleMembers: (circleId, offset, limit) =>
+    getCircleMembers: async (circleId, offset, limit) =>
       getCircleMembers(requirePublic("getCircleMembers"), circleId, offset, limit),
 
-    createGoal: (params) =>
+    createGoal: async (params) =>
       createGoal(requireWallet("createGoal"), params, config.publicClient),
-    lockGoal: (goalId) =>
+    lockGoal: async (goalId) =>
       lockGoal(requireWallet("lockGoal"), goalId),
-    getGoal: (goalId) =>
+    getGoal: async (goalId) =>
       getGoal(requirePublic("getGoal"), goalId),
 
-    stake: (params) =>
+    stake: async (params) =>
       stake(requireWallet("stake"), params, config.publicClient),
-    getStakeOf: (goalId, user, side) =>
+    getStakeOf: async (goalId, user, side) =>
       getStakeOf(requirePublic("getStakeOf"), goalId, user, side),
-    getPoolPerSide: (goalId, side) =>
+    getPoolPerSide: async (goalId, side) =>
       getPoolPerSide(requirePublic("getPoolPerSide"), goalId, side),
 
-    claim: (goalId) => claim(requireWallet("claim"), goalId),
-    refund: (goalId) => refund(requireWallet("refund"), goalId),
+    claim: async (goalId) => claim(requireWallet("claim"), goalId),
+    refund: async (goalId) => refund(requireWallet("refund"), goalId),
   };
 }
