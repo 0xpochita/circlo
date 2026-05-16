@@ -74,3 +74,16 @@ export {
   type CircleMetadataInput,
   type GoalMetadataInput,
 } from "./metadata.js";
+
+/**
+ * Re-export the metadata-decoding helpers from circlo-types so callers
+ * can `import { parseCircleMetadata } from "circlo-sdk"` without also
+ * needing to pull in circlo-types directly. The build* helpers above
+ * round-trip with these.
+ */
+export {
+  parseCircleMetadata,
+  parseGoalMetadata,
+  type CircleMetadata,
+  type GoalMetadata,
+} from "circlo-types";
