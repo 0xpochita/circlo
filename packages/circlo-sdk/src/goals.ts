@@ -6,6 +6,7 @@ import {
   OutcomeType,
 } from "circlo-types";
 import { buildGoalMetadata } from "./metadata.js";
+import { EventNotFoundError } from "./errors.js";
 
 export type CreateGoalParams = {
   /** Circle this goal lives in. Caller must be a member. */
@@ -98,9 +99,7 @@ export async function createGoal(
     }
   }
 
-  throw new Error(
-    `createGoal: tx ${hash} confirmed but no GoalCreated event was found in receipt`,
-  );
+  throw new EventNotFoundError("GoalCreated", hash);
 }
 
 /**

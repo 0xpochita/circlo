@@ -2,6 +2,7 @@ import type { Address, Hash, WalletClient, PublicClient, Account, Chain } from "
 import { decodeEventLog, publicActions } from "viem";
 import { CIRCLE_FACTORY_ABI, CIRCLO_CONTRACTS } from "circlo-types";
 import { buildCircleMetadata } from "./metadata.js";
+import { EventNotFoundError } from "./errors.js";
 
 export type CreateCircleParams = {
   /** Human-readable name for the circle (e.g. "Gym Squad"). */
@@ -83,9 +84,7 @@ export async function createCircle(
     }
   }
 
-  throw new Error(
-    `createCircle: tx ${hash} confirmed but no CircleCreated event was found in receipt`,
-  );
+  throw new EventNotFoundError("CircleCreated", hash);
 }
 
 /**

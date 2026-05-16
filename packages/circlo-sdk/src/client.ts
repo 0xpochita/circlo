@@ -30,6 +30,7 @@ import {
 } from "./stakes.js";
 import { claim, refund } from "./claims.js";
 import { finalize, submitVote, getTally } from "./resolution.js";
+import { NotConfiguredError } from "./errors.js";
 import type { Side } from "circlo-types";
 
 export type CircloClientConfig = {
@@ -116,14 +117,14 @@ export type CircloClient = {
 export function createCircloClient(config: CircloClientConfig = {}): CircloClient {
   const requireWallet = (op: string): WalletClient => {
     if (!config.walletClient) {
-      throw new Error(`${op}: CircloClient was created without a walletClient — pass one to createCircloClient(...) to send writes`);
+      throw new NotConfiguredError(op, "walletClient");
     }
     return config.walletClient;
   };
 
   const requirePublic = (op: string): PublicClient => {
     if (config.publicClient) return config.publicClient;
-    throw new Error(`${op}: CircloClient was created without a publicClient and the read path needs one`);
+    throw new NotConfiguredError(op, "publicClient");
   };
 
   return {
