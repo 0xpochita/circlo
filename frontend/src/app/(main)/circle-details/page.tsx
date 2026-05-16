@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
+import { HiOutlineChartPie } from "react-icons/hi2";
 import { TbTargetArrow } from "react-icons/tb";
 import { PageTransition } from "@/components/pages/(app)";
 import {
@@ -178,6 +179,17 @@ function CircleDetailsContent() {
         )}
         <DetailsGoals circleId={circleId || undefined} />
         <DetailsMembers circleId={circleId || undefined} />
+        {circleId && (
+          <div className="px-4 py-2">
+            <Link
+              href={`/circle-analytics?id=${circleId}`}
+              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white py-3 text-sm font-medium text-main-text cursor-pointer transition-all duration-200 active:scale-[0.98]"
+            >
+              <HiOutlineChartPie className="w-4 h-4" />
+              View circle analytics
+            </Link>
+          </div>
+        )}
       </PageTransition>
       {!isMember && (
         <JoinButton
