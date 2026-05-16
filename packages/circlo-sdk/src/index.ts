@@ -55,3 +55,9 @@ export {
 } from "./stakes.js";
 
 export { claim, refund } from "./claims.js";
+
+export {
+  watchCircleCreated,
+  watchGoalCreated,
+  watchStaked,
+} from "./events.js";
