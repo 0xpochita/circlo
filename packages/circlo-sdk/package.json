@@ -45,7 +45,7 @@
     "viem": "^2.0.0"
   },
   "dependencies": {
-    "circlo-types": "^0.1.0"
+    "circlo-types": "^0.1.1"
   },
   "devDependencies": {
     "typescript": "^5.7.3",
