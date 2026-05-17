@@ -1,0 +1,16 @@
+{
+  "name": "circlo-examples",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Runnable .mjs examples for the circlo-sdk package.",
+  "type": "module",
+  "scripts": {
+    "monitor": "node monitor-events.mjs",
+    "stats": "node read-stats.mjs"
+  },
+  "dependencies": {
+    "circlo-sdk": "^0.2.0",
+    "circlo-types": "^0.1.0",
+    "viem": "^2.48.0"
+  }
+}
