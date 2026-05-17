@@ -1,5 +1,6 @@
 "use client";
 
+import { createCircloClient } from "circlo-sdk";
 import { motion } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
@@ -9,7 +10,7 @@ import {
   HiOutlineLockClosed,
 } from "react-icons/hi2";
 import { toast } from "sonner";
-import { useAccount, useWriteContract } from "wagmi";
+import { useAccount, useWalletClient } from "wagmi";
 import { BottomTabBar, PageTransition } from "@/components/pages/(app)";
 import { EmojiAvatar, UsdtLabel } from "@/components/shared";
 import { circlesApi, type CircleDetailResponse } from "@/lib/api/endpoints";
@@ -19,8 +20,6 @@ import {
   parseInviteUrl,
   type InviteLinkParams,
 } from "@/lib/web3/inviteProof";
-import { circleFactoryContract } from "@/lib/web3/contracts";
-import { NETWORK } from "@/lib/web3/network";
 import { toAvatar } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -39,7 +38,7 @@ function AcceptInviteContent() {
   const searchParams = useSearchParams();
   const { address, isConnected } = useAccount();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const { writeContractAsync } = useWriteContract();
+  const { data: walletClient } = useWalletClient();
   const [circle, setCircle] = useState<CircleDetailResponse | null>(null);
   const [status, setStatus] = useState<Status>("loading");
 
@@ -83,20 +82,20 @@ function AcceptInviteContent() {
       return;
     }
 
+    if (!walletClient) {
+      toast.error("Wallet not ready — please reconnect");
+      setStatus("ready");
+      return;
+    }
+
     setStatus("joining");
     try {
       const proof = encodeInviteProofForContract(
         invite.signature,
         invite.expiry,
       );
-      const hash = await writeContractAsync({
-        address: circleFactoryContract.address,
-        abi: circleFactoryContract.abi,
-        functionName: "joinCirclePrivate",
-        args: [invite.chainId, proof],
-        chainId: NETWORK.id,
-        type: "legacy",
-      });
+      const circlo = createCircloClient({ walletClient });
+      const hash = await circlo.joinPrivateCircle(invite.chainId, proof);
 
       try {
         await circlesApi.join(invite.circleId);
