@@ -46,6 +46,30 @@ export type CreateGoalResult = {
 /**
  * Creates a goal on the PredictionPool contract. Waits for confirmation
  * and parses the GoalCreated event to return the new goalId.
+ *
+ * The contract requires `deadline > block.timestamp + 1 hour` — pad your
+ * deadline with at least a 5-minute buffer above 1h to survive normal
+ * block-timestamp drift between submission and inclusion.
+ *
+ * Defaults `outcomeType` to `Binary` (Yes/No) and `resolvers` to `[]`
+ * (which makes the contract fall back to its default resolver policy).
+ *
+ * @throws `Error` if the walletClient has no account configured.
+ * @throws `EventNotFoundError` if tx confirms without GoalCreated event.
+ * @throws viem `ContractFunctionExecutionError` for on-chain reverts
+ *   (`DeadlineTooSoon`, `NotCircleMember`, `NoResolvers`, etc).
+ *
+ * @example
+ * ```ts
+ * import { createGoal } from "circlo-sdk";
+ * const now = Math.floor(Date.now() / 1000);
+ * const { goalId } = await createGoal(wallet, {
+ *   circleId: 1n,
+ *   question: "Will I hit 10k steps today?",
+ *   deadline: BigInt(now + 86400 + 300), // 24h + 5min buffer
+ *   minStake: parseUnits("0.10", 6),
+ * });
+ * ```
  */
 export async function createGoal(
   wallet: WalletClient,

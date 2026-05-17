@@ -37,7 +37,21 @@ export type CreateCircleResult = {
  * The metadata JSON is built from the params object — you do not need to
  * stringify it yourself.
  *
- * @throws if the SDK has no walletClient configured, or if the tx reverts.
+ * @throws `Error` if the walletClient has no account configured.
+ * @throws `EventNotFoundError` if the tx confirms but the CircleCreated
+ *   event is missing from the receipt (usually means silent revert).
+ * @throws viem `ContractFunctionExecutionError` if the createCircle tx
+ *   reverts on chain.
+ *
+ * @example
+ * ```ts
+ * const { circleId } = await createCircle(wallet, {
+ *   name: "Gym Squad",
+ *   privacy: "public",
+ *   avatarEmoji: "💪",
+ * });
+ * console.log(`Created circle #${circleId}`);
+ * ```
  */
 export async function createCircle(
   wallet: WalletClient,

@@ -37,6 +37,28 @@ export type StakeResult = {
  * against the PredictionPool and submits an `approve` tx first if
  * needed. Two txs are sent sequentially (approve, then stake) — both
  * are awaited before returning.
+ *
+ * The approve tx grants 1000 USDT of headroom (not just `amount`) so
+ * subsequent stakes by the same wallet skip the approve step.
+ *
+ * @returns `{ stakeHash, approveHash? }`. `approveHash` is undefined
+ *   when existing allowance was already sufficient OR when
+ *   `autoApprove` was set to `false`.
+ *
+ * @throws `Error` if the walletClient has no account configured.
+ * @throws viem `ContractFunctionExecutionError` if either tx reverts.
+ *
+ * @example
+ * ```ts
+ * import { stake, Side } from "circlo-sdk";
+ * import { parseUnits } from "viem";
+ *
+ * await stake(wallet, {
+ *   goalId: 117n,
+ *   side: Side.Yes,
+ *   amount: parseUnits("1", 6), // 1 USDT, 6-decimal precision
+ * });
+ * ```
  */
 export async function stake(
   wallet: WalletClient,
