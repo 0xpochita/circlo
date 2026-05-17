@@ -101,6 +101,22 @@ await circlo.claim(goalId);
 | `claim(goalId)` | Collect a winning payout after the goal resolved. |
 | `refund(goalId)` | Get the original stake back if the goal was cancelled. |
 
+### Resolution (v0.2)
+
+| Method | Description |
+|---|---|
+| `submitVote(goalId, choice)` | Resolver casts a 0/1 vote. Auto-finalizes when quorum is met. |
+| `finalize(goalId)` | Force-finalize a goal whose tally reached quorum without auto-finalize. |
+| `getTally(goalId)` | Read — `{ counts: [no, yes], total }`. |
+
+### Chain reads (v0.2)
+
+| Method | Description |
+|---|---|
+| `getCircleNextId()` | Read — id assigned to the next circle (total = nextId - 1). |
+| `getGoalNextId()` | Read — same, for goals. |
+| `getCircleInfo(circleId)` | Read — `{ owner, isPrivate, createdAt, metadataURI }`. |
+
 ### Event subscriptions
 
 | Helper | Description |
@@ -115,6 +131,52 @@ await circlo.claim(goalId);
 |---|---|
 | `buildCircleMetadata(input)` | Build the metadataURI JSON for a circle. |
 | `buildGoalMetadata(input)` | Build the metadataURI JSON for a goal. |
+| `parseCircleMetadata(json)` | Decode JSON back to a typed `CircleMetadata`. Re-exported from `circlo-types`. |
+| `parseGoalMetadata(json)` | Decode JSON back to a typed `GoalMetadata`. Re-exported from `circlo-types`. |
+
+## Error handling (v0.2)
+
+The SDK throws four typed errors so callers can branch on failure mode
+without parsing message strings:
+
+```typescript
+import {
+  CircloSdkError,
+  NotConfiguredError,
+  EventNotFoundError,
+  TxRevertedError,
+} from "circlo-sdk";
+
+try {
+  const { circleId } = await circlo.createCircle({
+    name: "Gym Squad",
+    privacy: "public",
+  });
+} catch (e) {
+  if (e instanceof NotConfiguredError) {
+    // SDK created without a walletClient/publicClient.
+    // e.operation = "createCircle", e.missing = "walletClient"
+    showConnectWalletPrompt();
+  } else if (e instanceof EventNotFoundError) {
+    // Tx confirmed but CircleCreated wasn't in the receipt — likely silent revert.
+    // e.txHash carries the hash so you can deep-link to Celoscan.
+    showRevertHelp(e.txHash);
+  } else if (e instanceof TxRevertedError) {
+    // Receipt status was "reverted". e.operation + e.txHash available.
+    showRevertHelp(e.txHash);
+  } else if (e instanceof CircloSdkError) {
+    // Some other SDK error.
+    showGenericError(e.message);
+  } else {
+    // Not from us (network error, viem internal, etc.).
+    throw e;
+  }
+}
+```
+
+All four classes extend `CircloSdkError` so a blanket
+`if (e instanceof CircloSdkError)` catches every library-thrown error
+without catching unrelated runtime exceptions.
 
 ## Read-only usage
 
