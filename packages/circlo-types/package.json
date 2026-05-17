@@ -1,6 +1,6 @@
 {
   "name": "circlo-types",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "TypeScript types, ABIs, and contract addresses for Circlo — a social prediction game on Celo Mainnet.",
   "keywords": [
     "circlo",
