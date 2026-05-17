@@ -1,12 +1,11 @@
 "use client";
 
+import { createCircloClient } from "circlo-sdk";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { HiOutlineLockClosed } from "react-icons/hi2";
 import { toast } from "sonner";
-import { usePublicClient, useWriteContract } from "wagmi";
-import { predictionPoolContract } from "@/lib/web3/contracts";
-import { NETWORK } from "@/lib/web3/network";
+import { usePublicClient, useWalletClient } from "wagmi";
 
 type LockMarketButtonProps = {
   goalChainId?: string;
@@ -20,24 +19,24 @@ export default function LockMarketButton({
   deadline,
   onLocked,
 }: LockMarketButtonProps) {
-  const { writeContractAsync } = useWriteContract();
+  const { data: walletClient } = useWalletClient();
   const publicClient = usePublicClient();
   const [isLocking, setIsLocking] = useState(false);
   const [scStatus, setScStatus] = useState<number | null>(null);
 
+  // One SDK client per render; both read + write methods get the same wiring.
+  const circlo = useMemo(
+    () => createCircloClient({ walletClient: walletClient ?? undefined, publicClient }),
+    [walletClient, publicClient],
+  );
+
   useEffect(() => {
     if (!goalChainId || !publicClient) return;
     let cancelled = false;
-    publicClient
-      .readContract({
-        address: predictionPoolContract.address,
-        abi: predictionPoolContract.abi,
-        functionName: "goals",
-        args: [BigInt(goalChainId)],
-      })
-      .then((result) => {
+    circlo
+      .getGoal(BigInt(goalChainId))
+      .then((tuple) => {
         if (cancelled) return;
-        const tuple = result as readonly unknown[];
         setScStatus(Number(tuple[3]));
       })
       .catch(() => {
@@ -46,7 +45,7 @@ export default function LockMarketButton({
     return () => {
       cancelled = true;
     };
-  }, [goalChainId, publicClient]);
+  }, [goalChainId, publicClient, circlo]);
 
   const isOpenOnChain = scStatus === 0;
   const deadlinePassed = deadline
@@ -59,16 +58,13 @@ export default function LockMarketButton({
 
   async function handleLock() {
     if (!goalChainId) return;
+    if (!walletClient) {
+      toast.error("Wallet not ready — please reconnect");
+      return;
+    }
     setIsLocking(true);
     try {
-      const hash = await writeContractAsync({
-        address: predictionPoolContract.address,
-        abi: predictionPoolContract.abi,
-        functionName: "lockGoal",
-        args: [BigInt(goalChainId)],
-        chainId: NETWORK.id,
-        type: "legacy",
-      });
+      const hash = await circlo.lockGoal(BigInt(goalChainId));
 
       if (publicClient) {
         const receipt = await publicClient.waitForTransactionReceipt({ hash });
