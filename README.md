@@ -6,11 +6,33 @@
   **On-chain social prediction game — tokenize your circle of friends, turn personal goals into prediction markets, and hold each other accountable on Celo blockchain.**
 
   [Live Demo](https://circlo-celo.vercel.app) · [Video Demo](https://youtu.be/15PSqWPL3IY) · [CeloScan](https://celoscan.io/address/0x6cB74ce06E35caEfaFA1491769DeeeA46aebe6Ab)
+
+  [![circlo-types on npm](https://img.shields.io/npm/v/circlo-types.svg?label=circlo-types)](https://www.npmjs.com/package/circlo-types)
+  [![circlo-sdk on npm](https://img.shields.io/npm/v/circlo-sdk.svg?label=circlo-sdk)](https://www.npmjs.com/package/circlo-sdk)
+  [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+  [![Celo Mainnet](https://img.shields.io/badge/chain-Celo%20Mainnet-yellow.svg)](https://celoscan.io)
 </div>
 
 Circlo is a decentralized social accountability platform built on Celo. Friends form circles, create prediction markets around personal goals (workout streaks, project deadlines, learning milestones), and stake USDT on outcomes. When the deadline hits, friends-as-resolvers vote on the truth — winners split the pool, losers learn the cost of breaking commitments. All transparent, all on-chain, all in your pocket via MiniPay.
 
 ## What Makes Circlo Special
+
+- **Social, not anonymous** — prediction markets scoped to people you actually know, not strangers from Polymarket
+- **Friends as resolvers** — your own trusted circle decides outcomes via on-chain voting, no centralized arbiter
+- **Mobile-first onboarding** — built for MiniPay (Opera's Celo wallet), no seed phrase or KYC for small stakes
+- **Automatic settlement** — winners claim with one tx, losers' pool flows proportionally, all enforced by `PredictionPool`
+- **Dogfooded SDK** — the same [`circlo-sdk`](https://www.npmjs.com/package/circlo-sdk) we publish to npm powers the frontend
+
+## Developer Packages
+
+Two npm packages are published from this monorepo for anyone building on top of Circlo:
+
+| Package | Purpose | Install |
+|---|---|---|
+| [`circlo-types`](https://www.npmjs.com/package/circlo-types) | Contract addresses, ABIs (`as const` typed), `OutcomeType` / `GoalStatus` / `Side` enums, entity types | `npm i circlo-types` |
+| [`circlo-sdk`](https://www.npmjs.com/package/circlo-sdk) | High-level wrapper over viem — `createCircle`, `joinCircle`, `stake` (with auto-approve), `claim`, event watchers, typed errors | `npm i circlo-sdk viem` |
+
+The frontend in this repo depends on `circlo-sdk` directly — see [`frontend/src/components/pages/(circle-details)/LeaveButton.tsx`](frontend/src/components/pages/(circle-details)/LeaveButton.tsx) for a minimal write call, or [`frontend/src/hooks/useChainStats.ts`](frontend/src/hooks/useChainStats.ts) for a read-only client. Source for both packages lives under [`packages/`](packages/).
 
 ## Who This Is For
 
@@ -475,8 +497,9 @@ Winner                         │                              │             
 | 1 | CircleFactory (proxy) | `0x6cB74ce06E35caEfaFA1491769DeeeA46aebe6Ab` |
 | 2 | PredictionPool (proxy) | `0xE9cFa67358476194414ae3306888FfeCb8f41139` |
 | 3 | ResolutionModule (proxy) | `0x5861CAAFDCAc4313f2c9941C4fd1291B34C2c4f5` |
-| 4 | RewardDistributor (proxy) | TBD |
-| 5 | USDT (Celo native) | `0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e` |
+| 4 | RewardDistributor (proxy) | `0xb425fe1699e81E2Ef00Fc5592Fc865F6E93cBa7a` |
+| 5 | TimelockController | `0xc6B9554fAA6703645f9AC65794CF2321cB82fE47` |
+| 6 | USDT (Celo native) | `0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e` |
 
 All Circlo contracts are **UUPS upgradeable** (ERC1967Proxy pattern) with role-based access via OpenZeppelin AccessControl.
 
