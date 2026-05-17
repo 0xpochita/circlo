@@ -1,14 +1,13 @@
 "use client";
 
+import { createCircloClient } from "circlo-sdk";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { HiCheck } from "react-icons/hi2";
 import { toast } from "sonner";
-import { useAccount, useWriteContract } from "wagmi";
+import { useAccount, useWalletClient } from "wagmi";
 import { circlesApi } from "@/lib/api/endpoints";
-import { circleFactoryContract } from "@/lib/web3/contracts";
-import { NETWORK } from "@/lib/web3/network";
 import { useAuthStore } from "@/stores/authStore";
 
 type JoinButtonProps = {
@@ -25,7 +24,7 @@ export default function JoinButton({
   const [isLoading, setIsLoading] = useState(false);
   const { isConnected } = useAccount();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const { writeContractAsync } = useWriteContract();
+  const { data: walletClient } = useWalletClient();
 
   async function handleJoin() {
     if (!isConnected || !isAuthenticated) {
@@ -34,17 +33,15 @@ export default function JoinButton({
       return;
     }
     if (joined) return;
+    if (!walletClient) {
+      toast.error("Wallet not ready — please reconnect");
+      return;
+    }
 
     setIsLoading(true);
     try {
-      await writeContractAsync({
-        address: circleFactoryContract.address,
-        abi: circleFactoryContract.abi,
-        functionName: "joinCircle",
-        args: [BigInt(circleId)],
-        chainId: NETWORK.id,
-        type: "legacy",
-      });
+      const circlo = createCircloClient({ walletClient });
+      await circlo.joinCircle(BigInt(circleId));
 
       if (circleBackendId) {
         try {
