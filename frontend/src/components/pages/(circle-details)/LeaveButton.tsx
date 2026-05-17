@@ -1,15 +1,14 @@
 "use client";
 
+import { createCircloClient } from "circlo-sdk";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { HiOutlineArrowRightOnRectangle, HiXMark } from "react-icons/hi2";
 import { toast } from "sonner";
-import { useAccount, useWriteContract } from "wagmi";
+import { useAccount, useWalletClient } from "wagmi";
 import { useSheetOverflow } from "@/hooks";
 import { circlesApi } from "@/lib/api/endpoints";
-import { circleFactoryContract } from "@/lib/web3/contracts";
-import { NETWORK } from "@/lib/web3/network";
 import { useAuthStore } from "@/stores/authStore";
 
 type LeaveButtonProps = {
@@ -28,7 +27,7 @@ export default function LeaveButton({
   const [isLoading, setIsLoading] = useState(false);
   const { isConnected } = useAccount();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const { writeContractAsync } = useWriteContract();
+  const { data: walletClient } = useWalletClient();
 
   useSheetOverflow(open);
 
@@ -41,17 +40,15 @@ export default function LeaveButton({
       toast.error("Circle is not on-chain yet");
       return;
     }
+    if (!walletClient) {
+      toast.error("Wallet not ready — please reconnect");
+      return;
+    }
 
     setIsLoading(true);
     try {
-      await writeContractAsync({
-        address: circleFactoryContract.address,
-        abi: circleFactoryContract.abi,
-        functionName: "leaveCircle",
-        args: [BigInt(circleId)],
-        chainId: NETWORK.id,
-        type: "legacy",
-      });
+      const circlo = createCircloClient({ walletClient });
+      await circlo.leaveCircle(BigInt(circleId));
 
       if (circleBackendId) {
         try {
