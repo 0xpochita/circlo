@@ -80,3 +80,25 @@ jobs:
 
       - name: Test
         run: forge test -vv
+
+  sdk:
+    name: circlo-sdk (build + test)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/circlo-sdk
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies (no-save so we don't drift package.json)
+        run: npm install --no-save ../circlo-types typescript@^5.7.3 viem@^2.48.0
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm test
