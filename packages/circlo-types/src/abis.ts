@@ -95,6 +95,23 @@ export const CIRCLE_FACTORY_ABI = [
       { name: "member", type: "address", indexed: true },
     ],
   },
+  {
+    type: "function",
+    name: "getCircle",
+    stateMutability: "view",
+    inputs: [{ name: "circleId", type: "uint256" }],
+    outputs: [
+      {
+        type: "tuple",
+        components: [
+          { name: "owner", type: "address" },
+          { name: "isPrivate", type: "bool" },
+          { name: "createdAt", type: "uint64" },
+          { name: "metadataURI", type: "string" },
+        ],
+      },
+    ],
+  },
 ] as const;
 
 export const PREDICTION_POOL_ABI = [
@@ -286,6 +303,16 @@ export const RESOLUTION_MODULE_ABI = [
       { name: "counts", type: "uint256[]" },
       { name: "total", type: "uint256" },
     ],
+  },
+  {
+    type: "function",
+    name: "isResolver",
+    stateMutability: "view",
+    inputs: [
+      { name: "goalId", type: "uint256" },
+      { name: "user", type: "address" },
+    ],
+    outputs: [{ type: "bool" }],
   },
   {
     type: "event",
