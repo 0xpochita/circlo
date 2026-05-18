@@ -122,6 +122,16 @@ contract ResolutionModule is Initializable, AccessControlUpgradeable, UUPSUpgrad
         t.resolverCount  = pool.getResolverCount(goalId);
     }
 
+    /// @notice Cast a vote on a locked goal.
+    /// @dev Auto-finalizes when the running tally crosses quorum, saving a
+    ///      separate `finalize` call in the common case. Reverts when:
+    ///        - the goal is already finalized (AlreadyFinalized)
+    ///        - the resolver already voted on this goal (AlreadyVoted)
+    ///        - caller is not on the goal's resolver list (NotResolver)
+    ///        - vote window has elapsed (VoteWindowExpired)
+    /// @param goalId Goal to vote on.
+    /// @param choice 0 = NO, 1 = YES. Choice value is stored verbatim;
+    ///        outcomeType decoding lives in PredictionPool.
     function submitVote(uint256 goalId, uint8 choice) external {
         Tally storage t = tallies[goalId];
         if (t.finalized) revert AlreadyFinalized();
