@@ -77,6 +77,14 @@ contract ResolutionModule is Initializable, AccessControlUpgradeable, UUPSUpgrad
         _disableInitializers();
     }
 
+    /// @notice One-shot initializer for the UUPS proxy.
+    /// @dev MUST be called once immediately after proxy deployment. The
+    ///      `_disableInitializers()` in the constructor prevents calling
+    ///      this on the implementation contract directly.
+    /// @param admin Address granted DEFAULT_ADMIN_ROLE (controls `setPool` + role grants).
+    /// @param _quorumNumerator Quorum fraction numerator (e.g. 51).
+    /// @param _quorumDenominator Quorum fraction denominator (e.g. 100).
+    /// @param _voteWindow Seconds after startVote during which votes are accepted.
     function initialize(
         address admin,
         uint256 _quorumNumerator,
