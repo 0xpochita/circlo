@@ -195,6 +195,14 @@ contract CircleFactory is Initializable, AccessControlUpgradeable, UUPSUpgradeab
         emit CircleLeft(circleId, msg.sender);
     }
 
+    /// @notice Owner-driven add: pull `member` into the circle without
+    ///         requiring them to send a tx themselves.
+    /// @dev Owner-only. Useful for bulk seeding or admin migrations
+    ///      where the owner already has off-chain consent. Distinct
+    ///      from `joinCircle` (which msg.sender pays gas for themselves)
+    ///      and `joinCirclePrivate` (which requires a signed proof).
+    /// @param circleId Circle to add to.
+    /// @param member Address to add as a member.
     function addMember(uint256 circleId, address member) external {
         _requireCircle(circleId);
         if (circles[circleId].owner != msg.sender) revert NotCircleOwner();
