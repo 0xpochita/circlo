@@ -282,6 +282,25 @@ contract PredictionPool is
         g.status = GoalStatus.Resolving;
     }
 
+    /// @notice Claim a winner's payout for a resolved goal.
+    /// @dev Caller MUST be on the winning side. Payout formula:
+    ///
+    ///        winnerStake = stakeOf[goalId][msg.sender][winningSide]
+    ///        losersPool  = poolPerSide[goalId][losingSide]
+    ///        winnersPool = poolPerSide[goalId][winningSide]
+    ///        gross       = winnerStake + winnerStake * losersPool / winnersPool
+    ///        fee         = gross * protocolFeeBps / 10000
+    ///        payout      = gross - fee
+    ///
+    ///      Fee (if any) is transferred to feeRecipient; remainder to caller.
+    ///      nonReentrant + flag-then-transfer ordering — even with a
+    ///      malicious USDT, a re-entrant claim would hit AlreadyClaimed.
+    ///
+    ///      Reverts:
+    ///        - GoalNotPaidOut if goal isn't in PaidOut status
+    ///        - AlreadyClaimed if caller already claimed
+    ///        - NothingToClaim if caller had zero on winning side
+    /// @param goalId Goal to claim from.
     function claim(uint256 goalId) external nonReentrant {
         Goal storage g = goals[goalId];
         if (g.status != GoalStatus.PaidOut) revert GoalNotPaidOut();
