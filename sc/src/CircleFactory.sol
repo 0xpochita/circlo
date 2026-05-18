@@ -211,6 +211,16 @@ contract CircleFactory is Initializable, AccessControlUpgradeable, UUPSUpgradeab
         emit MemberAdded(circleId, member);
     }
 
+    /// @notice Owner-driven kick: remove `member` from the circle.
+    /// @dev Owner-only. Symmetric to addMember. Owner CAN remove themselves
+    ///      via this function (no OwnerCannotLeave check here) — useful
+    ///      for an owner-transfer flow where the new owner is set first,
+    ///      then the old owner is kicked.
+    ///
+    ///      Same append-only behaviour as leaveCircle: address stays in
+    ///      _members[], only isMember flag flips.
+    /// @param circleId Circle to remove from.
+    /// @param member Address to remove.
     function removeMember(uint256 circleId, address member) external {
         _requireCircle(circleId);
         if (circles[circleId].owner != msg.sender) revert NotCircleOwner();
