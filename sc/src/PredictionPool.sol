@@ -411,6 +411,12 @@ contract PredictionPool is
         g.status = GoalStatus.Disputed;
     }
 
+    /// @notice Read the number of resolvers registered for a goal.
+    /// @dev Used by ResolutionModule.startVote to size the quorum threshold.
+    ///      Stable for the lifetime of the goal (no add/remove API), so
+    ///      ResolutionModule can safely cache the value.
+    /// @param goalId Goal to query.
+    /// @return The resolver count, never zero (createGoal reverts NoResolvers).
     function getResolverCount(uint256 goalId) external view returns (uint256) {
         return _resolvers[goalId].length;
     }
