@@ -421,6 +421,12 @@ contract PredictionPool is
         return _resolvers[goalId].length;
     }
 
+    /// @notice Admin: wire the ResolutionModule address post-deploy.
+    /// @dev Admin-only. Pairs with the asymmetric initialize zero-check
+    ///      — _resolution can be address(0) at init time, so this is the
+    ///      post-deploy hook. Re-calling overwrites the binding; admin
+    ///      should be careful not to swap mid-flight.
+    /// @param m Deployed ResolutionModule proxy address.
     function setResolutionModule(address m) external onlyRole(DEFAULT_ADMIN_ROLE) {
         resolution = IResolutionModule(m);
     }
