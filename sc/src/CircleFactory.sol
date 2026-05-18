@@ -78,6 +78,13 @@ contract CircleFactory is Initializable, AccessControlUpgradeable, UUPSUpgradeab
         _disableInitializers();
     }
 
+    /// @notice One-shot initializer for the UUPS proxy.
+    /// @dev MUST be called once immediately after proxy deployment.
+    ///      Computes the EIP-712 domain separator from name="Circlo",
+    ///      version="1", current chainId, and this proxy's address.
+    ///      Off-chain signers MUST construct the domain with these same
+    ///      values or InviteProof signatures won't verify.
+    /// @param admin Address granted DEFAULT_ADMIN_ROLE.
     function initialize(address admin) external initializer {
         __AccessControl_init();
         __UUPSUpgradeable_init();
