@@ -448,10 +448,17 @@ contract PredictionPool is
         feeRecipient   = recipient;
     }
 
+    /// @notice Emergency stop — blocks `createGoal` and `stake`.
+    /// @dev PAUSER_ROLE only. Does NOT block `lockGoal`, `claim`, `refund`,
+    ///      `setWinner`, or `markDisputed` — already-locked positions
+    ///      can still flow to resolution + payout even while paused.
+    ///      Closes the new-money tap without freezing existing money.
     function pause() external onlyRole(PAUSER_ROLE) {
         _pause();
     }
 
+    /// @notice Release the emergency stop.
+    /// @dev PAUSER_ROLE only. Re-enables createGoal + stake.
     function unpause() external onlyRole(PAUSER_ROLE) {
         _unpause();
     }
