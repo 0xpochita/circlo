@@ -229,6 +229,17 @@ contract CircleFactory is Initializable, AccessControlUpgradeable, UUPSUpgradeab
         emit MemberRemoved(circleId, member);
     }
 
+    /// @notice Paginated read of a circle's member list.
+    /// @dev Returns a slice of the append-only _members[] array — INCLUDES
+    ///      addresses that have since left or been removed. Callers that
+    ///      want only-current must filter on `isCircleMember(circleId, addr)`.
+    ///
+    ///      offset >= total returns an empty array (not a revert) so
+    ///      pagination loops can break cleanly.
+    /// @param circleId Circle to read.
+    /// @param offset Starting index into the (append-only) member array.
+    /// @param limit Max number of addresses to return.
+    /// @return members Address slice of size min(limit, total - offset).
     function getMembers(uint256 circleId, uint256 offset, uint256 limit)
         external
         view
