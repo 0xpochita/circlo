@@ -431,6 +431,17 @@ contract PredictionPool is
         resolution = IResolutionModule(m);
     }
 
+    /// @notice Set the protocol fee + recipient.
+    /// @dev FEE_SETTER_ROLE only. Capped at 1000 bps (10%) — anything
+    ///      higher reverts FeeTooHigh. Applies to subsequent claims only;
+    ///      already-mined claims are unaffected.
+    ///
+    ///      Default protocolFeeBps = 0 at init; this function is the only
+    ///      way to flip on a fee. Set recipient to address(0) to "disable"
+    ///      the fee (transfer to 0x0 would revert, so practically the fee
+    ///      bps should be 0 in that case too).
+    /// @param bps Fee in basis points (10000 = 100%). Cap is 1000 (10%).
+    /// @param recipient Address that receives the fee on each claim.
     function setFee(uint256 bps, address recipient) external onlyRole(FEE_SETTER_ROLE) {
         if (bps > 1000) revert FeeTooHigh();
         protocolFeeBps = bps;
