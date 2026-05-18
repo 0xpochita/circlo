@@ -99,6 +99,11 @@ contract ResolutionModule is Initializable, AccessControlUpgradeable, UUPSUpgrad
         voteWindow        = _voteWindow;
     }
 
+    /// @notice Wire this ResolutionModule to a PredictionPool instance.
+    /// @dev Admin-only. Must be called once after both proxies are deployed
+    ///      and before any vote can be started — `startVote` reads
+    ///      `pool.getResolverCount` for quorum sizing.
+    /// @param _pool Deployed PredictionPool proxy address.
     function setPool(address _pool) external onlyRole(DEFAULT_ADMIN_ROLE) {
         pool = IPredictionPool(_pool);
     }
