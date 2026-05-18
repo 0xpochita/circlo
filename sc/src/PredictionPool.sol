@@ -369,6 +369,16 @@ contract PredictionPool is
         USDT.safeTransfer(msg.sender, total);
     }
 
+    /// @notice ResolutionModule callback: set the winning side + mark PaidOut.
+    /// @dev OnlyResolution — anyone else reverts with OnlyResolution.
+    ///      Called by ResolutionModule._finalize when a clear winner
+    ///      emerges from the resolver vote.
+    ///
+    ///      Reverts:
+    ///        - GoalNotResolving if goal isn't in Locked/Resolving status
+    ///        - OnlyResolution if caller != configured ResolutionModule
+    /// @param goalId Goal being resolved.
+    /// @param winningSide 0 = NO won, 1 = YES won.
     function setWinner(uint256 goalId, uint8 winningSide) external {
         if (msg.sender != address(resolution)) revert OnlyResolution();
         Goal storage g = goals[goalId];
