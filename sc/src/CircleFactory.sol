@@ -142,6 +142,22 @@ contract CircleFactory is Initializable, AccessControlUpgradeable, UUPSUpgradeab
         emit CircleJoined(circleId, msg.sender);
     }
 
+    /// @notice Join a private circle using an EIP-712 InviteProof from the owner.
+    /// @dev inviteProof encodes `(bytes signature, uint256 expiry)` via
+    ///      abi.encode. The signature must be over the EIP-712 digest of
+    ///      `InviteProof(circleId, msg.sender, expiry)` using this
+    ///      contract's domain separator.
+    ///
+    ///      The invitee address is bound INTO the signed payload, so a
+    ///      proof signed for Alice can't be replayed by Bob.
+    ///
+    ///      Reverts:
+    ///        - CircleNotFound if circleId was never created
+    ///        - AlreadyMember if msg.sender is already a member
+    ///        - ProofExpired if `expiry < block.timestamp`
+    ///        - InvalidProof if signer != circle owner
+    /// @param circleId Circle to join.
+    /// @param inviteProof ABI-encoded (bytes sig, uint256 expiry).
     function joinCirclePrivate(uint256 circleId, bytes calldata inviteProof) external {
         _requireCircle(circleId);
         if (isMember[circleId][msg.sender]) revert AlreadyMember();
