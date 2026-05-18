@@ -96,24 +96,43 @@ contract PredictionPool is
     /// @notice Address that receives the protocol fee on each claim.
     address public feeRecipient;
 
+    /// @notice Caller isn't a member of the goal's circle (createGoal/stake).
     error NotCircleMember();
+    /// @notice Goal deadline <= now + MIN_GOAL_DURATION (createGoal).
     error DeadlineTooSoon();
+    /// @notice Empty resolverList passed (createGoal).
     error NoResolvers();
+    /// @notice resolverList exceeds MAX_RESOLVERS (createGoal).
     error TooManyResolvers();
+    /// @notice One of the resolvers isn't a member of the circle (createGoal).
     error ResolverNotMember();
+    /// @notice Action requires goal in Open status (stake/lockGoal).
     error GoalNotOpen();
+    /// @notice Action requires goal in Locked status.
     error GoalNotLocked();
+    /// @notice Action requires goal in Resolving status (setWinner/markDisputed).
     error GoalNotResolving();
+    /// @notice Action requires goal in PaidOut status (claim).
     error GoalNotPaidOut();
+    /// @notice Action requires goal in Disputed status (refund).
     error GoalNotDisputed();
+    /// @notice lockGoal called before deadline elapsed.
     error DeadlineNotPassed();
+    /// @notice stake called after deadline elapsed.
     error DeadlinePassed();
+    /// @notice Stake amount below the goal's minStake.
     error BelowMinStake();
+    /// @notice User already staked on the OTHER side of this goal.
     error CannotSwitchSides();
+    /// @notice claim returned a zero payout (user on losing side, or never staked).
     error NothingToClaim();
+    /// @notice User has already claimed (or refunded) on this goal.
     error AlreadyClaimed();
+    /// @notice setWinner/markDisputed called by a non-ResolutionModule address.
     error OnlyResolution();
+    /// @notice setFee bps exceeds the 1000 (10%) hard cap.
     error FeeTooHigh();
+    /// @notice Zero address passed where a real address is required (initialize).
     error ZeroAddress();
 
     constructor() {
