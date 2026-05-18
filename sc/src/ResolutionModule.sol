@@ -189,6 +189,13 @@ contract ResolutionModule is Initializable, AccessControlUpgradeable, UUPSUpgrad
         return pool.isResolver(goalId, user);
     }
 
+    /// @notice Read the current vote distribution for a goal.
+    /// @dev Returns a fixed-length 2-element array because the only
+    ///      outcomes Circlo supports today are binary YES/NO. If multi-
+    ///      choice outcomes are added later, this signature changes.
+    /// @param goalId Goal to read tally for.
+    /// @return counts Length-2 array: counts[0] = NO votes, counts[1] = YES.
+    /// @return total Sum of both counts (always counts[0] + counts[1]).
     function getTally(uint256 goalId) external view returns (uint256[] memory counts, uint256 total) {
         Tally storage t = tallies[goalId];
         counts = new uint256[](2);
