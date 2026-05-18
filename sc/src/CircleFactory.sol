@@ -177,6 +177,16 @@ contract CircleFactory is Initializable, AccessControlUpgradeable, UUPSUpgradeab
         emit CircleJoined(circleId, msg.sender);
     }
 
+    /// @notice Leave a circle the caller is currently a member of.
+    /// @dev Owners cannot leave their own circle (would orphan the circle
+    ///      and break invariants downstream — PredictionPool reads the
+    ///      owner address for fee defaults). Owners must transfer
+    ///      ownership first (transfer flow is reserved for v2).
+    ///
+    ///      Note: the address stays in `_members[]` (append-only); only
+    ///      the `isMember` flag flips. Active stakes on goals in this
+    ///      circle remain claimable per the goal lifecycle.
+    /// @param circleId Circle to leave.
     function leaveCircle(uint256 circleId) external {
         _requireCircle(circleId);
         if (!isMember[circleId][msg.sender]) revert NotMember();
