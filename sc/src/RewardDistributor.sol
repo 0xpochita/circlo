@@ -68,6 +68,13 @@ contract RewardDistributor is
         _disableInitializers();
     }
 
+    /// @notice One-shot initializer for the UUPS proxy.
+    /// @dev Both addresses are checked for non-zero — the contract is
+    ///      unusable without either (no token to pay, no admin to grant
+    ///      operator role). Re-entrancy guard is initialized here too
+    ///      so `nonReentrant` works on the claim methods later.
+    /// @param _rewardToken Address of the ERC20 used for payouts (USDT on Celo Mainnet).
+    /// @param admin Address granted DEFAULT_ADMIN_ROLE (controls role grants).
     function initialize(address _rewardToken, address admin) external initializer {
         if (_rewardToken == address(0) || admin == address(0)) revert ZeroAddress();
         __AccessControl_init();
