@@ -102,6 +102,15 @@ contract CircleFactory is Initializable, AccessControlUpgradeable, UUPSUpgradeab
         );
     }
 
+    /// @notice Create a new circle. The creator becomes owner + auto-member.
+    /// @dev Permissionless — anyone can create a circle. circleId is the
+    ///      current nextCircleId, which is post-incremented after assignment.
+    ///      Note: id `0` is a valid circle id (first circle has id=0); never
+    ///      treat `circleId == 0` as "no circle" — use `createdAt == 0` check
+    ///      instead (that's what `_requireCircle` does).
+    /// @param isPrivate True for invite-only circles (requires EIP-712 inviteProof to join).
+    /// @param metadataURI Off-chain JSON metadata (name, description, avatar, etc).
+    /// @return circleId Sequential id assigned to the new circle.
     function createCircle(bool isPrivate, string calldata metadataURI)
         external
         returns (uint256 circleId)
