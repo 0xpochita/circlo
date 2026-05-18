@@ -172,6 +172,22 @@ contract PredictionPool is
         protocolFeeBps = 0;
     }
 
+    /// @notice Create a new prediction goal inside a circle.
+    /// @dev Caller MUST be a member of the circle. Validates four things:
+    ///        1. msg.sender ∈ circleMembers (NotCircleMember)
+    ///        2. deadline > now + MIN_GOAL_DURATION (DeadlineTooSoon)
+    ///        3. resolverList non-empty (NoResolvers)
+    ///        4. resolverList.length <= MAX_RESOLVERS (TooManyResolvers)
+    ///        5. every resolver is also a circle member (ResolverNotMember)
+    ///
+    ///      Pausable — blocked when contract is paused.
+    /// @param circleId Circle this goal belongs to.
+    /// @param outcomeType OutcomeType enum value (Binary today; reserved for future).
+    /// @param deadline Unix timestamp after which staking closes.
+    /// @param minStake Minimum USDT amount per stake (6-decimal base units).
+    /// @param resolverList Addresses allowed to vote on resolution.
+    /// @param metadataURI Off-chain JSON metadata (question, description).
+    /// @return goalId Sequential id assigned to the new goal.
     function createGoal(
         uint256 circleId,
         OutcomeType outcomeType,
