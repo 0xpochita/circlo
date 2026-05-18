@@ -84,6 +84,12 @@ contract RewardDistributor is
         rewardToken = IERC20(_rewardToken);
     }
 
+    /// @notice Top up the reward pool by pulling ERC20 from msg.sender.
+    /// @dev Operator-only. Caller MUST have approved this contract for
+    ///      `amount` on the reward token first; otherwise SafeERC20
+    ///      reverts. totalDeposited is bumped before the transfer for
+    ///      checks-effects-interactions ordering.
+    /// @param amount Reward-token base units to pull in (USDT = 6 decimals).
     function depositRewards(uint256 amount) external onlyRole(OPERATOR_ROLE) {
         totalDeposited += amount;
         rewardToken.safeTransferFrom(msg.sender, address(this), amount);
