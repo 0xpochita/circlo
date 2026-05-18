@@ -36,21 +36,42 @@ contract CircleFactory is Initializable, AccessControlUpgradeable, UUPSUpgradeab
     bytes32 private constant _INVITE_PROOF_TYPEHASH =
         keccak256("InviteProof(uint256 circleId,address invitee,uint256 expiry)");
 
+    /// @dev Cached domain separator — derived from _DOMAIN_TYPEHASH at
+    ///      initialize time and reused for every EIP-712 verification.
+    ///      Includes chainId so a signature from a different chain can't
+    ///      replay here.
     bytes32 private _DOMAIN_SEPARATOR;
 
+    /// @notice circleId → Circle struct (owner, isPrivate, createdAt, metadataURI).
     mapping(uint256 => Circle) public circles;
+    /// @notice circleId → member → membership flag. The canonical
+    ///         membership check for the whole Circlo system.
     mapping(uint256 => mapping(address => bool)) public isMember;
+    /// @notice circleId → append-only member array used by `getMembers`.
+    /// @dev Internal because `getMembers` exposes a paginated view.
+    ///      Members are never removed from this array (the flag mapping
+    ///      tracks live membership); iteration consumers must filter on
+    ///      `isMember` if they need only-current.
     mapping(uint256 => address[]) internal _members;
 
+    /// @notice Next id to assign on `createCircle`. Monotonically increasing.
     uint256 public nextCircleId;
 
+    /// @notice Thrown when an action targets a circleId that was never created.
     error CircleNotFound();
+    /// @notice Thrown when a join is attempted by someone already a member.
     error AlreadyMember();
+    /// @notice Thrown when a leave/remove is attempted on a non-member.
     error NotMember();
+    /// @notice Thrown when a circle owner tries to leave their own circle.
     error OwnerCannotLeave();
+    /// @notice Thrown when a non-owner calls an owner-only method.
     error NotCircleOwner();
+    /// @notice Thrown when `joinCircle` is called on a private circle.
     error CircleIsPrivate();
+    /// @notice Thrown when an inviteProof signature doesn't recover to the owner.
     error InvalidProof();
+    /// @notice Thrown when an inviteProof's expiry has passed.
     error ProofExpired();
 
     constructor() {
