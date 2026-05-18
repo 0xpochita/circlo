@@ -139,6 +139,19 @@ contract PredictionPool is
         _disableInitializers();
     }
 
+    /// @notice One-shot initializer for the UUPS proxy.
+    /// @dev Wires all four collaborator addresses + admin role. Note that
+    ///      `_resolution` is allowed to be zero at init time — the
+    ///      ResolutionModule proxy is typically deployed AFTER this one,
+    ///      so `setResolutionModule` is the post-deploy hook. USDT +
+    ///      factory MUST be set up-front (revert ZeroAddress otherwise).
+    ///
+    ///      protocolFeeBps initialized to 0 — no fee at launch; admin
+    ///      can adjust via setFee.
+    /// @param _usdt ERC20 used for all stakes + payouts.
+    /// @param _factory CircleFactory address — membership source of truth.
+    /// @param _resolution ResolutionModule address (can be address(0); set later).
+    /// @param admin Address granted DEFAULT_ADMIN_ROLE.
     function initialize(
         address _usdt,
         address _factory,
