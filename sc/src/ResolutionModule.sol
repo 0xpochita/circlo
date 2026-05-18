@@ -7,7 +7,15 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "./interfaces/IResolutionModule.sol";
 import "./interfaces/IPredictionPool.sol";
 
+/// @title ResolutionModule
+/// @notice On-chain resolver voting + tally finalization for Circlo goals.
+/// @dev UUPS upgradeable. Owned by the same admin as PredictionPool, but
+///      vote storage + finalization logic live here so the pool stays
+///      focused on stake/claim mechanics. Designed to be paired 1:1 with
+///      a PredictionPool instance via `setPool`.
 contract ResolutionModule is Initializable, AccessControlUpgradeable, UUPSUpgradeable, IResolutionModule {
+    /// @notice Role allowed to authorize UUPS upgrades of this contract.
+    /// @dev Granted via AccessControl; check before any `_authorizeUpgrade` call.
     bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
 
     struct Vote {
