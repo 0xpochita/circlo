@@ -392,6 +392,15 @@ contract PredictionPool is
         g.status = GoalStatus.PaidOut;
     }
 
+    /// @notice ResolutionModule callback: mark a goal Disputed (tied vote).
+    /// @dev OnlyResolution. Called by ResolutionModule._finalize when the
+    ///      resolver tally ends in a tie. After this, stakers can call
+    ///      `refund` to recover principal.
+    ///
+    ///      Reverts:
+    ///        - GoalNotResolving if goal isn't in Locked/Resolving status
+    ///        - OnlyResolution if caller != configured ResolutionModule
+    /// @param goalId Goal being marked disputed.
     function markDisputed(uint256 goalId) external {
         if (msg.sender != address(resolution)) revert OnlyResolution();
         Goal storage g = goals[goalId];
