@@ -336,6 +336,21 @@ contract PredictionPool is
         emit Claimed(goalId, msg.sender, payout);
     }
 
+    /// @notice Recover original stake from a disputed goal.
+    /// @dev Used when ResolutionModule marks a goal Disputed (tied vote).
+    ///      Returns the caller's stake on BOTH sides — no fee, no payout
+    ///      math, just the original principal back. Sets _claimed flag
+    ///      to prevent double-refund.
+    ///
+    ///      First refund call also emits the GoalRefunded event
+    ///      (gated by _refundEmitted bool — subsequent refund calls by
+    ///      other stakers don't re-emit).
+    ///
+    ///      Reverts:
+    ///        - GoalNotDisputed if goal isn't in Disputed status
+    ///        - AlreadyClaimed if caller already refunded
+    ///        - NothingToClaim if caller had zero stake
+    /// @param goalId Goal to refund from.
     function refund(uint256 goalId) external nonReentrant {
         Goal storage g = goals[goalId];
         if (g.status != GoalStatus.Disputed) revert GoalNotDisputed();
