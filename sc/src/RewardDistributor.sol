@@ -96,11 +96,30 @@ contract RewardDistributor is
         emit RewardsDeposited(amount);
     }
 
+    /// @notice [v1 stub] Pay out a referral reward.
+    /// @dev Always reverts with NotImplemented in v1. The signature is
+    ///      locked so the ABI doesn't churn when the real implementation
+    ///      ships; downstream integrators can wire calls without
+    ///      worrying about signature drift later.
+    ///
+    ///      Future shape (target v2): verify referrer is eligible
+    ///      (referee did N qualifying actions), check `referralClaimed`,
+    ///      mark claimed, transfer `referralRewardAmount` to referrer,
+    ///      emit ReferralRewarded.
+    /// @param referrer Address that brought referee in.
+    /// @param referee Address that completed the qualifying actions.
     function claimReferral(address referrer, address referee) external nonReentrant {
         (referrer, referee);
         revert NotImplemented();
     }
 
+    /// @notice [v1 stub] Pay out a retention bonus.
+    /// @dev Always reverts with NotImplemented in v1. Future shape
+    ///      (target v2): verify the OPERATOR signed a {user, nonce}
+    ///      tuple, check retentionNonce + retentionClaimed, increment
+    ///      nonce, mark claimed, transfer `retentionBonusAmount`,
+    ///      emit RetentionBonusClaimed.
+    /// @param user Address claiming the retention bonus.
     function claimRetentionBonus(address user) external nonReentrant {
         (user);
         revert NotImplemented();
