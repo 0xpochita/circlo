@@ -152,6 +152,17 @@ contract ResolutionModule is Initializable, AccessControlUpgradeable, UUPSUpgrad
         }
     }
 
+    /// @notice Force-finalize a goal whose tally hasn't auto-finalized.
+    /// @dev Permissionless on purpose — anyone can poke a stale vote
+    ///      window past the line. Reverts with CannotFinalizeYet unless
+    ///      EITHER quorum has been reached OR the vote window has fully
+    ///      elapsed; this prevents premature finalization but allows
+    ///      cleanup of dead goals.
+    ///
+    ///      Outcome split inside `_finalize`:
+    ///        - tie (count0 == count1) → markDisputed on pool
+    ///        - else → setWinner(side with more votes) on pool
+    /// @param goalId Goal to finalize.
     function finalize(uint256 goalId) external {
         Tally storage t = tallies[goalId];
         if (t.finalized) revert AlreadyFinalized();
