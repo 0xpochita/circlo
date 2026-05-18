@@ -226,6 +226,20 @@ contract PredictionPool is
         emit GoalCreated(goalId, circleId, msg.sender, uint8(outcomeType), deadline, minStake, resolverList, metadataURI);
     }
 
+    /// @notice Stake USDT on a side of a goal.
+    /// @dev Caller MUST be a circle member + the goal MUST be Open +
+    ///      pre-deadline. Enforces:
+    ///        - one-side-per-user: revert CannotSwitchSides if user
+    ///          already has a stake on the OTHER side
+    ///        - minimum stake size (BelowMinStake)
+    ///        - safe ERC20 pull (caller MUST have approved this contract)
+    ///
+    ///      Pausable + nonReentrant. The nonReentrant guard matters
+    ///      because the ERC20 transfer COULD reenter if the token is
+    ///      malicious — defensive default.
+    /// @param goalId Goal to stake on.
+    /// @param side 0 = NO, 1 = YES.
+    /// @param amount USDT to stake (6-decimal base units).
     function stake(uint256 goalId, uint8 side, uint256 amount)
         external
         whenNotPaused
