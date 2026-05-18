@@ -12,6 +12,19 @@ import "./interfaces/IPredictionPool.sol";
 import "./interfaces/ICircleFactory.sol";
 import "./interfaces/IResolutionModule.sol";
 
+/// @title PredictionPool
+/// @notice Core escrow + lifecycle contract for Circlo prediction goals.
+///         Holds USDT stakes, transitions goals through Open → Locked →
+///         Resolving → PaidOut/Refunded, and pays winners proportionally.
+/// @dev UUPS upgradeable. Pausable (`PAUSER_ROLE` can halt new stakes +
+///      claims without breaking already-locked positions).
+///      ReentrancyGuard wraps the two USDT-transfer paths (`claim`,
+///      `refund`).
+///
+///      Companion contracts:
+///        - CircleFactory: membership source of truth (gated by `isCircleMember`)
+///        - ResolutionModule: vote tally — calls back via `setWinner` /
+///          `markDisputed` after finalization
 contract PredictionPool is
     Initializable,
     AccessControlUpgradeable,
@@ -22,13 +35,24 @@ contract PredictionPool is
 {
     using SafeERC20 for IERC20;
 
+    /// @notice Role allowed to call `pause()` / `unpause()` — emergency stop.
     bytes32 public constant PAUSER_ROLE    = keccak256("PAUSER_ROLE");
+    /// @notice Role allowed to authorize UUPS upgrades.
     bytes32 public constant UPGRADER_ROLE  = keccak256("UPGRADER_ROLE");
+    /// @notice Role allowed to call `setFee` — adjusts protocol fee bps.
     bytes32 public constant FEE_SETTER_ROLE = keccak256("FEE_SETTER_ROLE");
 
+    /// @notice Minimum allowed time between `block.timestamp` and `deadline`
+    ///         at goal-creation time. Goals must run for AT LEAST 1 hour
+    ///         to prevent flash-create-and-resolve attacks.
     uint64  public constant MIN_GOAL_DURATION = 1 hours;
+    /// @notice Hard cap on resolver list size per goal — protects gas on
+    ///         iteration paths (vote tally, etc).
     uint256 public constant MAX_RESOLVERS     = 32;
 
+    /// @notice Sentinel for the `winningSide` field while a goal is unresolved.
+    ///         Match against this (rather than 0) to distinguish "no winner
+    ///         yet" from "NO won".
     uint8 public constant UNRESOLVED = 255;
 
     mapping(uint256 => Goal) public goals;
