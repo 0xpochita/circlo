@@ -261,6 +261,15 @@ contract PredictionPool is
         emit Staked(goalId, msg.sender, side, amount);
     }
 
+    /// @notice Transition a goal from Open to Locked + open the vote window.
+    /// @dev Permissionless — anyone can poke this once the deadline elapses.
+    ///      Calls into ResolutionModule.startVote which captures the
+    ///      current resolver count for quorum sizing.
+    ///
+    ///      Reverts:
+    ///        - GoalNotOpen if goal is already locked/resolved/etc
+    ///        - DeadlineNotPassed if called before deadline
+    /// @param goalId Goal to lock.
     function lockGoal(uint256 goalId) external {
         Goal storage g = goals[goalId];
         if (g.status != GoalStatus.Open) revert GoalNotOpen();
