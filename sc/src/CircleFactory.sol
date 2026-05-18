@@ -126,6 +126,14 @@ contract CircleFactory is Initializable, AccessControlUpgradeable, UUPSUpgradeab
         emit CircleCreated(circleId, msg.sender, isPrivate, metadataURI);
     }
 
+    /// @notice Join a public circle as a new member.
+    /// @dev Permissionless for public circles; reverts for private ones
+    ///      (use `joinCirclePrivate` with a signed InviteProof instead).
+    ///      Reverts:
+    ///        - CircleNotFound if circleId was never created
+    ///        - CircleIsPrivate if the circle is invite-only
+    ///        - AlreadyMember if msg.sender is already a member
+    /// @param circleId Circle to join.
     function joinCircle(uint256 circleId) external {
         Circle storage c = _requireCircle(circleId);
         if (c.isPrivate) revert CircleIsPrivate();
