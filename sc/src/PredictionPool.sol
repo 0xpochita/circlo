@@ -55,20 +55,45 @@ contract PredictionPool is
     ///         yet" from "NO won".
     uint8 public constant UNRESOLVED = 255;
 
+    /// @notice goalId → Goal struct (circleId, creator, outcomeType, status,
+    ///         deadline, minStake, totalPool, winningSide, metadataURI).
     mapping(uint256 => Goal) public goals;
+    /// @notice goalId → side → total USDT pooled on that side.
+    ///         Used for payout proportion math at claim time.
     mapping(uint256 => mapping(uint8 => uint256)) public poolPerSide;
+    /// @notice goalId → user → side → user's stake on that side.
+    ///         Tri-level mapping so a user can stake on both sides if
+    ///         they choose (though most front-ends gate this with
+    ///         CannotSwitchSides at the contract level — see `stake`).
     mapping(uint256 => mapping(address => mapping(uint8 => uint256))) public stakeOf;
+    /// @notice goalId → resolver list. Internal; iteration via
+    ///         getResolverCount + isResolver checks.
     mapping(uint256 => address[]) internal _resolvers;
+    /// @notice goalId → address → is-resolver flag. Public so UIs can
+    ///         gate vote buttons without a dedicated read function.
     mapping(uint256 => mapping(address => bool)) public isResolver;
+    /// @notice goalId → user → has-claimed flag. Internal to prevent
+    ///         double-claim; exposed indirectly via `claim` revert.
     mapping(uint256 => mapping(address => bool)) internal _claimed;
+    /// @notice goalId → bool. Tracks whether a refund event has been
+    ///         emitted (so a 2nd refund call doesn't double-emit).
     mapping(uint256 => bool) internal _refundEmitted;
 
+    /// @notice The USDT (or ERC20) token used for all stakes + payouts.
     IERC20             public USDT;
+    /// @notice CircleFactory address — source of truth for circle
+    ///         membership (gates createGoal + stake).
     ICircleFactory     public factory;
+    /// @notice ResolutionModule address — receives `startVote` calls at
+    ///         lock time, calls back via `setWinner` / `markDisputed`.
     IResolutionModule  public resolution;
 
+    /// @notice Next id to assign on `createGoal`. Monotonically increasing.
     uint256 public nextGoalId;
+    /// @notice Protocol fee in basis points (10000 = 100%). Default 0.
+    ///         Capped at 1000 (10%) by `setFee`.
     uint256 public protocolFeeBps;
+    /// @notice Address that receives the protocol fee on each claim.
     address public feeRecipient;
 
     error NotCircleMember();
