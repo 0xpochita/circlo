@@ -108,6 +108,12 @@ contract ResolutionModule is Initializable, AccessControlUpgradeable, UUPSUpgrad
         pool = IPredictionPool(_pool);
     }
 
+    /// @notice Open the vote window for a goal.
+    /// @dev Callable only by the configured PredictionPool, which calls
+    ///      this when transitioning a goal to Locked status. Captures the
+    ///      current resolver count so subsequent quorum math is stable
+    ///      even if the pool's resolver list mutates.
+    /// @param goalId Goal whose vote window is being opened.
     function startVote(uint256 goalId) external {
         if (address(pool) == address(0)) revert PoolNotSet();
         if (msg.sender != address(pool)) revert OnlyPool();
