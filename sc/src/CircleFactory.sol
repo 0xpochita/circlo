@@ -8,15 +8,31 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 import "./interfaces/ICircleFactory.sol";
 
+/// @title CircleFactory
+/// @notice Authoritative registry for Circlo circles + membership.
+/// @dev UUPS upgradeable. The only contract that mutates membership
+///      state — PredictionPool, ResolutionModule, and off-chain
+///      indexers all read membership via `isCircleMember`.
+///
+///      Private-circle joins use an EIP-712 `InviteProof` signed by the
+///      circle owner off-chain; see `joinCirclePrivate` for the encoded
+///      bytes layout.
 contract CircleFactory is Initializable, AccessControlUpgradeable, UUPSUpgradeable, ICircleFactory {
     using ECDSA for bytes32;
 
+    /// @notice Role allowed to pause future entrypoints (reserved for v2).
     bytes32 public constant PAUSER_ROLE   = keccak256("PAUSER_ROLE");
+    /// @notice Role allowed to authorize UUPS upgrades.
     bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
 
+    /// @dev EIP-712 domain separator type hash. Standard form, never
+    ///      changes per chain — `_DOMAIN_SEPARATOR` is derived from it.
     bytes32 private constant _DOMAIN_TYPEHASH =
         keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
 
+    /// @dev Type hash for the InviteProof struct used by joinCirclePrivate.
+    ///      Must stay byte-identical to the off-chain signer's hash or
+    ///      EIP-712 recovery breaks.
     bytes32 private constant _INVITE_PROOF_TYPEHASH =
         keccak256("InviteProof(uint256 circleId,address invitee,uint256 expiry)");
 
