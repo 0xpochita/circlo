@@ -33,22 +33,35 @@ contract RewardDistributor is
     ///      compromise can't change roles.
     bytes32 public constant OPERATOR_ROLE  = keccak256("OPERATOR_ROLE");
 
+    /// @notice Emitted when a referrer's reward is paid out.
     event ReferralRewarded(address indexed referrer, address indexed referee, uint256 amount);
+    /// @notice Emitted when a user claims their retention bonus.
     event RetentionBonusClaimed(address indexed user, uint256 amount);
+    /// @notice Emitted on each operator top-up of the reward pool.
     event RewardsDeposited(uint256 amount);
 
+    /// @notice ERC20 token the contract holds + pays out (USDT on Celo Mainnet).
     IERC20 public rewardToken;
 
+    /// @notice Tracks whether a given referrer has claimed (one-shot per address).
     mapping(address => bool)    public referralClaimed;
+    /// @notice Monotonic per-user nonce used to invalidate retention signatures.
     mapping(address => uint256) public retentionNonce;
+    /// @notice Pending referral reward balance per referrer address.
     mapping(address => uint256) public pendingReferralReward;
+    /// @notice Tracks whether a given user has claimed retention bonus.
     mapping(address => bool)    public retentionClaimed;
 
+    /// @notice Default referral payout amount (referrer's cut).
     uint256 public referralRewardAmount;
+    /// @notice Default retention bonus amount per qualifying user.
     uint256 public retentionBonusAmount;
+    /// @notice Running total of all rewards ever deposited (audit field).
     uint256 public totalDeposited;
 
+    /// @notice Stub error for not-yet-implemented claim methods (v1 placeholder).
     error NotImplemented();
+    /// @notice Thrown when a zero address is passed where a real address is required.
     error ZeroAddress();
 
     constructor() {
