@@ -178,6 +178,13 @@ contract ResolutionModule is Initializable, AccessControlUpgradeable, UUPSUpgrad
         _finalize(goalId);
     }
 
+    /// @notice Convenience read — true if `user` is a resolver for `goalId`.
+    /// @dev Delegates to PredictionPool.isResolver. Exposed here so UIs that
+    ///      only know the ResolutionModule address don't need to also know
+    ///      the pool address to gate vote buttons.
+    /// @param goalId Goal to check.
+    /// @param user Address to test for resolver membership.
+    /// @return True if `user` is on the goal's resolver list.
     function isResolver(uint256 goalId, address user) external view returns (bool) {
         return pool.isResolver(goalId, user);
     }
