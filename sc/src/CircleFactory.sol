@@ -257,10 +257,27 @@ contract CircleFactory is Initializable, AccessControlUpgradeable, UUPSUpgradeab
         }
     }
 
+    /// @notice Canonical membership check used across the Circlo system.
+    /// @dev Single-call lookup; PredictionPool.createGoal/stake gates on
+    ///      this exact function. Indexers + UI gating should prefer this
+    ///      over re-implementing the check off-chain.
+    ///
+    ///      Does NOT validate that circleId exists — returns false for
+    ///      non-existent circles (no revert). Callers needing existence
+    ///      should use `getCircle` instead.
+    /// @param circleId Circle to check.
+    /// @param user Address to test.
+    /// @return True if `user` is currently a member of `circleId`.
     function isCircleMember(uint256 circleId, address user) external view returns (bool) {
         return isMember[circleId][user];
     }
 
+    /// @notice Read the full Circle struct (owner, isPrivate, createdAt, metadataURI).
+    /// @dev Reverts CircleNotFound if circleId was never created.
+    ///      Use this when you need the metadata + owner info; for
+    ///      membership-only checks prefer `isCircleMember` (skips revert).
+    /// @param circleId Circle to read.
+    /// @return Full Circle struct.
     function getCircle(uint256 circleId) external view returns (Circle memory) {
         _requireCircle(circleId);
         return circles[circleId];
