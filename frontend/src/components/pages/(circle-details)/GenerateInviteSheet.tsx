@@ -86,7 +86,7 @@ export default function GenerateInviteSheet({
       return;
     }
 
-    const seconds = DURATIONS.find((d) => d.key === duration)?.seconds;
+    const seconds = DURATIONS.find((d) => d.key === duration)?.seconds ?? 3600;
     const expiry = BigInt(Math.floor(Date.now() / 1000) + seconds);
 
     setIsSigning(true);

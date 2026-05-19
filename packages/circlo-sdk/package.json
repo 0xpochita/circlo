@@ -38,7 +38,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "test": "npm run build && node --test \"test/*.test.mjs\"",
+    "test": "npm run build && node --test test/metadata.test.mjs test/client.test.mjs test/client-v2.test.mjs test/errors.test.mjs test/stake.test.mjs",
     "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
