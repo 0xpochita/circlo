@@ -31,17 +31,11 @@ jobs:
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
+          # build-mode: none skips the compile/build phase since
+          # javascript-typescript is interpreted — autobuild is unnecessary
+          # and was the failure point in the prior config.
+          build-mode: none
           queries: security-extended,security-and-quality
-          # Scan the apps + the published packages. Solidity is covered
-          # separately by forge build + slither (not wired up here yet).
-          paths:
-            - frontend/src
-            - backend/src
-            - packages/circlo-sdk/src
-            - packages/circlo-types/src
-
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v3
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
