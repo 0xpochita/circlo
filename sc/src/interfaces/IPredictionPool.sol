@@ -100,12 +100,30 @@ interface IPredictionPool {
 
     /// @notice Reclaim principal from a disputed goal (tied resolver vote).
     function refund(uint256 goalId) external;
+    /// @notice Admin: wire the ResolutionModule address (post-deploy hook).
     function setResolutionModule(address m) external;
+
+    /// @notice FEE_SETTER_ROLE: set protocol fee bps (capped at 1000 = 10%) + recipient.
     function setFee(uint256 bps, address recipient) external;
+
+    /// @notice PAUSER_ROLE: emergency stop on `createGoal` + `stake` only.
+    ///         Existing locked positions still flow to resolution + payout.
     function pause() external;
+
+    /// @notice PAUSER_ROLE: release the emergency stop.
     function unpause() external;
+
+    /// @notice ResolutionModule callback: set winning side + mark PaidOut.
+    /// @dev OnlyResolution-gated; anyone else reverts OnlyResolution.
     function setWinner(uint256 goalId, uint8 winningSide) external;
+
+    /// @notice ResolutionModule callback: mark goal Disputed (tied vote).
     function markDisputed(uint256 goalId) external;
+
+    /// @notice Read — true if `user` is on the goal's resolver list.
     function isResolver(uint256 goalId, address user) external view returns (bool);
+
+    /// @notice Read — number of resolvers registered for a goal.
+    /// @dev Stable for the goal's lifetime (no add/remove API).
     function getResolverCount(uint256 goalId) external view returns (uint256);
 }
