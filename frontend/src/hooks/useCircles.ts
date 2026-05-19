@@ -70,7 +70,7 @@ export function useMyCircles() {
         if (!hasCached) setMyCircles([]);
       })
       .finally(() => setIsLoading(false));
-  }, []);
+  }, [hasCached, isStale, setMyCircles]);
 
   return { circles: cached, isLoading };
 }

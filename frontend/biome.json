@@ -19,7 +19,18 @@
     "rules": {
       "recommended": true,
       "suspicious": {
-        "noUnknownAtRules": "off"
+        "noUnknownAtRules": "off",
+        "noArrayIndexKey": "warn"
+      },
+      "a11y": {
+        "noLabelWithoutControl": "warn",
+        "useSemanticElements": "warn"
+      },
+      "style": {
+        "noNonNullAssertion": "warn"
+      },
+      "correctness": {
+        "noUnusedFunctionParameters": "warn"
       }
     },
     "domains": {
