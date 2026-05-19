@@ -32,11 +32,27 @@ interface ICircleFactory {
     /// @notice Emitted when the owner kicks a member via `removeMember`.
     event MemberRemoved(uint256 indexed id, address indexed member);
 
+    /// @notice Create a new circle. Caller becomes owner + auto-member.
+    /// @param isPrivate True = invite-only (requires inviteProof to join).
+    /// @param metadataURI Off-chain JSON metadata.
+    /// @return circleId Sequential id of the new circle (0 is valid).
     function createCircle(bool isPrivate, string calldata metadataURI) external returns (uint256 circleId);
+
+    /// @notice Join a public circle. Reverts CircleIsPrivate for private ones.
     function joinCircle(uint256 circleId) external;
+
+    /// @notice Join a private circle via an EIP-712 InviteProof signed by the owner.
+    /// @dev inviteProof = abi.encode(bytes sig, uint256 expiry). Signature is
+    ///      over the InviteProof(circleId, msg.sender, expiry) struct hash.
     function joinCirclePrivate(uint256 circleId, bytes calldata inviteProof) external;
+
+    /// @notice Leave a circle. Owners can't leave (must transfer ownership first).
     function leaveCircle(uint256 circleId) external;
+
+    /// @notice Owner-driven add: pull `member` into the circle (member pays no gas).
     function addMember(uint256 circleId, address member) external;
+
+    /// @notice Owner-driven kick: remove `member` from the circle.
     function removeMember(uint256 circleId, address member) external;
     function getMembers(uint256 circleId, uint256 offset, uint256 limit) external view returns (address[] memory members);
     function isCircleMember(uint256 circleId, address user) external view returns (bool);
