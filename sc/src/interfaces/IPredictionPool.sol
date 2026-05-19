@@ -72,6 +72,10 @@ interface IPredictionPool {
     /// @notice Emitted on each successful `claim`. `amount` is post-fee.
     event Claimed(uint256 indexed goalId, address indexed user, uint256 amount);
 
+    /// @notice Create a new goal inside a circle.
+    /// @dev Caller MUST be a circle member; all resolvers MUST too.
+    ///      `deadline` MUST be > now + 1 hour. resolverList capped at 32.
+    /// @return goalId Sequential id of the new goal.
     function createGoal(
         uint256 circleId,
         OutcomeType outcomeType,
@@ -81,9 +85,20 @@ interface IPredictionPool {
         string calldata metadataURI
     ) external returns (uint256 goalId);
 
+    /// @notice Stake USDT on a side. Caller MUST have approved USDT to this contract.
+    /// @dev One-side-per-user invariant: switching sides reverts CannotSwitchSides.
+    /// @param side 0 = NO, 1 = YES.
+    /// @param amount USDT base units (6-decimal).
     function stake(uint256 goalId, uint8 side, uint256 amount) external;
+
+    /// @notice Permissionless lock: anyone can transition Open → Locked after deadline.
     function lockGoal(uint256 goalId) external;
+
+    /// @notice Claim winner's payout. Caller MUST be on the winning side.
+    /// @dev Payout = winnerStake + winnerStake * losersPool / winnersPool - fee.
     function claim(uint256 goalId) external;
+
+    /// @notice Reclaim principal from a disputed goal (tied resolver vote).
     function refund(uint256 goalId) external;
     function setResolutionModule(address m) external;
     function setFee(uint256 bps, address recipient) external;
