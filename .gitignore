@@ -18,6 +18,9 @@ sc/.env
 # Backend build
 backend/dist/
 
+# Package build artifacts (rebuilt by CI + npm publish)
+packages/*/dist/
+
 # Frontend build
 frontend/.next/
 frontend/out/
