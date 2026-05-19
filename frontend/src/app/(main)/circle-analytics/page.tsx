@@ -13,10 +13,10 @@ import {
 import { BottomTabBar, PageTransition } from "@/components/pages/(app)";
 import { EmojiAvatar, UsdtLabel } from "@/components/shared";
 import {
-  circlesApi,
-  goalsApi,
   type CircleDetailResponse,
+  circlesApi,
   type GoalResponse,
+  goalsApi,
   type ParticipantResponse,
 } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
@@ -189,7 +189,14 @@ function CircleAnalyticsContent() {
 
   const statusEntries = useMemo(() => {
     if (!analytics) return [];
-    const statusOrder = ["open", "locked", "resolving", "resolved", "paidout", "disputed"];
+    const statusOrder = [
+      "open",
+      "locked",
+      "resolving",
+      "resolved",
+      "paidout",
+      "disputed",
+    ];
     const entries = statusOrder
       .map((s) => ({ status: s, count: analytics.byStatus[s] ?? 0 }))
       .filter((e) => e.count > 0);
@@ -220,7 +227,10 @@ function CircleAnalyticsContent() {
             <div className="rounded-3xl bg-white animate-pulse h-40" />
             <div className="mt-3 grid grid-cols-2 gap-3">
               {Array.from({ length: 4 }).map((_, i) => (
-                <div key={`s-${i}`} className="rounded-2xl bg-white animate-pulse h-24" />
+                <div
+                  key={`s-${i}`}
+                  className="rounded-2xl bg-white animate-pulse h-24"
+                />
               ))}
             </div>
           </div>
@@ -357,7 +367,9 @@ function CircleAnalyticsContent() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-main-text truncate">
-                          {s.name ?? s.username ?? `${s.walletAddress.slice(0, 6)}...${s.walletAddress.slice(-4)}`}
+                          {s.name ??
+                            s.username ??
+                            `${s.walletAddress.slice(0, 6)}...${s.walletAddress.slice(-4)}`}
                         </p>
                         <p className="text-xs text-muted">
                           {s.stakeCount} stake{s.stakeCount !== 1 ? "s" : ""}
@@ -407,8 +419,8 @@ function CircleAnalyticsContent() {
                           {gs.goal.title}
                         </p>
                         <p className="text-xs text-muted">
-                          {gs.stakeCount} stake{gs.stakeCount !== 1 ? "s" : ""} ·{" "}
-                          <span className="capitalize">{gs.goal.status}</span>
+                          {gs.stakeCount} stake{gs.stakeCount !== 1 ? "s" : ""}{" "}
+                          · <span className="capitalize">{gs.goal.status}</span>
                         </p>
                       </div>
                       <p className="text-xs font-bold text-main-text inline-flex items-center gap-1 shrink-0">

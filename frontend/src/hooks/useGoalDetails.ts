@@ -2,8 +2,8 @@
 
 import {
   createCircloClient,
-  parseGoalMetadata,
   type GoalMetadata,
+  parseGoalMetadata,
 } from "circlo-sdk";
 import { GoalStatus, Side, UNRESOLVED_SIDE } from "circlo-types";
 import { useEffect, useMemo, useState } from "react";

@@ -34,7 +34,7 @@ export default function ActivePredictionCard() {
         if (!hasCached) setGoal(null);
       })
       .finally(() => setIsLoading(false));
-  }, []);
+  }, [cached, hasCached, isStale, setFeedGoal]);
 
   if (isLoading) return null;
 

@@ -12,7 +12,7 @@ import {
 import { BottomTabBar, PageTransition } from "@/components/pages/(app)";
 import { EmojiAvatar, UsdtLabel } from "@/components/shared";
 import { useMyCircles } from "@/hooks";
-import { goalsApi, type GoalWithMyStake } from "@/lib/api/endpoints";
+import { type GoalWithMyStake, goalsApi } from "@/lib/api/endpoints";
 import { normalizeSide, toAvatar } from "@/lib/utils";
 import { useDataCache } from "@/stores/dataCache";
 
@@ -69,7 +69,7 @@ export default function StatsPage() {
       })
       .catch(() => {})
       .finally(() => setGoalsLoading(false));
-  }, []);
+  }, [cachedGoals, isStale, setMyGoals]);
 
   const staked = useMemo(
     () => goals.filter((g) => g.myStake !== null && g.myStake !== undefined),
@@ -87,8 +87,8 @@ export default function StatsPage() {
       const o = outcomeOf(g);
       const s = parseFloat(g.myStake?.staked ?? "0");
       const c = parseFloat(g.myStake?.claimedAmount ?? "0");
-      totalStaked += isNaN(s) ? 0 : s;
-      totalClaimed += isNaN(c) ? 0 : c;
+      totalStaked += Number.isNaN(s) ? 0 : s;
+      totalClaimed += Number.isNaN(c) ? 0 : c;
       if (o === "won" || o === "claimed") won++;
       else if (o === "lost") lost++;
       else active++;
@@ -122,8 +122,8 @@ export default function StatsPage() {
       entry.stakes++;
       const s = parseFloat(g.myStake?.staked ?? "0");
       const c = parseFloat(g.myStake?.claimedAmount ?? "0");
-      entry.staked += isNaN(s) ? 0 : s;
-      entry.pnl += (isNaN(c) ? 0 : c) - (isNaN(s) ? 0 : s);
+      entry.staked += Number.isNaN(s) ? 0 : s;
+      entry.pnl += (Number.isNaN(c) ? 0 : c) - (Number.isNaN(s) ? 0 : s);
       const o = outcomeOf(g);
       if (o === "won" || o === "claimed") entry.won++;
       else if (o === "lost") entry.lost++;
@@ -140,7 +140,7 @@ export default function StatsPage() {
       if (o !== "claimed") continue;
       const s = parseFloat(g.myStake?.staked ?? "0");
       const c = parseFloat(g.myStake?.claimedAmount ?? "0");
-      const pnl = (isNaN(c) ? 0 : c) - (isNaN(s) ? 0 : s);
+      const pnl = (Number.isNaN(c) ? 0 : c) - (Number.isNaN(s) ? 0 : s);
       if (!best || pnl > best.pnl) best = { goal: g, pnl };
     }
     return best;

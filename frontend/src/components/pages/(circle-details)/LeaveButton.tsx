@@ -134,8 +134,9 @@ export default function LeaveButton({
               <div className="px-6 pb-6 pt-2">
                 <div className="rounded-2xl bg-gray-50 p-4 mb-5">
                   <p className="text-sm text-muted leading-relaxed">
-                    Your active stakes on goals in this circle will remain on-chain
-                    until each goal resolves. You can still claim your winnings later.
+                    Your active stakes on goals in this circle will remain
+                    on-chain until each goal resolves. You can still claim your
+                    winnings later.
                   </p>
                 </div>
 

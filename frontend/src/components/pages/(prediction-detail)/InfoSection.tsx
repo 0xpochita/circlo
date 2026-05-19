@@ -55,7 +55,11 @@ export default function InfoSection({ goal }: InfoSectionProps) {
     { label: "Start date", value: createdDate },
     { label: "Deadline", value: deadlineDate },
     { label: "Outcome type", value: goal?.outcomeType || "binary" },
-    { label: "Minimum stake", value: goal?.minStake || DEFAULT_MIN_STAKE, usdt: true },
+    {
+      label: "Minimum stake",
+      value: goal?.minStake || DEFAULT_MIN_STAKE,
+      usdt: true,
+    },
   ];
 
   const resolvers = goal?.resolvers || [];

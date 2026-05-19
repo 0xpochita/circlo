@@ -110,7 +110,11 @@ export default function CirclesList() {
             >
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-3">
-                  <EmojiAvatar avatar={circle.avatar} size={48} shape="square" />
+                  <EmojiAvatar
+                    avatar={circle.avatar}
+                    size={48}
+                    shape="square"
+                  />
                   <div>
                     <p className="text-base font-bold text-main-text">
                       {circle.name}

@@ -121,9 +121,7 @@ export default function DetailsGoals({ circleId }: DetailsGoalsProps) {
         const counts = await Promise.all(items.map(getCount));
 
         if (cancelled) return;
-        setGoals(
-          items.map((g, i) => ({ ...g, participantCount: counts[i] })),
-        );
+        setGoals(items.map((g, i) => ({ ...g, participantCount: counts[i] })));
       })
       .catch((err) => toast.error(err.message))
       .finally(() => {
@@ -164,7 +162,10 @@ export default function DetailsGoals({ circleId }: DetailsGoalsProps) {
         {loading ? (
           <div className="flex flex-col gap-3">
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={`skel-${i}`} className="flex items-center gap-3 rounded-2xl bg-white p-3 animate-pulse">
+              <div
+                key={`skel-${i}`}
+                className="flex items-center gap-3 rounded-2xl bg-white p-3 animate-pulse"
+              >
                 <div className="h-12 w-12 rounded-full bg-gray-100" />
                 <div className="flex-1">
                   <div className="h-4 w-32 rounded-lg bg-gray-100 mb-2" />
@@ -273,9 +274,7 @@ export default function DetailsGoals({ circleId }: DetailsGoalsProps) {
                     <p className="text-base font-semibold text-main-text mb-1">
                       No {activeFilter} goals
                     </p>
-                    <p className="text-sm text-muted">
-                      Try a different filter
-                    </p>
+                    <p className="text-sm text-muted">Try a different filter</p>
                   </div>
                 ) : (
                   <div className="flex flex-col gap-2">

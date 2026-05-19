@@ -1,10 +1,10 @@
 "use client";
 
 import {
-  createCircloClient,
-  parseCircleMetadata,
   type CircleInfo,
   type CircleMetadata,
+  createCircloClient,
+  parseCircleMetadata,
 } from "circlo-sdk";
 import { useEffect, useMemo, useState } from "react";
 import { usePublicClient } from "wagmi";
@@ -58,5 +58,9 @@ export function useCircleInfo(circleId: bigint | undefined) {
     };
   }, [publicClient, circlo, circleId]);
 
-  return { data, error, isLoading: data === null && error === null && circleId !== undefined };
+  return {
+    data,
+    error,
+    isLoading: data === null && error === null && circleId !== undefined,
+  };
 }

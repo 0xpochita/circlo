@@ -1,10 +1,10 @@
 import { create } from "zustand";
+import type { CircleWithCount } from "@/hooks/useCircles";
 import type {
   CircleResponse,
   GoalResponse,
   GoalWithMyStake,
 } from "@/lib/api/endpoints";
-import type { CircleWithCount } from "@/hooks/useCircles";
 
 const STALE_MS = 60_000;
 

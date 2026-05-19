@@ -18,7 +18,9 @@ function useAuthHydrated() {
       setHydrated(true);
       return;
     }
-    const unsub = useAuthStore.persist.onFinishHydration(() => setHydrated(true));
+    const unsub = useAuthStore.persist.onFinishHydration(() =>
+      setHydrated(true),
+    );
     return unsub;
   }, []);
 

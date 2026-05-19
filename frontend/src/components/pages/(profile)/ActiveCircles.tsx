@@ -5,8 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { HiOutlineUserGroup, HiXMark } from "react-icons/hi2";
 import { EmojiAvatar } from "@/components/shared";
-import { useSheetOverflow } from "@/hooks";
-import { useMyCircles } from "@/hooks";
+import { useMyCircles, useSheetOverflow } from "@/hooks";
 
 export default function ActiveCircles() {
   const { circles, isLoading } = useMyCircles();
@@ -126,7 +125,8 @@ export default function ActiveCircles() {
                     Your Circles
                   </h2>
                   <p className="mt-1 text-sm text-muted">
-                    {circles.length} circle{circles.length !== 1 ? "s" : ""} joined
+                    {circles.length} circle{circles.length !== 1 ? "s" : ""}{" "}
+                    joined
                   </p>
                 </div>
                 <button
@@ -165,7 +165,11 @@ export default function ActiveCircles() {
                           onClick={() => setSheetOpen(false)}
                           className="flex items-center gap-3 rounded-2xl p-3 bg-gray-50 cursor-pointer transition-all duration-200 active:scale-[0.98]"
                         >
-                          <EmojiAvatar avatar={c.avatar} size={44} shape="square" />
+                          <EmojiAvatar
+                            avatar={c.avatar}
+                            size={44}
+                            shape="square"
+                          />
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-semibold text-main-text truncate">
                               {c.name}

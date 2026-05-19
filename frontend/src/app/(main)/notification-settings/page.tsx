@@ -144,7 +144,9 @@ export default function NotificationSettingsPage() {
                     <div className="flex items-start gap-3 min-w-0">
                       <div
                         className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-colors duration-200 ${
-                          enabled ? "bg-gray-900 text-white" : "bg-gray-50 text-muted"
+                          enabled
+                            ? "bg-gray-900 text-white"
+                            : "bg-gray-50 text-muted"
                         }`}
                       >
                         {cat.icon}

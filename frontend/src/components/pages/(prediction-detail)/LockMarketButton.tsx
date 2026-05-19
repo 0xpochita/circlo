@@ -26,7 +26,11 @@ export default function LockMarketButton({
 
   // One SDK client per render; both read + write methods get the same wiring.
   const circlo = useMemo(
-    () => createCircloClient({ walletClient: walletClient ?? undefined, publicClient }),
+    () =>
+      createCircloClient({
+        walletClient: walletClient ?? undefined,
+        publicClient,
+      }),
     [walletClient, publicClient],
   );
 

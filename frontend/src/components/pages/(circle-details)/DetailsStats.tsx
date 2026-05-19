@@ -44,8 +44,11 @@ export default function DetailsStats({ circleId, circle }: DetailsStatsProps) {
       setGoalCount(goals.filter(isActiveGoal).length);
 
       const details = await Promise.all(
-        goals.map((g) =>
-          goalsApi.detail(g.id).catch(() => null) as Promise<GoalDetail | null>,
+        goals.map(
+          (g) =>
+            goalsApi
+              .detail(g.id)
+              .catch(() => null) as Promise<GoalDetail | null>,
         ),
       );
       const sum = details.reduce((acc, d) => {

@@ -1,11 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export type NotifCategory =
-  | "circle"
-  | "goal"
-  | "payout"
-  | "referral";
+export type NotifCategory = "circle" | "goal" | "payout" | "referral";
 
 export type NotifPrefs = Record<NotifCategory, boolean>;
 

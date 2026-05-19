@@ -161,7 +161,6 @@ export default function InviteMemberButton({
                   <HiOutlineMagnifyingGlass className="w-5 h-5 text-muted" />
                   <input
                     type="text"
-                    autoFocus
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder="Search username to invite..."

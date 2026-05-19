@@ -245,7 +245,11 @@ export default function ConfirmButton() {
         updateStep(stepIdx, "done");
       } catch (err) {
         console.error("[createGoal] Full error:", err);
-        const errObj = err as { name?: string; code?: number | string; cause?: unknown };
+        const errObj = err as {
+          name?: string;
+          code?: number | string;
+          cause?: unknown;
+        };
         console.error("[createGoal] Error name:", errObj?.name);
         console.error("[createGoal] Error code:", errObj?.code);
         console.error("[createGoal] Error cause:", errObj?.cause);
@@ -336,7 +340,10 @@ export default function ConfirmButton() {
     { label: "Circle", value: store.circleName || "—" },
     { label: "Outcome type", value: getOutcomeLabel() },
     { label: "Deadline", value: getDeadlineDisplay() },
-    { label: "Minimum stake", value: `${store.stakeAmount || DEFAULT_MIN_STAKE} USDT` },
+    {
+      label: "Minimum stake",
+      value: `${store.stakeAmount || DEFAULT_MIN_STAKE} USDT`,
+    },
     {
       label: "Resolvers",
       value:

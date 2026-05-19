@@ -55,7 +55,7 @@ export default function RecentPredictions() {
         if (!hasCached) setGoals([]);
       })
       .finally(() => setIsLoading(false));
-  }, []);
+  }, [cached, hasCached, isStale, setMyGoals]);
 
   if (isLoading) {
     return (
@@ -105,7 +105,9 @@ export default function RecentPredictions() {
     <>
       <div className="px-4 py-2">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-base font-bold text-main-text">Recent predictions</p>
+          <p className="text-base font-bold text-main-text">
+            Recent predictions
+          </p>
           <button
             type="button"
             onClick={() => setSheetOpen(true)}
@@ -177,7 +179,8 @@ export default function RecentPredictions() {
                     All Predictions
                   </h2>
                   <p className="mt-1 text-sm text-muted">
-                    {goals.length} prediction{goals.length !== 1 ? "s" : ""} total
+                    {goals.length} prediction{goals.length !== 1 ? "s" : ""}{" "}
+                    total
                   </p>
                 </div>
                 <button

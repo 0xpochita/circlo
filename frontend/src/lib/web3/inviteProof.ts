@@ -11,7 +11,7 @@
  * msg.sender matches the invitee address in the signed struct.
  */
 
-import { encodeAbiParameters, type Address, type Hex } from "viem";
+import { type Address, encodeAbiParameters, type Hex } from "viem";
 import { circleFactoryContract } from "@/lib/web3/contracts";
 import { NETWORK } from "@/lib/web3/network";
 
@@ -69,7 +69,10 @@ export interface InviteLinkParams {
   signature: Hex;
 }
 
-export function buildInviteUrl(params: InviteLinkParams, origin: string): string {
+export function buildInviteUrl(
+  params: InviteLinkParams,
+  origin: string,
+): string {
   const url = new URL("/accept-invite", origin);
   url.searchParams.set("id", params.circleId);
   url.searchParams.set("chainId", params.chainId.toString());

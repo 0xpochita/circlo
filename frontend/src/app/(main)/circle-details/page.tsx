@@ -11,9 +11,9 @@ import {
   DetailsHeader,
   DetailsHero,
   DetailsMembers,
+  DetailsStats,
   GenerateInviteSheet,
   InviteMemberButton,
-  DetailsStats,
   JoinButton,
   LeaveButton,
 } from "@/components/pages/(circle-details)";
@@ -163,7 +163,9 @@ function CircleDetailsContent() {
                   onClick={() => setInviteOpen(true)}
                   className="flex w-full items-center justify-center gap-2 rounded-2xl bg-white py-3 text-sm font-medium text-main-text cursor-pointer transition-all duration-200 active:scale-[0.98]"
                 >
-                  <span className="inline-flex h-5 w-5 items-center justify-center">🔗</span>
+                  <span className="inline-flex h-5 w-5 items-center justify-center">
+                    🔗
+                  </span>
                   Generate invite link
                 </button>
               </div>

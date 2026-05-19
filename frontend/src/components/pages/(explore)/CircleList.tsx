@@ -71,7 +71,15 @@ export default function CircleList({
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [search, category]);
+  }, [
+    search,
+    category,
+    cached,
+    hasCached,
+    isDefault,
+    isStale,
+    setPublicCircles,
+  ]);
 
   async function handleJoin(e: React.MouseEvent, circleId: string) {
     e.preventDefault();

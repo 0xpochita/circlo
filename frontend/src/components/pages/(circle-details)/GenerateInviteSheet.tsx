@@ -5,19 +5,18 @@ import { useState } from "react";
 import {
   HiOutlineCheck,
   HiOutlineClipboard,
-  HiOutlineLink,
   HiOutlineSparkles,
   HiXMark,
 } from "react-icons/hi2";
 import { toast } from "sonner";
+import type { Address } from "viem";
 import { useAccount, useSignTypedData } from "wagmi";
 import { useSheetOverflow } from "@/hooks";
 import {
+  buildInviteUrl,
   INVITE_PROOF_TYPED_DATA_DOMAIN,
   INVITE_PROOF_TYPES,
-  buildInviteUrl,
 } from "@/lib/web3/inviteProof";
-import type { Address } from "viem";
 
 type DurationKey = "1h" | "1d" | "7d" | "30d";
 
@@ -87,7 +86,7 @@ export default function GenerateInviteSheet({
       return;
     }
 
-    const seconds = DURATIONS.find((d) => d.key === duration)!.seconds;
+    const seconds = DURATIONS.find((d) => d.key === duration)?.seconds;
     const expiry = BigInt(Math.floor(Date.now() / 1000) + seconds);
 
     setIsSigning(true);
@@ -144,7 +143,11 @@ export default function GenerateInviteSheet({
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
-            transition={{ type: "spring" as const, stiffness: 300, damping: 32 }}
+            transition={{
+              type: "spring" as const,
+              stiffness: 300,
+              damping: 32,
+            }}
             className="fixed bottom-0 left-1/2 z-101 w-full max-w-md -translate-x-1/2 rounded-t-3xl bg-white"
           >
             <div className="flex items-start justify-between px-6 pt-6 pb-2">
@@ -269,8 +272,8 @@ export default function GenerateInviteSheet({
                   </motion.button>
 
                   <p className="mt-3 text-xs text-muted text-center px-4">
-                    No gas fee — this is an off-chain signature. The invitee pays gas
-                    when joining.
+                    No gas fee — this is an off-chain signature. The invitee
+                    pays gas when joining.
                   </p>
                 </>
               )}

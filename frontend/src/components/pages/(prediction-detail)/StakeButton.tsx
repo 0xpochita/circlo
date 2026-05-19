@@ -10,13 +10,13 @@ import { UsdtLabel } from "@/components/shared";
 import { useSheetOverflow } from "@/hooks";
 import { circlesApi, goalsApi } from "@/lib/api/endpoints";
 import { normalizeSide } from "@/lib/utils";
-import { NETWORK } from "@/lib/web3/network";
 import {
   circleFactoryContract,
   mockUSDTContract,
   predictionPoolContract,
   resolutionModuleContract,
 } from "@/lib/web3/contracts";
+import { NETWORK } from "@/lib/web3/network";
 import { DEFAULT_MIN_STAKE, fromUSDT, toUSDT } from "@/lib/web3/usdt";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -526,9 +526,12 @@ export default function StakeButton({
           { duration: 10000 },
         );
       } else {
-        toast.error(`Failed [${errObj?.name ?? "?"}]: ${message.slice(0, 100)}`, {
-          duration: 10000,
-        });
+        toast.error(
+          `Failed [${errObj?.name ?? "?"}]: ${message.slice(0, 100)}`,
+          {
+            duration: 10000,
+          },
+        );
       }
       setSteps((prev) =>
         prev.map((s) =>

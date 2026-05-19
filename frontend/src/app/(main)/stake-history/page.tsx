@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import { HiOutlineChartBar, HiOutlineChevronLeft } from "react-icons/hi2";
 import { BottomTabBar, PageTransition } from "@/components/pages/(app)";
 import { EmojiAvatar, UsdtLabel } from "@/components/shared";
-import { goalsApi, type GoalWithMyStake } from "@/lib/api/endpoints";
+import { type GoalWithMyStake, goalsApi } from "@/lib/api/endpoints";
 import { normalizeSide, toAvatar } from "@/lib/utils";
 import { useDataCache } from "@/stores/dataCache";
 
@@ -77,7 +77,7 @@ export default function StakeHistoryPage() {
         if (!hasCached) setGoals([]);
       })
       .finally(() => setIsLoading(false));
-  }, []);
+  }, [cached, hasCached, isStale, setMyGoals]);
 
   const staked = useMemo(
     () => goals.filter((g) => g.myStake !== null && g.myStake !== undefined),
@@ -95,8 +95,8 @@ export default function StakeHistoryPage() {
       const s = getStakeStatus(g);
       const stakedAmt = parseFloat(g.myStake?.staked ?? "0");
       const claimedAmt = parseFloat(g.myStake?.claimedAmount ?? "0");
-      totalStaked += isNaN(stakedAmt) ? 0 : stakedAmt;
-      totalClaimed += isNaN(claimedAmt) ? 0 : claimedAmt;
+      totalStaked += Number.isNaN(stakedAmt) ? 0 : stakedAmt;
+      totalClaimed += Number.isNaN(claimedAmt) ? 0 : claimedAmt;
       if (s === "won" || s === "claimed") won++;
       else if (s === "lost") lost++;
       else active++;
