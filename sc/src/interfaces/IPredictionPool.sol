@@ -43,6 +43,8 @@ interface IPredictionPool {
         string metadataURI;
     }
 
+    /// @notice Emitted by `createGoal`. Full goal config in one event so
+    ///         indexers don't need a separate read to backfill metadata.
     event GoalCreated(
         uint256 indexed id,
         uint256 indexed circleId,
@@ -53,10 +55,21 @@ interface IPredictionPool {
         address[] resolvers,
         string metadataURI
     );
+    /// @notice Emitted by `stake`. Reports the user's PER-CALL stake;
+    ///         off-chain totals come from summing all Staked events for
+    ///         a given (goalId, user, side).
     event Staked(uint256 indexed goalId, address indexed user, uint8 side, uint256 amount);
+    /// @notice Emitted by `lockGoal` when goal transitions Open → Locked.
     event GoalLocked(uint256 indexed goalId);
+    /// @notice Emitted by `setWinner` when goal transitions to PaidOut.
+    /// @dev `winningSide` matches the resolver's choice. UNRESOLVED (255)
+    ///      will never appear in this event — resolved goals always have
+    ///      a real side.
     event GoalResolved(uint256 indexed goalId, uint8 winningSide);
+    /// @notice Emitted the FIRST time `refund` is called on a disputed
+    ///         goal — subsequent refunds by other stakers don't re-emit.
     event GoalRefunded(uint256 indexed goalId);
+    /// @notice Emitted on each successful `claim`. `amount` is post-fee.
     event Claimed(uint256 indexed goalId, address indexed user, uint256 amount);
 
     function createGoal(
