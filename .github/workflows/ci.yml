@@ -84,9 +84,6 @@ jobs:
   sdk:
     name: circlo-sdk (build + test)
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/circlo-sdk
     steps:
       - uses: actions/checkout@v4
 
@@ -94,11 +91,22 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies (no-save so we don't drift package.json)
+      # circlo-types must be built first so its dist/ exists when the SDK
+      # imports it via the file: install below. dist/ is gitignored.
+      - name: Build circlo-types (so dist/ exists for SDK install)
+        working-directory: packages/circlo-types
+        run: |
+          npm install --no-save typescript@^5.7.3
+          npm run build
+
+      - name: Install SDK dependencies (no-save so package.json stays clean)
+        working-directory: packages/circlo-sdk
         run: npm install --no-save ../circlo-types typescript@^5.7.3 viem@^2.48.0
 
-      - name: Build
+      - name: Build SDK
+        working-directory: packages/circlo-sdk
         run: npm run build
 
-      - name: Test
+      - name: Test SDK
+        working-directory: packages/circlo-sdk
         run: npm test
