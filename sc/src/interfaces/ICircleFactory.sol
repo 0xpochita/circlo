@@ -54,8 +54,18 @@ interface ICircleFactory {
 
     /// @notice Owner-driven kick: remove `member` from the circle.
     function removeMember(uint256 circleId, address member) external;
+    /// @notice Paginated read of a circle's member list (append-only history).
+    /// @dev Returns ALL historical members, including those who left.
+    ///      Filter via `isCircleMember` if you need only-current.
     function getMembers(uint256 circleId, uint256 offset, uint256 limit) external view returns (address[] memory members);
+
+    /// @notice Canonical membership check used across the Circlo system.
+    /// @dev Never reverts — returns false for non-existent circles too.
     function isCircleMember(uint256 circleId, address user) external view returns (bool);
+
+    /// @notice Full Circle struct read; reverts CircleNotFound on missing id.
     function getCircle(uint256 circleId) external view returns (Circle memory);
+
+    /// @notice Next id to assign on `createCircle`. Total ever = this value.
     function nextCircleId() external view returns (uint256);
 }
