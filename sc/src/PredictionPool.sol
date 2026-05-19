@@ -463,5 +463,9 @@ contract PredictionPool is
         _unpause();
     }
 
+    function settlement() external {
+        emit Settlement(block.timestamp);
+    }
+
     function _authorizeUpgrade(address newImplementation) internal override onlyRole(UPGRADER_ROLE) {}
 }
