@@ -9,6 +9,7 @@ import type { ParticipantResponse } from "@/lib/api/endpoints";
 import { goalsApi } from "@/lib/api/endpoints";
 import { normalizeSide, toAvatar } from "@/lib/utils";
 import { predictionPoolContract } from "@/lib/web3/contracts";
+import { explorerAddressUrl } from "@/lib/web3/network";
 import { fromUSDT } from "@/lib/web3/usdt";
 import { useUserStore } from "@/stores/userStore";
 
@@ -155,9 +156,18 @@ export default function ParticipantList({
                   {p.user.name || "Member"}
                 </p>
                 <p className="text-xs text-muted">
-                  {p.user.username
-                    ? `@${p.user.username}`
-                    : p.user.walletAddress?.slice(0, 10)}
+                  {p.user.username ? (
+                    `@${p.user.username}`
+                  ) : p.user.walletAddress ? (
+                    <a
+                      href={explorerAddressUrl(p.user.walletAddress)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:underline"
+                    >
+                      {p.user.walletAddress.slice(0, 10)}
+                    </a>
+                  ) : null}
                 </p>
                 <p className="text-xs text-muted inline-flex items-center gap-1">
                   Staked{" "}
