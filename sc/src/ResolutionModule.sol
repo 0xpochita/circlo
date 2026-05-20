@@ -204,6 +204,15 @@ contract ResolutionModule is Initializable, AccessControlUpgradeable, UUPSUpgrad
         total = t.totalVotes;
     }
 
+    /// @dev Internal settle path shared by `submitVote` (auto-finalize
+    ///      after the last vote lands) and `finalize` (callable by
+    ///      anyone once the vote window closes).
+    /// @dev Outcome rules:
+    ///        - count0 == count1 → tie → `pool.markDisputed`
+    ///        - else             → side with more votes wins
+    /// @dev `finalized` is flipped before the external call to enforce
+    ///      a single-resolution invariant even if the pool re-enters.
+    /// @param goalId Goal whose tally is being finalized.
     function _finalize(uint256 goalId) internal {
         Tally storage t = tallies[goalId];
         t.finalized = true;
@@ -221,5 +230,10 @@ contract ResolutionModule is Initializable, AccessControlUpgradeable, UUPSUpgrad
         }
     }
 
+    /// @dev UUPS hook — restricts upgrades to UPGRADER_ROLE holders
+    ///      (today the TimelockController on Celo Mainnet, which
+    ///      enforces a 48h delay before any new implementation can
+    ///      be installed). Empty body is the standard OZ pattern.
+    /// @param newImplementation New ResolutionModule implementation address.
     function _authorizeUpgrade(address newImplementation) internal override onlyRole(UPGRADER_ROLE) {}
 }

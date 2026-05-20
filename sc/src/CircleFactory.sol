@@ -283,15 +283,33 @@ contract CircleFactory is Initializable, AccessControlUpgradeable, UUPSUpgradeab
         return circles[circleId];
     }
 
+    /// @dev Shared add-member primitive used by `createCircle`,
+    ///      `joinCircle`, `joinCirclePrivate`, and `addMember`. Both
+    ///      side effects (isMember flag + _members array push) MUST
+    ///      stay in lockstep so off-chain pagination via `getMembers`
+    ///      mirrors the on-chain membership truth.
+    /// @param circleId Circle being joined.
+    /// @param member Address being added as a member.
     function _addMember(uint256 circleId, address member) internal {
         isMember[circleId][member] = true;
         _members[circleId].push(member);
     }
 
+    /// @dev Internal guard that loads a circle storage pointer and
+    ///      reverts CircleNotFound if the circle was never created.
+    ///      Used by every membership-mutating method as the first
+    ///      step before any state change.
+    /// @param circleId Circle to look up.
+    /// @return c Storage pointer to the circle (caller may read/write).
     function _requireCircle(uint256 circleId) internal view returns (Circle storage c) {
         c = circles[circleId];
         if (c.createdAt == 0) revert CircleNotFound();
     }
 
+    /// @dev UUPS hook — restricts upgrades to UPGRADER_ROLE holders
+    ///      (today the TimelockController on Celo Mainnet, which
+    ///      enforces a 48h delay before any new implementation can
+    ///      be installed). Empty body is the standard OZ pattern.
+    /// @param newImplementation New CircleFactory implementation address.
     function _authorizeUpgrade(address newImplementation) internal override onlyRole(UPGRADER_ROLE) {}
 }
