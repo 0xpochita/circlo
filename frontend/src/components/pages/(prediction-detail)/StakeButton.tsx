@@ -16,7 +16,7 @@ import {
   predictionPoolContract,
   resolutionModuleContract,
 } from "@/lib/web3/contracts";
-import { NETWORK } from "@/lib/web3/network";
+import { explorerTxUrl, NETWORK } from "@/lib/web3/network";
 import { DEFAULT_MIN_STAKE, fromUSDT, toUSDT } from "@/lib/web3/usdt";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -469,7 +469,12 @@ export default function StakeButton({
         amount: String(parsed),
         claimedAmount: null,
       });
-      toast.success("Stake placed!");
+      toast.success("Stake placed!", {
+        action: {
+          label: "View on Celo explorer",
+          onClick: () => window.open(explorerTxUrl(stakeTx), "_blank"),
+        },
+      });
       const t1 = setTimeout(() => {
         setSheetOpen(false);
         setAmount("");
@@ -573,7 +578,12 @@ export default function StakeButton({
           return;
         }
       }
-      toast.success("Vote submitted!");
+      toast.success("Vote submitted!", {
+        action: {
+          label: "View on Celo explorer",
+          onClick: () => window.open(explorerTxUrl(txHash), "_blank"),
+        },
+      });
       setResolveSheetOpen(false);
       if (onStaked) {
         const t = setTimeout(onStaked, 1000);
@@ -631,7 +641,12 @@ export default function StakeButton({
       setMyStake((prev) =>
         prev ? { ...prev, claimedAmount: prev.amount } : prev,
       );
-      toast.success("Reward claimed!");
+      toast.success("Reward claimed!", {
+        action: {
+          label: "View on Celo explorer",
+          onClick: () => window.open(explorerTxUrl(txHash), "_blank"),
+        },
+      });
       if (onStaked) {
         const t = setTimeout(onStaked, 1000);
         timeoutRefs.current.push(t);

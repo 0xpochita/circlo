@@ -13,7 +13,7 @@ import {
   circleFactoryContract,
   predictionPoolContract,
 } from "@/lib/web3/contracts";
-import { NETWORK } from "@/lib/web3/network";
+import { explorerTxUrl, NETWORK } from "@/lib/web3/network";
 import { DEFAULT_MIN_STAKE, toUSDT } from "@/lib/web3/usdt";
 import { useCreateGoalStore } from "@/stores/createGoalStore";
 
@@ -319,7 +319,12 @@ export default function ConfirmButton() {
 
       const circleIdForRedirect = store.circleId;
       store.reset();
-      toast.success("Goal created!");
+      toast.success("Goal created!", {
+        action: {
+          label: "View on Celo explorer",
+          onClick: () => window.open(explorerTxUrl(txHash), "_blank"),
+        },
+      });
       setTimeout(() => {
         setSheetOpen(false);
         router.push(`/circle-details?id=${circleIdForRedirect}`);
