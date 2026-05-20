@@ -4,12 +4,11 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { HiOutlineUserGroup } from "react-icons/hi2";
 import { useAccount, useReadContract } from "wagmi";
-import { EmojiAvatar, UsdtLabel } from "@/components/shared";
+import { AddressLink, EmojiAvatar, UsdtLabel } from "@/components/shared";
 import type { ParticipantResponse } from "@/lib/api/endpoints";
 import { goalsApi } from "@/lib/api/endpoints";
 import { normalizeSide, toAvatar } from "@/lib/utils";
 import { predictionPoolContract } from "@/lib/web3/contracts";
-import { explorerAddressUrl } from "@/lib/web3/network";
 import { fromUSDT } from "@/lib/web3/usdt";
 import { useUserStore } from "@/stores/userStore";
 
@@ -156,18 +155,11 @@ export default function ParticipantList({
                   {p.user.name || "Member"}
                 </p>
                 <p className="text-xs text-muted">
-                  {p.user.username ? (
-                    `@${p.user.username}`
-                  ) : p.user.walletAddress ? (
-                    <a
-                      href={explorerAddressUrl(p.user.walletAddress)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="hover:underline"
-                    >
-                      {p.user.walletAddress.slice(0, 10)}
-                    </a>
-                  ) : null}
+                  {p.user.username
+                    ? `@${p.user.username}`
+                    : p.user.walletAddress && (
+                        <AddressLink address={p.user.walletAddress} />
+                      )}
                 </p>
                 <p className="text-xs text-muted inline-flex items-center gap-1">
                   Staked{" "}

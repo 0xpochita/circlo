@@ -12,7 +12,7 @@ import {
 import { toast } from "sonner";
 import { useAccount, useWalletClient } from "wagmi";
 import { BottomTabBar, PageTransition } from "@/components/pages/(app)";
-import { EmojiAvatar, UsdtLabel } from "@/components/shared";
+import { AddressLink, EmojiAvatar, UsdtLabel } from "@/components/shared";
 import { type CircleDetailResponse, circlesApi } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
 import {
@@ -21,7 +21,6 @@ import {
   isExpired,
   parseInviteUrl,
 } from "@/lib/web3/inviteProof";
-import { explorerAddressUrl } from "@/lib/web3/network";
 import { useAuthStore } from "@/stores/authStore";
 
 type Status =
@@ -170,14 +169,11 @@ function AcceptInviteContent() {
               body={
                 <>
                   This link is only valid for{" "}
-                  <a
-                    href={explorerAddressUrl(invite.invitee)}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <AddressLink
+                    address={invite.invitee}
+                    withTail
                     className="font-medium text-main-text hover:underline"
-                  >
-                    {`${invite.invitee.slice(0, 6)}...${invite.invitee.slice(-4)}`}
-                  </a>
+                  />
                   . Switch to that wallet to accept.
                 </>
               }

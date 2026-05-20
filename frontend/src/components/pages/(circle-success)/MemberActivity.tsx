@@ -7,11 +7,10 @@ import {
   HiOutlineUserGroup,
 } from "react-icons/hi2";
 import { toast } from "sonner";
-import { EmojiAvatar } from "@/components/shared";
+import { AddressLink, EmojiAvatar } from "@/components/shared";
 import type { MemberResponse } from "@/lib/api/endpoints";
 import { circlesApi } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
-import { explorerAddressUrl } from "@/lib/web3/network";
 
 type MemberActivityProps = {
   circleId?: string;
@@ -85,14 +84,7 @@ export default function MemberActivity({ circleId }: MemberActivityProps) {
                     {m.user.username ? (
                       `@${m.user.username}`
                     ) : (
-                      <a
-                        href={explorerAddressUrl(m.user.walletAddress)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="hover:underline"
-                      >
-                        {m.user.walletAddress.slice(0, 10)}
-                      </a>
+                      <AddressLink address={m.user.walletAddress} />
                     )}
                   </p>
                   <span className="inline-block rounded-md px-2 py-0.5 text-xs font-medium bg-emerald-50 text-emerald-500">

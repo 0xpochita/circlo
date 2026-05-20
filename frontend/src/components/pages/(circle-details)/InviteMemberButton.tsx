@@ -8,11 +8,10 @@ import {
   HiXMark,
 } from "react-icons/hi2";
 import { toast } from "sonner";
-import { EmojiAvatar } from "@/components/shared";
+import { AddressLink, EmojiAvatar } from "@/components/shared";
 import { useSheetOverflow } from "@/hooks";
 import { circlesApi, usersApi } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
-import { explorerAddressUrl } from "@/lib/web3/network";
 
 type SearchUser = {
   id: string;
@@ -236,15 +235,11 @@ export default function InviteMemberButton({
                                 {user.username ? (
                                   `@${user.username}`
                                 ) : (
-                                  <a
-                                    href={explorerAddressUrl(user.walletAddress)}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="hover:underline"
-                                    onClick={(e) => e.stopPropagation()}
-                                  >
-                                    {user.walletAddress.slice(0, 12)}
-                                  </a>
+                                  <AddressLink
+                                    address={user.walletAddress}
+                                    length={12}
+                                    stopPropagation
+                                  />
                                 )}
                               </p>
                             </div>
