@@ -107,7 +107,23 @@ export async function stake(
 }
 
 /**
- * Read a user's stake on a given side of a goal.
+ * Read how much USDT a given user has staked on a given side of a
+ * goal. Returns the amount in USDT base units (6-decimal, so
+ * 1_500_000n = 1.5 USDT). Returns 0n if the user never staked on
+ * that side.
+ *
+ * Useful for rendering "your position" UI and for figuring out which
+ * side a user is eligible to claim from after a goal resolves on Celo.
+ *
+ * @example
+ * ```ts
+ * import { getStakeOf, Side } from "circlo-sdk";
+ *
+ * const myYesStake = await getStakeOf(client, 117n, "0xabc...", Side.Yes);
+ * if (myYesStake > 0n) {
+ *   // user staked on YES — eligible to claim if YES wins
+ * }
+ * ```
  */
 export async function getStakeOf(
   client: PublicClient,
@@ -124,7 +140,14 @@ export async function getStakeOf(
 }
 
 /**
- * Read the total pool on a given side of a goal.
+ * Read the total pool size on one side of a goal, in USDT base units
+ * (6-decimal). Combined with the opposing side's pool, this is the
+ * primitive for live odds and payout-projection math:
+ *
+ *     impliedProb(yes) = yesPool / (yesPool + noPool)
+ *     payout(yesWin, myStake) = myStake + myStake * noPool / yesPool
+ *
+ * Both calls in parallel via `Promise.all` is the common pattern.
  */
 export async function getPoolPerSide(
   client: PublicClient,

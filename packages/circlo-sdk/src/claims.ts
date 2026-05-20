@@ -32,8 +32,27 @@ export async function claim(
 }
 
 /**
- * Refund a stake when a goal was cancelled or could not be resolved.
- * Returns the original stake to the caller (no payout).
+ * Refund the caller's original stake when a goal entered the
+ * Disputed status (resolver vote tied) or was otherwise marked
+ * non-resolvable on Celo. Anyone who staked can call this — payout
+ * is exactly the principal, no share of the opposing pool.
+ *
+ * Returns the raw tx hash — callers can wait on the receipt
+ * themselves if they need to confirm the USDT transfer landed.
+ *
+ * @throws `Error` if the walletClient has no account configured.
+ * @throws viem `ContractFunctionExecutionError` with one of:
+ *   - `NotRefundable` — goal is not in a refundable state
+ *     (still Open / Locked / Resolving / PaidOut)
+ *   - `NothingToRefund` — caller never staked, or already refunded
+ *
+ * @example
+ * ```ts
+ * import { refund } from "circlo-sdk";
+ *
+ * const hash = await refund(wallet, 117n);
+ * await publicClient.waitForTransactionReceipt({ hash });
+ * ```
  */
 export async function refund(
   wallet: WalletClient,
