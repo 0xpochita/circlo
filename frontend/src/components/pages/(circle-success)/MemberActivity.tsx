@@ -11,6 +11,7 @@ import { EmojiAvatar } from "@/components/shared";
 import type { MemberResponse } from "@/lib/api/endpoints";
 import { circlesApi } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
+import { explorerAddressUrl } from "@/lib/web3/network";
 
 type MemberActivityProps = {
   circleId?: string;
@@ -81,9 +82,18 @@ export default function MemberActivity({ circleId }: MemberActivityProps) {
                     {m.user.name || "Anonymous"}
                   </p>
                   <p className="text-xs text-muted mb-1">
-                    {m.user.username
-                      ? `@${m.user.username}`
-                      : m.user.walletAddress.slice(0, 10)}
+                    {m.user.username ? (
+                      `@${m.user.username}`
+                    ) : (
+                      <a
+                        href={explorerAddressUrl(m.user.walletAddress)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:underline"
+                      >
+                        {m.user.walletAddress.slice(0, 10)}
+                      </a>
+                    )}
                   </p>
                   <span className="inline-block rounded-md px-2 py-0.5 text-xs font-medium bg-emerald-50 text-emerald-500">
                     Joined

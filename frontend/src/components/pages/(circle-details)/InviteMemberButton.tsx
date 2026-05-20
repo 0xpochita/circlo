@@ -12,6 +12,7 @@ import { EmojiAvatar } from "@/components/shared";
 import { useSheetOverflow } from "@/hooks";
 import { circlesApi, usersApi } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
+import { explorerAddressUrl } from "@/lib/web3/network";
 
 type SearchUser = {
   id: string;
@@ -232,9 +233,19 @@ export default function InviteMemberButton({
                                   user.walletAddress.slice(0, 8)}
                               </p>
                               <p className="text-xs text-muted truncate">
-                                {user.username
-                                  ? `@${user.username}`
-                                  : user.walletAddress.slice(0, 12)}
+                                {user.username ? (
+                                  `@${user.username}`
+                                ) : (
+                                  <a
+                                    href={explorerAddressUrl(user.walletAddress)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="hover:underline"
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    {user.walletAddress.slice(0, 12)}
+                                  </a>
+                                )}
                               </p>
                             </div>
                           </div>
