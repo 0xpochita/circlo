@@ -12,7 +12,7 @@ import {
 import { TbTargetArrow } from "react-icons/tb";
 import { toast } from "sonner";
 import { usePublicClient } from "wagmi";
-import { EmojiAvatar, UsdtLabel } from "@/components/shared";
+import { EmojiAvatar, OnChainBadge, UsdtLabel } from "@/components/shared";
 import { useSheetOverflow } from "@/hooks";
 import type { GoalResponse } from "@/lib/api/endpoints";
 import { circlesApi, goalsApi } from "@/lib/api/endpoints";
@@ -309,6 +309,9 @@ export default function DetailsGoals({ circleId }: DetailsGoalsProps) {
                           </div>
                           <div className="flex flex-col items-end gap-1 shrink-0">
                             <StatusBadge status={g.status} />
+                            {g.chainId && (
+                              <OnChainBadge kind="goal" chainId={g.chainId} />
+                            )}
                             <span className="text-[10px] text-muted inline-flex items-center gap-0.5">
                               <HiOutlineClock className="w-3 h-3" />
                               {formatTimeLeft(g.deadline)}
@@ -355,6 +358,9 @@ function GoalCard({ goal, index }: { goal: GoalResponse; index: number }) {
             <span className="text-xs text-muted">
               {goal.participantCount} joined
             </span>
+            {goal.chainId && (
+              <OnChainBadge kind="goal" chainId={goal.chainId} />
+            )}
           </div>
         </div>
         <div className="flex items-center gap-1 shrink-0">
