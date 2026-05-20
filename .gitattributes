@@ -1,0 +1,24 @@
+# Normalize line endings across platforms.
+# Auto-detect text files and check them out with LF on every OS, so
+# Windows contributors stop triggering CRLF→LF warnings on every commit.
+* text=auto eol=lf
+
+# Explicit binary types — never touch line endings.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.svg binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.otf binary
+*.mp4 binary
+*.mp3 binary
+*.pdf binary
+*.zip binary
+*.tar binary
+*.gz binary
