@@ -4,12 +4,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import {
+  HiArrowTopRightOnSquare,
   HiCheck,
   HiOutlineDocumentDuplicate,
   HiOutlineShieldCheck,
   HiXMark,
 } from "react-icons/hi2";
 import QRCode from "react-qr-code";
+import { explorerAddressUrl } from "@/lib/web3/network";
 
 type DepositSheetProps = {
   open: boolean;
@@ -161,7 +163,7 @@ export default function DepositSheet({
                     type="button"
                     onClick={handleCopy}
                     whileTap={{ scale: 0.97 }}
-                    className="mb-4 flex w-full items-center justify-center gap-2 rounded-full bg-main-text py-4 text-base font-semibold text-white cursor-pointer"
+                    className="mb-3 flex w-full items-center justify-center gap-2 rounded-full bg-main-text py-4 text-base font-semibold text-white cursor-pointer"
                   >
                     {copied ? (
                       <>
@@ -175,6 +177,16 @@ export default function DepositSheet({
                       </>
                     )}
                   </motion.button>
+
+                  <a
+                    href={explorerAddressUrl(walletAddress)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mb-4 flex w-full items-center justify-center gap-2 rounded-full border border-gray-200 py-3 text-sm font-semibold text-main-text transition-all duration-200 active:scale-[0.97]"
+                  >
+                    <HiArrowTopRightOnSquare className="w-4 h-4" />
+                    View on Celo explorer
+                  </a>
 
                   <div className="rounded-2xl bg-gray-50 p-4">
                     <div className="flex items-start gap-3">
