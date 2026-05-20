@@ -20,6 +20,7 @@ import {
   type ParticipantResponse,
 } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
+import { explorerAddressUrl } from "@/lib/web3/network";
 
 type StakerStat = {
   userId: string;
@@ -367,9 +368,17 @@ function CircleAnalyticsContent() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-main-text truncate">
-                          {s.name ??
-                            s.username ??
-                            `${s.walletAddress.slice(0, 6)}...${s.walletAddress.slice(-4)}`}
+                          {s.name ?? s.username ?? (
+                            <a
+                              href={explorerAddressUrl(s.walletAddress)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="hover:underline"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {`${s.walletAddress.slice(0, 6)}...${s.walletAddress.slice(-4)}`}
+                            </a>
+                          )}
                         </p>
                         <p className="text-xs text-muted">
                           {s.stakeCount} stake{s.stakeCount !== 1 ? "s" : ""}
