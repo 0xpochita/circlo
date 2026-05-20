@@ -60,6 +60,29 @@ export const NETWORK: NetworkConfig = IS_MAINNET ? MAINNET : TESTNET;
 export const ZERO_ADDRESS =
   "0x0000000000000000000000000000000000000000" as Address;
 
+/**
+ * Build a link to the active Celo block explorer (Celoscan for mainnet,
+ * Blockscout for Sepolia) pointing at an address.
+ */
+export function explorerAddressUrl(address: Address | string): string {
+  return `${NETWORK.explorerUrl}/address/${address}`;
+}
+
+/**
+ * Build a link to the active Celo block explorer for a tx hash.
+ */
+export function explorerTxUrl(hash: `0x${string}` | string): string {
+  return `${NETWORK.explorerUrl}/tx/${hash}`;
+}
+
+/**
+ * Build a Celoscan link to a PredictionPool goal — opens the contract
+ * read tab so users can inspect the goal struct directly.
+ */
+export function explorerGoalUrl(goalId: bigint | number | string): string {
+  return `${NETWORK.explorerUrl}/address/${NETWORK.contracts.predictionPool}#readContract`;
+}
+
 if (typeof window !== "undefined") {
   const tag = IS_MAINNET ? "%cMAINNET" : "%cTESTNET";
   const style = IS_MAINNET
