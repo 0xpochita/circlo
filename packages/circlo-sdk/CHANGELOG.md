@@ -3,6 +3,17 @@
 All notable changes to `circlo-sdk` are documented here. This project follows
 [Semantic Versioning](https://semver.org).
 
+## [0.2.1] — 2026-05-20
+
+### Docs
+
+- Enriched JSDoc on `refund`, `getStakeOf`, and `getPoolPerSide`. The
+  previously one-line docstrings now match the depth of the rest of the
+  surface — documenting return units (USDT base, 6-decimal), the typed
+  reverts they can throw on Celo (`NotRefundable`, `NothingToRefund`),
+  and the live-odds + payout-projection formulas that consumers
+  compose them into.
+
 ## [0.2.0] — 2026-05-17
 
 ### Added
