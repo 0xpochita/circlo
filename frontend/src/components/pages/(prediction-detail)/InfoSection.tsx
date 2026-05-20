@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { HiArrowTopRightOnSquare } from "react-icons/hi2";
 import { EmojiAvatar, UsdtLabel } from "@/components/shared";
 import type { GoalResponse } from "@/lib/api/endpoints";
 import { circlesApi } from "@/lib/api/endpoints";
 import { normalizeSide, toAvatar } from "@/lib/utils";
+import { explorerGoalUrl } from "@/lib/web3/network";
 import { DEFAULT_MIN_STAKE } from "@/lib/web3/usdt";
 
 type Resolver = {
@@ -80,6 +82,20 @@ export default function InfoSection({ goal }: InfoSectionProps) {
             </p>
           </div>
         ))}
+        {goal?.chainId && (
+          <div className="flex items-center justify-between px-4 py-3">
+            <p className="text-sm text-muted">On-chain ID</p>
+            <a
+              href={explorerGoalUrl(goal.chainId)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-sm font-medium text-main-text hover:underline"
+            >
+              #{goal.chainId}
+              <HiArrowTopRightOnSquare className="w-3.5 h-3.5" />
+            </a>
+          </div>
+        )}
       </div>
 
       {resolvers.length > 0 && (
