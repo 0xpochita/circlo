@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { HiCheck, HiOutlineShieldCheck } from "react-icons/hi2";
-import { EmojiAvatar } from "@/components/shared";
+import { AddressLink, EmojiAvatar } from "@/components/shared";
 import { circlesApi } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
 import { useCreateGoalStore } from "@/stores/createGoalStore";
@@ -12,7 +12,8 @@ import type { UserAvatar } from "@/types";
 type Member = {
   userId: string;
   displayName: string;
-  username: string;
+  username: string | null;
+  walletAddress: string;
   avatar: UserAvatar;
 };
 
@@ -31,9 +32,8 @@ export default function ResolverPicker() {
           res.items.map((m) => ({
             userId: m.userId,
             displayName: m.user.name || "Member",
-            username: m.user.username
-              ? `@${m.user.username}`
-              : m.user.walletAddress.slice(0, 10),
+            username: m.user.username ? `@${m.user.username}` : null,
+            walletAddress: m.user.walletAddress,
             avatar: toAvatar(m.user.avatarEmoji, m.user.avatarColor),
           })),
         );
@@ -141,7 +141,14 @@ export default function ResolverPicker() {
                 <p className="text-sm font-semibold text-main-text">
                   {member.displayName}
                 </p>
-                <p className="text-xs text-muted">{member.username}</p>
+                <p className="text-xs text-muted">
+                  {member.username ?? (
+                    <AddressLink
+                      address={member.walletAddress}
+                      stopPropagation
+                    />
+                  )}
+                </p>
               </div>
               <div
                 className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full transition-all duration-200 ${

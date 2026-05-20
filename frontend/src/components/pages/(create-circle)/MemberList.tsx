@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { HiOutlineMagnifyingGlass, HiOutlineUserPlus } from "react-icons/hi2";
 import { toast } from "sonner";
-import { EmojiAvatar } from "@/components/shared";
+import { AddressLink, EmojiAvatar } from "@/components/shared";
 import { circlesApi, usersApi } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
 import { useCreateCircleStore } from "@/stores/createCircleStore";
@@ -175,13 +175,22 @@ export default function MemberList({ circleId }: MemberListProps) {
                     <div>
                       <p className="text-sm font-semibold text-main-text">
                         {member.name ??
-                          member.username ??
-                          member.walletAddress.slice(0, 8)}
+                          member.username ?? (
+                            <AddressLink
+                              address={member.walletAddress}
+                              length={8}
+                            />
+                          )}
                       </p>
                       <p className="text-xs text-muted">
-                        {member.username
-                          ? `@${member.username}`
-                          : member.walletAddress.slice(0, 12)}
+                        {member.username ? (
+                          `@${member.username}`
+                        ) : (
+                          <AddressLink
+                            address={member.walletAddress}
+                            length={12}
+                          />
+                        )}
                       </p>
                     </div>
                   </div>
