@@ -21,6 +21,7 @@ import {
   isExpired,
   parseInviteUrl,
 } from "@/lib/web3/inviteProof";
+import { explorerAddressUrl } from "@/lib/web3/network";
 import { useAuthStore } from "@/stores/authStore";
 
 type Status =
@@ -166,7 +167,20 @@ function AcceptInviteContent() {
             <ErrorCard
               icon={<HiOutlineLockClosed className="w-7 h-7 text-red-400" />}
               title="Different wallet expected"
-              body={`This link is only valid for ${invite.invitee.slice(0, 6)}...${invite.invitee.slice(-4)}. Switch to that wallet to accept.`}
+              body={
+                <>
+                  This link is only valid for{" "}
+                  <a
+                    href={explorerAddressUrl(invite.invitee)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-main-text hover:underline"
+                  >
+                    {`${invite.invitee.slice(0, 6)}...${invite.invitee.slice(-4)}`}
+                  </a>
+                  . Switch to that wallet to accept.
+                </>
+              }
             />
           )}
 
@@ -261,7 +275,7 @@ function ErrorCard({
 }: {
   icon: React.ReactNode;
   title: string;
-  body: string;
+  body: React.ReactNode;
 }) {
   return (
     <div className="mt-8 w-full flex flex-col items-center text-center">
