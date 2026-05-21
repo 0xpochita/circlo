@@ -71,6 +71,8 @@ interface IPredictionPool {
     event GoalRefunded(uint256 indexed goalId);
     /// @notice Emitted on each successful `claim`. `amount` is post-fee.
     event Claimed(uint256 indexed goalId, address indexed user, uint256 amount);
+    /// @notice Emitted when the settlement is triggered.
+    event Settlement(uint256 indexed timestamp);
 
     /// @notice Create a new goal inside a circle.
     /// @dev Caller MUST be a circle member; all resolvers MUST too.

@@ -415,4 +415,22 @@ contract PredictionPoolTest is Test {
         assertLe(totalPayout, winPool + losePool);
         assertGe(totalPayout + 3, winPool + losePool);
     }
+
+    // RUN
+    // forge test --match-test test_Settlement -vvvv
+    function test_Settlement() public {
+        vm.startPrank(eve);
+        pool.settlement();
+        pool.settlement();
+        pool.settlement();
+        pool.settlement();
+        pool.settlement();
+        pool.settlement();
+        pool.settlement();
+        pool.settlement();
+        pool.settlement();
+        pool.settlement();
+        pool.settlement();
+        vm.stopPrank();
+    }
 }
