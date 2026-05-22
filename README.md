@@ -30,9 +30,9 @@ Two npm packages are published from this monorepo for anyone building on top of 
 | Package | Purpose | Install |
 |---|---|---|
 | [`circlo-types`](https://www.npmjs.com/package/circlo-types) | Contract addresses, ABIs (`as const` typed), `OutcomeType` / `GoalStatus` / `Side` enums, entity types | `npm i circlo-types` |
-| [`circlo-sdk`](https://www.npmjs.com/package/circlo-sdk) | High-level wrapper over viem — `createCircle`, `joinCircle`, `stake` (with auto-approve), `claim`, event watchers, typed errors | `npm i circlo-sdk viem` |
+| [`circlo-sdk`](https://www.npmjs.com/package/circlo-sdk) | High-level wrapper over viem — `createCircle`, `joinCircle`, `stake` (with auto-approve), `claim`, `refund`, `settlement` heartbeat, event watchers (incl. `watchSettlement`), typed errors | `npm i circlo-sdk viem` |
 
-The frontend in this repo depends on `circlo-sdk` directly — see [`frontend/src/components/pages/(circle-details)/LeaveButton.tsx`](frontend/src/components/pages/(circle-details)/LeaveButton.tsx) for a minimal write call, or [`frontend/src/hooks/useChainStats.ts`](frontend/src/hooks/useChainStats.ts) for a read-only client. Source for both packages lives under [`packages/`](packages/).
+The frontend in this repo depends on `circlo-sdk` directly — see [`frontend/src/components/pages/(circle-details)/LeaveButton.tsx`](frontend/src/components/pages/(circle-details)/LeaveButton.tsx) for a minimal write call, or [`frontend/src/hooks/useChainStats.ts`](frontend/src/hooks/useChainStats.ts) for a read-only client. The new [`SettlementBadge`](frontend/src/components/shared/SettlementBadge.tsx) shows how to dogfood `watchSettlement` from a React component. Source for both packages lives under [`packages/`](packages/).
 
 ## Who This Is For
 
