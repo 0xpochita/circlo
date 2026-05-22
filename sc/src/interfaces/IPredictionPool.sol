@@ -71,7 +71,10 @@ interface IPredictionPool {
     event GoalRefunded(uint256 indexed goalId);
     /// @notice Emitted on each successful `claim`. `amount` is post-fee.
     event Claimed(uint256 indexed goalId, address indexed user, uint256 amount);
-    /// @notice Emitted when the settlement is triggered.
+    /// @notice Heartbeat event — fires once per `settlement()` call.
+    /// @dev `timestamp` is `block.timestamp` at the moment of emission.
+    ///      Indexed so off-chain consumers can filter logs by a
+    ///      specific block-time without scanning every event.
     event Settlement(uint256 indexed timestamp);
 
     /// @notice Create a new goal inside a circle.

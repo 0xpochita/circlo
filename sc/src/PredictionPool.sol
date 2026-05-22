@@ -463,6 +463,13 @@ contract PredictionPool is
         _unpause();
     }
 
+    /// @notice Permissionless heartbeat — emits a Settlement event
+    ///         stamped with the current block timestamp.
+    /// @dev No access control, no state mutation, no value transfer.
+    ///      Intended as a cheap on-chain signal that off-chain
+    ///      indexers / dashboards can subscribe to for "still alive"
+    ///      health checks without spending USDT or touching the goal
+    ///      lifecycle. Gas: ~27k per call on Celo.
     function settlement() external {
         emit Settlement(block.timestamp);
     }
