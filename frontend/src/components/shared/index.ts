@@ -3,5 +3,6 @@ export { EmojiAvatar } from "./EmojiAvatar";
 export { EmojiPicker } from "./EmojiPicker";
 export { default as NetworkBadge } from "./NetworkBadge";
 export { default as OnChainBadge } from "./OnChainBadge";
+export { default as SettlementBadge } from "./SettlementBadge";
 export { ShareSheet } from "./ShareSheet";
 export { UsdtLabel } from "./UsdtLabel";
