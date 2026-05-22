@@ -11,6 +11,23 @@ grouped by date instead.
 
 ### Added
 
+- **Settlement heartbeat on Celo Mainnet.** New permissionless
+  `PredictionPool.settlement()` function and `Settlement(timestamp)`
+  event, deployed via UUPS upgrade to the existing proxy. Anyone can
+  call it as a cheap (~27k gas) on-chain ping without touching the
+  goal lifecycle or USDT escrow. Wired through:
+  - `circlo-types` 0.1.2: ABI entry + event type
+  - `circlo-sdk` 0.3.0: `settlement(wallet)` writer + `watchSettlement`
+    log subscription
+  - Frontend: `SettlementBadge` shared component mounted in the
+    root layout (bottom-left) showing "Heartbeat: Xm ago", clickable
+    to the underlying tx on Celoscan
+- New `ARCHITECTURE.md` capturing the end-to-end component map
+  (Celo Mainnet contracts, Fastify backend + indexer, Next.js
+  frontend, npm packages, role + governance matrix).
+- Shared `OnChainBadge` component — compact "On-chain" pill linking
+  goals / addresses / tx hashes to the active Celo block explorer.
+  Mounted in the circle-details goal cards and the all-goals sheet.
 - Shared `AddressLink` component that renders a shortened wallet
   address as a link to the active Celo block explorer (Celoscan on
   Celo Mainnet, Blockscout on Celo Sepolia). Used across the
@@ -48,3 +65,20 @@ grouped by date instead.
 - NatSpec coverage extended across `IPredictionPool` (user-facing,
   admin writes, reads) and `IResolutionModule` (contract + events,
   writes + reads).
+- NatSpec on `settlement()` + `Settlement` event documenting the
+  permissionless heartbeat semantics (no state mutation, ~27k gas).
+- `SECURITY.md` added with the responsible disclosure policy for
+  all Celo Mainnet surfaces.
+- `circlo-sdk` JSDoc enriched on `refund`, `getStakeOf`,
+  `getPoolPerSide` documenting return units, typed reverts, and the
+  odds/payout formulas frontend composes them into.
+
+### SC
+
+- `PredictionPool` upgraded on Celo Mainnet (proxy
+  `0xE9cFa67358476194414ae3306888FfeCb8f41139`) to new implementation
+  `0x65BC4fa16D9a299363916619bac95133a93A7602` that ships the
+  `settlement()` heartbeat.
+- Test suite gains `test_Settlement_EmitsEventEachCall` and
+  `test_Settlement_PermissionlessForAllRoles` replacing the prior
+  no-assertion `test_Settlement`.
