@@ -274,6 +274,18 @@ export const PREDICTION_POOL_ABI = [
       { name: "amount", type: "uint256", indexed: false },
     ],
   },
+  {
+    type: "function",
+    name: "settlement",
+    stateMutability: "nonpayable",
+    inputs: [],
+    outputs: [],
+  },
+  {
+    type: "event",
+    name: "Settlement",
+    inputs: [{ name: "timestamp", type: "uint256", indexed: true }],
+  },
 ] as const;
 
 export const RESOLUTION_MODULE_ABI = [
