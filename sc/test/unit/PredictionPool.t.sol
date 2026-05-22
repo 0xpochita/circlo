@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import "../../src/CircleFactory.sol";
 import "../../src/PredictionPool.sol";
 import "../../src/ResolutionModule.sol";
+import "../../src/interfaces/IPredictionPool.sol";
 import "../../src/mocks/MockUSDT.sol";
 
 contract PredictionPoolTest is Test {
@@ -418,19 +419,35 @@ contract PredictionPoolTest is Test {
 
     // RUN
     // forge test --match-test test_Settlement -vvvv
-    function test_Settlement() public {
+    function test_Settlement_EmitsEventEachCall() public {
         vm.startPrank(eve);
-        pool.settlement();
-        pool.settlement();
-        pool.settlement();
-        pool.settlement();
-        pool.settlement();
-        pool.settlement();
-        pool.settlement();
-        pool.settlement();
-        pool.settlement();
-        pool.settlement();
-        pool.settlement();
+        for (uint256 i = 0; i < 11; i++) {
+            uint256 stamp = block.timestamp + i;
+            vm.warp(stamp);
+            vm.expectEmit(true, false, false, false, address(pool));
+            emit IPredictionPool.Settlement(stamp);
+            pool.settlement();
+        }
         vm.stopPrank();
+    }
+
+    /// @dev Settlement is permissionless — any address (including
+    ///      non-members and non-resolvers) MUST be able to call it.
+    function test_Settlement_PermissionlessForAllRoles() public {
+        // Goal owner
+        vm.prank(alice);
+        pool.settlement();
+
+        // Random staker
+        vm.prank(bob);
+        pool.settlement();
+
+        // Non-member EOA (eve is set up as an outsider in this suite)
+        vm.prank(eve);
+        pool.settlement();
+
+        // Even the zero-address protocol caller works (no msg.sender guard)
+        vm.prank(address(0xBEEF));
+        pool.settlement();
     }
 }
