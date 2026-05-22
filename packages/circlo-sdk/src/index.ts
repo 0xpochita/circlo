@@ -62,6 +62,8 @@ export { claim, refund } from "./claims.js";
 
 export { finalize, getTally, submitVote } from "./resolution.js";
 
+export { settlement } from "./settlement.js";
+
 export {
   watchCircleCreated,
   watchGoalCreated,
