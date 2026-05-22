@@ -537,7 +537,17 @@ refund(uint256 goalId)                                    // disputed goals
 setWinner(uint256 goalId, uint8 winningSide)              // ResolutionModule only
 markDisputed(uint256 goalId)                              // ResolutionModule only
 setFee(uint256 bps, address recipient)                    // FEE_SETTER_ROLE only
+settlement()                                              // permissionless heartbeat — emits Settlement(timestamp)
 ```
+
+> **Settlement heartbeat.** `settlement()` is a permissionless,
+> value-free function (~27k gas on Celo Mainnet) that emits a
+> single `Settlement(uint256 indexed timestamp)` event. It does not
+> touch the goal lifecycle or USDT escrow — it exists purely as a
+> cheap on-chain ping for off-chain liveness dashboards. The
+> frontend mounts a `SettlementBadge` ("Heartbeat: 5m ago") driven
+> by this event, and the `circlo-sdk` exposes both `settlement()`
+> and `watchSettlement()` helpers.
 
 **ResolutionModule**
 
