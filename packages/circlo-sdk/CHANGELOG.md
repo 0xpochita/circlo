@@ -3,6 +3,30 @@
 All notable changes to `circlo-sdk` are documented here. This project follows
 [Semantic Versioning](https://semver.org).
 
+## [0.3.0] — 2026-05-21
+
+### Added
+
+- **`settlement(wallet)`** — write helper for the new permissionless
+  `settlement()` function on PredictionPool. Emits the on-chain
+  `Settlement(timestamp)` heartbeat with one tx. Returns the raw tx
+  hash, throws if the wallet has no account configured. Mirrors the
+  shape of `claim` / `refund`.
+- **`watchSettlement(client, onEvent)`** — event watcher for the
+  `Settlement(timestamp)` log. Same shape as the existing
+  `watchCircleCreated` / `watchGoalCreated` / `watchStaked` helpers;
+  returns the viem unsubscribe handle. Useful for liveness
+  dashboards that need to surface "last on-chain heartbeat at …"
+  without rolling their own log subscription.
+- **PredictionPool ABI** — exposes the `settlement()` function entry
+  and the `Settlement(uint256 indexed timestamp)` event so SDK
+  consumers and indexers can decode logs without a parallel ABI.
+
+### Compatibility
+
+- No breaking changes; this is an additive minor release. Existing
+  callers do not need to update any imports.
+
 ## [0.2.1] — 2026-05-20
 
 ### Docs

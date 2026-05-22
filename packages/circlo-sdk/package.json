@@ -1,6 +1,6 @@
 {
   "name": "circlo-sdk",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "High-level TypeScript SDK for Circlo — a social prediction game on Celo Mainnet. Wraps viem with ergonomic helpers for creating circles, staking on goals, and listening to onchain events.",
   "keywords": [
     "circlo",
