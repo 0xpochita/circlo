@@ -99,6 +99,42 @@ export function watchGoalCreated(
 }
 
 /**
+ * Watch Settlement heartbeat events. Fires once per `settlement()`
+ * call with the on-chain `block.timestamp`. Useful for liveness
+ * dashboards and "last activity" indicators.
+ *
+ * @example
+ * ```ts
+ * const unsub = watchSettlement(client, ({ timestamp }) => {
+ *   console.log(`heartbeat at ${new Date(Number(timestamp) * 1000)}`);
+ * });
+ * ```
+ */
+export function watchSettlement(
+  client: PublicClient,
+  onEvent: (args: { timestamp: bigint }) => void,
+): () => void {
+  const event = PREDICTION_POOL_ABI.find(
+    (x): x is Extract<typeof x, { type: "event"; name: "Settlement" }> =>
+      x.type === "event" && x.name === "Settlement",
+  );
+  if (!event) {
+    throw new Error("watchSettlement: Settlement event missing from ABI");
+  }
+
+  return client.watchEvent({
+    address: CIRCLO_CONTRACTS.PredictionPool,
+    event: event as AbiEvent,
+    onLogs: (logs) => {
+      for (const log of logs) {
+        const args = (log as { args: unknown }).args as { timestamp: bigint };
+        onEvent(args);
+      }
+    },
+  });
+}
+
+/**
  * Watch Staked events. Optionally filter by goalId to only get stakes
  * on a specific goal.
  */

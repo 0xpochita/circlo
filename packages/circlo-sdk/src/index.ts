@@ -67,6 +67,7 @@ export { settlement } from "./settlement.js";
 export {
   watchCircleCreated,
   watchGoalCreated,
+  watchSettlement,
   watchStaked,
 } from "./events.js";
 
