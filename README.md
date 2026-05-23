@@ -5,12 +5,13 @@
 
   **On-chain social prediction game — tokenize your circle of friends, turn personal goals into prediction markets, and hold each other accountable on Celo blockchain.**
 
-  [Live Demo](https://circlo-celo.vercel.app) · [Video Demo](https://youtu.be/15PSqWPL3IY) · [CeloScan](https://celoscan.io/address/0x6cB74ce06E35caEfaFA1491769DeeeA46aebe6Ab)
+  [Live Demo](https://circlo-celo.vercel.app) · [Video Demo](https://youtu.be/15PSqWPL3IY) · [CeloScan](https://celoscan.io/address/0x6cB74ce06E35caEfaFA1491769DeeeA46aebe6Ab) · [Follow on X](https://x.com/circlo_celo)
 
   [![circlo-types on npm](https://img.shields.io/npm/v/circlo-types.svg?label=circlo-types)](https://www.npmjs.com/package/circlo-types)
   [![circlo-sdk on npm](https://img.shields.io/npm/v/circlo-sdk.svg?label=circlo-sdk)](https://www.npmjs.com/package/circlo-sdk)
   [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
   [![Celo Mainnet](https://img.shields.io/badge/chain-Celo%20Mainnet-yellow.svg)](https://celoscan.io)
+  [![Follow @circlo_celo](https://img.shields.io/twitter/follow/circlo_celo?style=social&label=Follow)](https://x.com/circlo_celo)
 </div>
 
 Circlo is a decentralized social accountability platform built on Celo. Friends form circles, create prediction markets around personal goals (workout streaks, project deadlines, learning milestones), and stake USDT on outcomes. When the deadline hits, friends-as-resolvers vote on the truth — winners split the pool, losers learn the cost of breaking commitments. All transparent, all on-chain, all in your pocket via MiniPay.
