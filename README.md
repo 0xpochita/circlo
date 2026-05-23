@@ -87,6 +87,24 @@ Circlo solves this with five core primitives built on Celo:
 - **Referral Rewards System** — RewardDistributor contract for referral bonuses and retention rewards
 - **Multi-Wallet Support** — MiniPay (mobile-first), MetaMask, any EIP-1193 wallet via WalletConnect
 
+## Live on Celo Mainnet
+
+Circlo has been running on Celo Mainnet since launch — these are the
+contracts you can audit and the surfaces real users touch:
+
+| Surface | Where |
+|---|---|
+| Frontend | [`circlo-celo.vercel.app`](https://circlo-celo.vercel.app) (also accessible inside the MiniPay app) |
+| PredictionPool (escrow + settlement heartbeat) | [`0xE9cFa67358476194414ae3306888FfeCb8f41139`](https://celoscan.io/address/0xE9cFa67358476194414ae3306888FfeCb8f41139) |
+| CircleFactory (membership) | [`0x6cB74ce06E35caEfaFA1491769DeeeA46aebe6Ab`](https://celoscan.io/address/0x6cB74ce06E35caEfaFA1491769DeeeA46aebe6Ab) |
+| ResolutionModule (resolver voting) | [`0x5861CAAFDCAc4313f2c9941C4fd1291B34C2c4f5`](https://celoscan.io/address/0x5861CAAFDCAc4313f2c9941C4fd1291B34C2c4f5) |
+| TimelockController (48h governance delay) | [`0xc6B9554fAA6703645f9AC65794CF2321cB82fE47`](https://celoscan.io/address/0xc6B9554fAA6703645f9AC65794CF2321cB82fE47) |
+
+All contracts are UUPS-upgradeable proxies, source-verified on
+Celoscan, and the new implementation slot routes through the
+TimelockController above with a 48-hour delay before any upgrade
+can land.
+
 ## Tech Stack
 
 | Layer | Technology |
