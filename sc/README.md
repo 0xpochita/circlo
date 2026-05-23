@@ -509,6 +509,27 @@ Listen to these events to update UI state without polling:
 | ResolutionModule | `VoteSubmitted(goalId, resolver, choice)` | Resolver voted |
 | ResolutionModule | `GoalFinalized(goalId, winningChoice)` | Quorum reached, winner set |
 | ResolutionModule | `GoalDisputed(goalId)` | Tie vote or expired window |
+| PredictionPool | `Settlement(timestamp)` | Permissionless heartbeat — emitted on every `settlement()` call |
+
+---
+
+## MiniPay Compatibility
+
+The contracts are designed to work cleanly inside the MiniPay Mini
+App browser on Celo Mainnet without special handling:
+
+- **Legacy transactions only.** All write calls must be sent with
+  `type: "legacy"` — MiniPay does not honour EIP-1559
+  `maxFeePerGas` / `maxPriorityFeePerGas`. The frontend + SDK already
+  emit legacy txs.
+- **Permissionless `settlement()` heartbeat.** Mini Apps that want to
+  signal liveness on Celo without spending USDT can call
+  `PredictionPool.settlement()` from any wallet at ~27k gas; the
+  emitted `Settlement(timestamp)` event is a cheap on-chain ping
+  with no escrow side effects.
+- **Native USDT, no bridges.** Stakes use Celo-native USDT
+  (`0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e`, 6 decimals), so
+  MiniPay's default USDT balance works as-is.
 
 ---
 
