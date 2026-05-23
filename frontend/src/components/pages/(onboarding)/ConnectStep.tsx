@@ -63,37 +63,41 @@ export default function ConnectStep({ onNext, onBack }: ConnectStepProps) {
       let refreshToken: string | null = null;
       let user = null;
 
-      try {
-        const nonceRes = await authApi.nonce(walletAddress);
-        const nonce = nonceRes.nonce;
+      // MiniPay historically does not support eth_sign / personal_sign,
+      // so SIWE would always fail there. Skip the SIWE round-trip
+      // entirely and drop straight to wallet-only auth — saves the
+      // user an extra prompt and avoids a silent failure path on Celo.
+      if (!isMiniPayBrowser) {
+        try {
+          const nonceRes = await authApi.nonce(walletAddress);
+          const nonce = nonceRes.nonce;
 
-        if (nonce) {
-          setStatusText(
-            isMiniPayBrowser ? "Verifying..." : "Sign the message...",
-          );
+          if (nonce) {
+            setStatusText("Sign the message...");
 
-          const message = new SiweMessage({
-            domain: window.location.host,
-            address: walletAddress,
-            statement: "Sign in to Circlo",
-            uri: window.location.origin,
-            version: "1",
-            chainId: NETWORK.id,
-            nonce,
-          });
+            const message = new SiweMessage({
+              domain: window.location.host,
+              address: walletAddress,
+              statement: "Sign in to Circlo",
+              uri: window.location.origin,
+              version: "1",
+              chainId: NETWORK.id,
+              nonce,
+            });
 
-          const messageString = message.prepareMessage();
-          const signature = await signMessageAsync({ message: messageString });
+            const messageString = message.prepareMessage();
+            const signature = await signMessageAsync({ message: messageString });
 
-          setStatusText("Verifying...");
-          const verifyRes = await authApi.verify(messageString, signature);
+            setStatusText("Verifying...");
+            const verifyRes = await authApi.verify(messageString, signature);
 
-          accessToken = verifyRes.accessToken || null;
-          refreshToken = verifyRes.refreshToken || null;
-          user = verifyRes.user || null;
+            accessToken = verifyRes.accessToken || null;
+            refreshToken = verifyRes.refreshToken || null;
+            user = verifyRes.user || null;
+          }
+        } catch {
+          // SIWE failed — continue with wallet-only auth
         }
-      } catch {
-        // SIWE failed — continue with wallet-only auth
       }
 
       if (accessToken && user) {
