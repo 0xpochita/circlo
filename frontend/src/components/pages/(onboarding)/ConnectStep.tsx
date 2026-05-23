@@ -63,41 +63,44 @@ export default function ConnectStep({ onNext, onBack }: ConnectStepProps) {
       let refreshToken: string | null = null;
       let user = null;
 
-      // MiniPay historically does not support eth_sign / personal_sign,
-      // so SIWE would always fail there. Skip the SIWE round-trip
-      // entirely and drop straight to wallet-only auth — saves the
-      // user an extra prompt and avoids a silent failure path on Celo.
-      if (!isMiniPayBrowser) {
-        try {
-          const nonceRes = await authApi.nonce(walletAddress);
-          const nonce = nonceRes.nonce;
+      // SIWE round-trip is the only path to a real JWT — the backend
+      // `usersApi.me()` call downstream requires it. MiniPay DOES
+      // sign personal_sign messages silently (no prompt), so the
+      // round-trip is invisible to the user; we just label the
+      // intermediate state "Verifying…" instead of "Sign the message…".
+      try {
+        const nonceRes = await authApi.nonce(walletAddress);
+        const nonce = nonceRes.nonce;
 
-          if (nonce) {
-            setStatusText("Sign the message...");
+        if (nonce) {
+          setStatusText(
+            isMiniPayBrowser ? "Verifying..." : "Sign the message...",
+          );
 
-            const message = new SiweMessage({
-              domain: window.location.host,
-              address: walletAddress,
-              statement: "Sign in to Circlo",
-              uri: window.location.origin,
-              version: "1",
-              chainId: NETWORK.id,
-              nonce,
-            });
+          const message = new SiweMessage({
+            domain: window.location.host,
+            address: walletAddress,
+            statement: "Sign in to Circlo",
+            uri: window.location.origin,
+            version: "1",
+            chainId: NETWORK.id,
+            nonce,
+          });
 
-            const messageString = message.prepareMessage();
-            const signature = await signMessageAsync({ message: messageString });
+          const messageString = message.prepareMessage();
+          const signature = await signMessageAsync({ message: messageString });
 
-            setStatusText("Verifying...");
-            const verifyRes = await authApi.verify(messageString, signature);
+          setStatusText("Verifying...");
+          const verifyRes = await authApi.verify(messageString, signature);
 
-            accessToken = verifyRes.accessToken || null;
-            refreshToken = verifyRes.refreshToken || null;
-            user = verifyRes.user || null;
-          }
-        } catch {
-          // SIWE failed — continue with wallet-only auth
+          accessToken = verifyRes.accessToken || null;
+          refreshToken = verifyRes.refreshToken || null;
+          user = verifyRes.user || null;
         }
+      } catch {
+        // SIWE failed — fall back to wallet-only auth (downstream
+        // backend calls will 401, but at least the UI can show the
+        // connected address rather than a stuck spinner).
       }
 
       if (accessToken && user) {
@@ -130,19 +133,22 @@ export default function ConnectStep({ onNext, onBack }: ConnectStepProps) {
             color: u.avatarColor,
           });
         }
-      } else {
-        setAuth(walletAddress, null, {
-          id: walletAddress,
-          wallet: walletAddress,
-          username: `@${walletAddress.slice(2, 8).toLowerCase()}`,
-          displayName: "Player",
-          avatar: null,
-          createdAt: new Date().toISOString(),
-        });
-      }
 
-      toast.success("Wallet connected!");
-      onNext();
+        toast.success("Wallet connected!");
+        onNext();
+      } else {
+        // Wallet connected but SIWE didn't yield a real JWT.
+        // Don't proceed to onNext() — downstream usersApi.me() would
+        // 401 and the user would be stuck on a spinner with an opaque
+        // "Couldn't load your profile" toast. Stop here, show a
+        // clear error + retry, and let the user re-try the sign-in.
+        toast.error(
+          isMiniPayBrowser
+            ? "MiniPay sign-in didn't complete. Tap retry below."
+            : "Sign-in didn't complete. Try again.",
+        );
+        setStatusText("Retry sign-in");
+      }
     } catch {
       toast.error("Could not connect wallet. Please try again.");
       setStatusText("Connect Wallet");
@@ -248,12 +254,28 @@ export default function ConnectStep({ onNext, onBack }: ConnectStepProps) {
           </span>
         </div>
         {isMiniPayBrowser ? (
-          <div className="flex items-center justify-center gap-2 w-full rounded-full bg-gray-100 py-4">
-            <div className="h-4 w-4 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin" />
-            <span className="text-sm font-medium text-main-text">
-              {statusText}
-            </span>
-          </div>
+          isConnecting ? (
+            // Active sign-in in progress — quiet spinner, no tappable surface.
+            <div className="flex items-center justify-center gap-2 w-full rounded-full bg-gray-100 py-4">
+              <div className="h-4 w-4 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin" />
+              <span className="text-sm font-medium text-main-text">
+                {statusText}
+              </span>
+            </div>
+          ) : (
+            // Idle in MiniPay (initial mount waiting for auto-fire OR
+            // a previous attempt failed). Render a retry button so the
+            // user can manually re-trigger sign-in instead of being
+            // stuck on a stale spinner.
+            <motion.button
+              type="button"
+              onClick={handleConnect}
+              whileTap={{ scale: 0.97 }}
+              className="w-full rounded-full bg-gray-900 py-4 text-base font-semibold text-white cursor-pointer"
+            >
+              {statusText === "Retry sign-in" ? "Retry sign-in" : "Sign in with MiniPay"}
+            </motion.button>
+          )
         ) : (
           <>
             <motion.button
