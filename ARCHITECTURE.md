@@ -118,9 +118,36 @@ Surface helpers in `@/components/shared/`:
 - `AddressLink` — shortened address with anchor to active Celo
   block explorer (Celoscan / Blockscout).
 - `OnChainBadge` — "On-chain" pill for goals/addresses/tx hashes.
-- `NetworkBadge` — bottom-right Celo Mainnet/Sepolia indicator.
+- `NetworkBadge` — top-right Celo Mainnet/Sepolia indicator.
 - `SettlementBadge` — bottom-left heartbeat pill driven by the
   `Settlement(timestamp)` event.
+
+### MiniPay integration
+
+Circlo is built as a MiniPay-first Mini App. The relevant pieces:
+
+- **Detection** — `lib/web3/minipay.ts#isMiniPay()` checks
+  `window.ethereum.isMiniPay` first, falling back to a `?minipay=1`
+  query-string override useful for desktop QA.
+- **Implicit auto-connect** — `Header.tsx` and `ProfileHero.tsx`
+  fire `connectAsync` in a mount effect whenever
+  `isMiniPayBrowser && !isConnected && !isAuthenticated`, so the
+  user is never asked to tap a Connect button (per Mini App
+  listing guidelines). A second `isAuthenticated` branch silently
+  re-attaches wagmi after a navigation without re-triggering SIWE.
+- **UI gating** — buttons that depend on the wallet read
+  `isConnected || isAuthenticated` rather than `isConnected` alone,
+  since wagmi state briefly reads disconnected on every in-app
+  navigation while the session is still valid.
+- **On-chain membership truth** — circle-details and JoinButton
+  both call `CircleFactory.isCircleMember(circleId, address)` so
+  members land on the Create Goal CTA even when the backend
+  `membersPreview` hasn't synced yet.
+- **Legacy txs only** — every write call uses `type: "legacy"`.
+  MiniPay does not honour EIP-1559 fee fields.
+- **PWA shell** — `/manifest.json` + 192/512/180 icons + ToS at
+  `/terms` + Privacy at `/privacy` are all served from the Next.js
+  app, satisfying the developer.minipay.to listing form.
 
 ## npm packages (`packages/`)
 
