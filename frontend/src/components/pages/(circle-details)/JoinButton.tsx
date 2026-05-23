@@ -3,11 +3,12 @@
 import { createCircloClient } from "circlo-sdk";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { HiCheck } from "react-icons/hi2";
 import { toast } from "sonner";
-import { useAccount, useWalletClient } from "wagmi";
+import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 import { circlesApi } from "@/lib/api/endpoints";
+import { circleFactoryContract } from "@/lib/web3/contracts";
 import { useAuthStore } from "@/stores/authStore";
 
 type JoinButtonProps = {
@@ -22,9 +23,34 @@ export default function JoinButton({
   const router = useRouter();
   const [joined, setJoined] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { isConnected } = useAccount();
+  const { address, isConnected } = useAccount();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const { data: walletClient } = useWalletClient();
+  const publicClient = usePublicClient();
+
+  // Seed `joined` from on-chain truth so users who already joined in a
+  // previous session don't see "Join Circle" on this page. Re-runs when
+  // the wallet address or target circle changes.
+  useEffect(() => {
+    if (!publicClient || !address || !circleId) return;
+    let cancelled = false;
+    publicClient
+      .readContract({
+        address: circleFactoryContract.address,
+        abi: circleFactoryContract.abi,
+        functionName: "isCircleMember",
+        args: [BigInt(circleId), address],
+      })
+      .then((isMember) => {
+        if (!cancelled && isMember === true) setJoined(true);
+      })
+      .catch(() => {
+        /* RPC hiccup is non-fatal — leave button in default state */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [publicClient, address, circleId]);
 
   async function handleJoin() {
     if (!isConnected || !isAuthenticated) {
