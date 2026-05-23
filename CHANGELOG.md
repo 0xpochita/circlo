@@ -11,6 +11,17 @@ grouped by date instead.
 
 ### Added
 
+- **MiniPay listing readiness on Celo.** Front-end is now compliant
+  with the MiniPay Mini App listing guidelines: no Connect button
+  surfaces inside the MiniPay browser (Header + ProfileHero
+  auto-connect implicitly), wagmi silently re-attaches after every
+  in-app page navigation so the "Connecting to MiniPay…" pill never
+  sticks, JoinButton + circle-details seed `isMember` from the
+  on-chain `CircleFactory.isCircleMember` read so members land
+  straight on the Create Goal CTA instead of a stale Join prompt,
+  `/terms` and `/privacy` legal routes ship inside the app, and the
+  PWA manifest (192/512/180 icons) is wired so the listing form's
+  required 512×512 icon comes from `circlo-celo.vercel.app/icon-512.png`.
 - **Settlement heartbeat on Celo Mainnet.** New permissionless
   `PredictionPool.settlement()` function and `Settlement(timestamp)`
   event, deployed via UUPS upgrade to the existing proxy. Anyone can
