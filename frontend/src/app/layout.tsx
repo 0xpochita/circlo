@@ -17,16 +17,26 @@ export const metadata: Metadata = {
     template: "%s | Circlo",
   },
   description: "Tokenize Your Circle, Turn Predictions into Real Goals",
+  manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
   openGraph: {
     title: "Circlo",
     description: "Tokenize Your Circle, Turn Predictions into Real Goals",
     type: "website",
     siteName: "Circlo",
+    images: [{ url: "/icon-512.png", width: 512, height: 512, alt: "Circlo" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Circlo",
     description: "Tokenize Your Circle, Turn Predictions into Real Goals",
+    images: ["/icon-512.png"],
   },
   other: {
     "talentapp:project_verification":
