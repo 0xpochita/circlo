@@ -10,6 +10,7 @@ import { EmojiAvatar } from "@/components/shared";
 import { useAuth } from "@/hooks/useAuth";
 import { useMiniPay } from "@/hooks/useMiniPay";
 import { NETWORK } from "@/lib/web3/network";
+import { useAuthStore } from "@/stores/authStore";
 import { useUserStore } from "@/stores/userStore";
 
 export default function Header() {
@@ -19,17 +20,30 @@ export default function Header() {
   const { connectAsync } = useConnect();
   const { login } = useAuth();
   const isMiniPayBrowser = useMiniPay();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const [isConnecting, setIsConnecting] = useState(false);
 
   // In MiniPay, wallet connection is implicit — auto-connect on mount
   // so the user is never asked to tap a Connect button (per MiniPay
   // Mini App guidelines).
+  //
+  // IMPORTANT: guard against re-firing once the user is already
+  // authenticated via the onboarding flow. Without this check the
+  // wagmi `isConnected` flag briefly reads `false` on every page
+  // navigation (before it rehydrates from localStorage), which would
+  // race the effect and trigger a second SIWE signature prompt — a
+  // confusing UX after the user has just signed once.
   // biome-ignore lint/correctness/useExhaustiveDependencies: handleConnect is stable within component scope
   useEffect(() => {
-    if (isMiniPayBrowser && !isConnected && !isConnecting) {
+    if (
+      isMiniPayBrowser &&
+      !isConnected &&
+      !isConnecting &&
+      !isAuthenticated
+    ) {
       handleConnect();
     }
-  }, [isMiniPayBrowser, isConnected]);
+  }, [isMiniPayBrowser, isConnected, isAuthenticated]);
 
   async function handleConnect() {
     setIsConnecting(true);

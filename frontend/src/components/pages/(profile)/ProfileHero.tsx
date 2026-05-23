@@ -40,6 +40,7 @@ export default function ProfileHero() {
   const { connectAsync } = useConnect();
   const { login } = useAuth();
   const isMiniPayBrowser = useMiniPay();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const { formatted: usdtBalance, isLoading: isBalanceLoading } =
     useUSDTBalance(address);
 
@@ -47,17 +48,27 @@ export default function ProfileHero() {
   // whatever reason we landed here disconnected (cold reload, manual
   // disconnect via wagmi, etc). Never render a Connect button inside
   // the MiniPay browser per MiniPay Mini App guidelines.
+  //
+  // IMPORTANT: guard against re-firing once the user is already
+  // authenticated. wagmi's `isConnected` briefly reads `false` on
+  // every page navigation before it rehydrates from localStorage,
+  // which would race the effect and trigger a second SIWE signature
+  // prompt — a confusing UX after the user has just signed once.
   // biome-ignore lint/correctness/useExhaustiveDependencies: handleConnect is stable within component scope
   useEffect(() => {
-    if (isMiniPayBrowser && !isConnected && !isConnecting) {
+    if (
+      isMiniPayBrowser &&
+      !isConnected &&
+      !isConnecting &&
+      !isAuthenticated
+    ) {
       handleConnect();
     }
-  }, [isMiniPayBrowser, isConnected]);
+  }, [isMiniPayBrowser, isConnected, isAuthenticated]);
 
   const displayBalance = isBalanceLoading ? "..." : usdtBalance.toFixed(2);
   const unreadCount = useNotificationStore((s) => s.unreadCount);
   const fetchNotifications = useNotificationStore((s) => s.fetchNotifications);
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   const [stats, setStats] = useState<{ pnl: string } | null>(null);
 
