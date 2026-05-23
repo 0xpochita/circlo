@@ -42,6 +42,20 @@ pnpm dev
 
 Open http://localhost:3000.
 
+To preview the MiniPay-only UI flow (implicit auto-connect,
+hidden Connect button) from a desktop browser without launching
+the actual Mini App, append `?minipay=1` to any route:
+
+```
+http://localhost:3000/?minipay=1
+http://localhost:3000/profile?minipay=1
+```
+
+The query-string override is read by `frontend/src/lib/web3/minipay.ts`
+and behaves identically to a real MiniPay environment for
+client-side detection — the EIP-1193 provider checks still need a
+real wallet for actual write txs.
+
 ## Branch & Commit Conventions
 
 - Branch from `main`: `feat/<thing>`, `fix/<thing>`, `chore/<thing>`
