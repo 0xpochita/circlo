@@ -2,12 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAccount, useConnect } from "wagmi";
 import { injected } from "wagmi/connectors";
 import { EmojiAvatar } from "@/components/shared";
 import { useAuth } from "@/hooks/useAuth";
+import { useMiniPay } from "@/hooks/useMiniPay";
 import { NETWORK } from "@/lib/web3/network";
 import { useUserStore } from "@/stores/userStore";
 
@@ -17,7 +18,18 @@ export default function Header() {
   const { isConnected } = useAccount();
   const { connectAsync } = useConnect();
   const { login } = useAuth();
+  const isMiniPayBrowser = useMiniPay();
   const [isConnecting, setIsConnecting] = useState(false);
+
+  // In MiniPay, wallet connection is implicit — auto-connect on mount
+  // so the user is never asked to tap a Connect button (per MiniPay
+  // Mini App guidelines).
+  // biome-ignore lint/correctness/useExhaustiveDependencies: handleConnect is stable within component scope
+  useEffect(() => {
+    if (isMiniPayBrowser && !isConnected && !isConnecting) {
+      handleConnect();
+    }
+  }, [isMiniPayBrowser, isConnected]);
 
   async function handleConnect() {
     setIsConnecting(true);
@@ -70,6 +82,11 @@ export default function Header() {
         <Link href="/profile" className="cursor-pointer">
           <EmojiAvatar avatar={avatar} size={44} />
         </Link>
+      ) : isMiniPayBrowser ? (
+        // MiniPay browser: connection is implicit + handled by the effect
+        // above. Render nothing rather than a Connect button (per MiniPay
+        // Mini App listing guideline).
+        null
       ) : (
         <button
           type="button"

@@ -13,6 +13,7 @@ import { useAccount, useConnect } from "wagmi";
 import { injected } from "wagmi/connectors";
 import { EmojiAvatar } from "@/components/shared";
 import { useAuth } from "@/hooks/useAuth";
+import { useMiniPay } from "@/hooks/useMiniPay";
 import { useUSDTBalance } from "@/hooks/useUSDT";
 import { usersApi } from "@/lib/api/endpoints";
 import { NETWORK } from "@/lib/web3/network";
@@ -38,8 +39,20 @@ export default function ProfileHero() {
   const { address, isConnected } = useAccount();
   const { connectAsync } = useConnect();
   const { login } = useAuth();
+  const isMiniPayBrowser = useMiniPay();
   const { formatted: usdtBalance, isLoading: isBalanceLoading } =
     useUSDTBalance(address);
+
+  // In MiniPay, wallet connection is implicit — auto-connect if for
+  // whatever reason we landed here disconnected (cold reload, manual
+  // disconnect via wagmi, etc). Never render a Connect button inside
+  // the MiniPay browser per MiniPay Mini App guidelines.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: handleConnect is stable within component scope
+  useEffect(() => {
+    if (isMiniPayBrowser && !isConnected && !isConnecting) {
+      handleConnect();
+    }
+  }, [isMiniPayBrowser, isConnected]);
 
   const displayBalance = isBalanceLoading ? "..." : usdtBalance.toFixed(2);
   const unreadCount = useNotificationStore((s) => s.unreadCount);
@@ -193,6 +206,13 @@ export default function ProfileHero() {
                   Withdraw
                 </button>
               </>
+            ) : isMiniPayBrowser ? (
+              // MiniPay: implicit connection via the effect above.
+              // Render a quiet "connecting" pill instead of a button so
+              // users don't see anything tappable they shouldn't tap.
+              <div className="flex-1 flex items-center justify-center rounded-full bg-white/30 py-3 text-sm font-medium text-white/80 backdrop-blur-md">
+                Connecting to MiniPay…
+              </div>
             ) : (
               <button
                 type="button"
