@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { HiOutlineChartPie } from "react-icons/hi2";
 import { TbTargetArrow } from "react-icons/tb";
+import { useAccount, usePublicClient } from "wagmi";
 import { PageTransition } from "@/components/pages/(app)";
 import {
   DetailsGoals,
@@ -20,6 +21,7 @@ import {
 import { ShareSheet } from "@/components/shared";
 import type { CircleDetailResponse } from "@/lib/api/endpoints";
 import { circlesApi } from "@/lib/api/endpoints";
+import { circleFactoryContract } from "@/lib/web3/contracts";
 import { useAuthStore } from "@/stores/authStore";
 
 function CircleDetailsContent() {
@@ -31,17 +33,25 @@ function CircleDetailsContent() {
   const [shareOpen, setShareOpen] = useState(false);
   const [inviteOpen, setInviteOpen] = useState(false);
   const userId = useAuthStore((s) => s.user?.id);
+  const { address } = useAccount();
+  const publicClient = usePublicClient();
+  const [chainIsMember, setChainIsMember] = useState(false);
 
   const isOwner = useMemo(() => {
     if (!circle || !userId) return false;
     return circle.ownerId === userId;
   }, [circle, userId]);
 
+  // Combine backend (membersPreview) + on-chain (isCircleMember) checks.
+  // The backend can lag the chain — a user who just joined on-chain may
+  // not yet appear in membersPreview, which would leave them stuck on
+  // the JoinButton instead of seeing the "Create Goal" CTA they earned.
   const isMember = useMemo(() => {
-    if (!circle || !userId) return false;
     if (isOwner) return true;
+    if (chainIsMember) return true;
+    if (!circle || !userId) return false;
     return circle.membersPreview?.some((m) => m.userId === userId) ?? false;
-  }, [circle, userId, isOwner]);
+  }, [circle, userId, isOwner, chainIsMember]);
 
   useEffect(() => {
     if (!circleId) {
@@ -54,6 +64,29 @@ function CircleDetailsContent() {
       .catch(() => setError(true))
       .finally(() => setIsLoading(false));
   }, [circleId]);
+
+  // On-chain membership probe — runs once we have wallet + circle chainId.
+  // Cheap eth_call to CircleFactory.isCircleMember(circleId, address).
+  useEffect(() => {
+    if (!publicClient || !address || !circle?.chainId) return;
+    let cancelled = false;
+    publicClient
+      .readContract({
+        address: circleFactoryContract.address,
+        abi: circleFactoryContract.abi,
+        functionName: "isCircleMember",
+        args: [BigInt(circle.chainId), address],
+      })
+      .then((isMem) => {
+        if (!cancelled && isMem === true) setChainIsMember(true);
+      })
+      .catch(() => {
+        /* non-fatal — leave at default false */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [publicClient, address, circle?.chainId]);
 
   if (isLoading) {
     return (
