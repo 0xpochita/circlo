@@ -101,6 +101,12 @@ await circlo.claim(goalId);
 | `claim(goalId)` | Collect a winning payout after the goal resolved. |
 | `refund(goalId)` | Get the original stake back if the goal was cancelled. |
 
+### Heartbeat (v0.3)
+
+| Method | Description |
+|---|---|
+| `settlement(wallet)` | Fire the permissionless `PredictionPool.settlement()` heartbeat on Celo Mainnet. Emits `Settlement(block.timestamp)`. ~27k gas, no value transfer. Useful as a cheap "I'm alive" ping for liveness dashboards. |
+
 ### Resolution (v0.2)
 
 | Method | Description |
@@ -124,6 +130,7 @@ await circlo.claim(goalId);
 | `watchCircleCreated(client, cb)` | Stream every new CircleCreated event. |
 | `watchGoalCreated(client, cb, { circleId? })` | Stream GoalCreated, optionally filtered by circle. |
 | `watchStaked(client, cb, { goalId? })` | Stream Staked, optionally filtered by goal. |
+| `watchSettlement(client, cb)` | Stream Settlement heartbeat events from PredictionPool. v0.3. |
 
 ### Pure helpers (no chain needed)
 
