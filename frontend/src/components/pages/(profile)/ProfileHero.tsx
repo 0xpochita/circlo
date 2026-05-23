@@ -44,24 +44,28 @@ export default function ProfileHero() {
   const { formatted: usdtBalance, isLoading: isBalanceLoading } =
     useUSDTBalance(address);
 
-  // In MiniPay, wallet connection is implicit — auto-connect if for
-  // whatever reason we landed here disconnected (cold reload, manual
-  // disconnect via wagmi, etc). Never render a Connect button inside
-  // the MiniPay browser per MiniPay Mini App guidelines.
+  // In MiniPay, wallet connection is implicit. Two distinct cases:
   //
-  // IMPORTANT: guard against re-firing once the user is already
-  // authenticated. wagmi's `isConnected` briefly reads `false` on
-  // every page navigation before it rehydrates from localStorage,
-  // which would race the effect and trigger a second SIWE signature
-  // prompt — a confusing UX after the user has just signed once.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: handleConnect is stable within component scope
+  // 1. Authenticated but wagmi disconnected — common after a page
+  //    navigation in the MiniPay browser (wagmi state doesn't always
+  //    survive in-app browser route changes). Silently call
+  //    connectAsync to reattach wagmi to the MiniPay injected
+  //    provider. Do NOT call login() — the user already has a valid
+  //    session, triggering SIWE would prompt them again.
+  //
+  // 2. Unauthenticated — full handleConnect path (connect + SIWE).
+  //
+  // Never render a Connect button inside MiniPay per Mini App
+  // listing guidelines.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: stable callbacks
   useEffect(() => {
-    if (
-      isMiniPayBrowser &&
-      !isConnected &&
-      !isConnecting &&
-      !isAuthenticated
-    ) {
+    if (!isMiniPayBrowser || isConnected || isConnecting) return;
+    if (isAuthenticated) {
+      // Silent reattach — no SIWE prompt.
+      connectAsync({ connector: injected(), chainId: NETWORK.id }).catch(
+        () => {},
+      );
+    } else {
       handleConnect();
     }
   }, [isMiniPayBrowser, isConnected, isAuthenticated]);
@@ -200,7 +204,13 @@ export default function ProfileHero() {
           </div>
 
           <div className="flex items-center gap-3">
-            {isConnected ? (
+            {isConnected || isAuthenticated ? (
+              // Gate UI on the auth session, not just wagmi connection.
+              // wagmi state can briefly drop after navigation in the
+              // MiniPay browser but the user still has a valid session
+              // and the silent-reattach effect above will fix wagmi
+              // soon — meanwhile, show the actual UI rather than a
+              // stuck "Connecting…" pill.
               <>
                 <button
                   type="button"
@@ -218,9 +228,8 @@ export default function ProfileHero() {
                 </button>
               </>
             ) : isMiniPayBrowser ? (
-              // MiniPay: implicit connection via the effect above.
-              // Render a quiet "connecting" pill instead of a button so
-              // users don't see anything tappable they shouldn't tap.
+              // Unauthenticated AND in MiniPay → genuine first-connect
+              // in progress (handleConnect was just fired above).
               <div className="flex-1 flex items-center justify-center rounded-full bg-white/30 py-3 text-sm font-medium text-white/80 backdrop-blur-md">
                 Connecting to MiniPay…
               </div>

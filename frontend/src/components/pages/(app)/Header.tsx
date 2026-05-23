@@ -23,24 +23,20 @@ export default function Header() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const [isConnecting, setIsConnecting] = useState(false);
 
-  // In MiniPay, wallet connection is implicit — auto-connect on mount
-  // so the user is never asked to tap a Connect button (per MiniPay
-  // Mini App guidelines).
+  // In MiniPay, wallet connection is implicit. Two distinct cases:
   //
-  // IMPORTANT: guard against re-firing once the user is already
-  // authenticated via the onboarding flow. Without this check the
-  // wagmi `isConnected` flag briefly reads `false` on every page
-  // navigation (before it rehydrates from localStorage), which would
-  // race the effect and trigger a second SIWE signature prompt — a
-  // confusing UX after the user has just signed once.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: handleConnect is stable within component scope
+  // 1. Authenticated but wagmi disconnected — common after a page
+  //    navigation in the MiniPay browser. Silently call connectAsync
+  //    to reattach wagmi without prompting SIWE.
+  // 2. Unauthenticated — full handleConnect (connect + SIWE).
+  // biome-ignore lint/correctness/useExhaustiveDependencies: stable callbacks
   useEffect(() => {
-    if (
-      isMiniPayBrowser &&
-      !isConnected &&
-      !isConnecting &&
-      !isAuthenticated
-    ) {
+    if (!isMiniPayBrowser || isConnected || isConnecting) return;
+    if (isAuthenticated) {
+      connectAsync({ connector: injected(), chainId: NETWORK.id }).catch(
+        () => {},
+      );
+    } else {
       handleConnect();
     }
   }, [isMiniPayBrowser, isConnected, isAuthenticated]);
@@ -92,14 +88,15 @@ export default function Header() {
           </h1>
         </div>
       </div>
-      {isConnected ? (
+      {isConnected || isAuthenticated ? (
+        // Gate avatar on the auth session so it survives a transient
+        // wagmi disconnection during MiniPay page navigation. The
+        // silent-reattach effect above will restore wagmi state.
         <Link href="/profile" className="cursor-pointer">
           <EmojiAvatar avatar={avatar} size={44} />
         </Link>
       ) : isMiniPayBrowser ? (
-        // MiniPay browser: connection is implicit + handled by the effect
-        // above. Render nothing rather than a Connect button (per MiniPay
-        // Mini App listing guideline).
+        // Unauthenticated AND in MiniPay → first-connect in flight.
         null
       ) : (
         <button
