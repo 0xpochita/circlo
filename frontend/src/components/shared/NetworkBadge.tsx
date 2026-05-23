@@ -20,7 +20,7 @@ export default function NetworkBadge() {
       href={NETWORK.explorerUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-2 right-2 z-50 select-none transition-opacity duration-200 hover:opacity-80"
+      className="fixed top-2 right-2 z-50 select-none transition-opacity duration-200 hover:opacity-80"
       title={`Connected to ${NETWORK.name} — click to open block explorer`}
     >
       <span
