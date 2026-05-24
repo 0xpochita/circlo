@@ -1,0 +1,28 @@
+# CODEOWNERS — auto-assign reviewers based on what the PR touches.
+# See https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+#
+# Fallback owner for anything not covered by a more specific rule.
+* @alventendrawan123
+
+# Smart contracts — Foundry + Solidity work
+/sc/                        @alventendrawan123
+
+# Frontend (Next.js + wagmi + viem + MiniPay) — Bima leads UI work
+/frontend/                  @alventendrawan123
+
+# Backend (Fastify + Prisma + indexer)
+/backend/                   @alventendrawan123
+
+# Published npm packages — extra care, public API surface
+/packages/                  @alventendrawan123
+
+# Bot orchestration + cycle scripts — gitignored locally but the
+# bot.ts framework lives in git
+/scripts/                   @alventendrawan123
+
+# Repo-wide policy + governance docs require owner review
+/README.md                  @alventendrawan123
+/ARCHITECTURE.md            @alventendrawan123
+/SECURITY.md                @alventendrawan123
+/CHANGELOG.md               @alventendrawan123
+/.github/                   @alventendrawan123
