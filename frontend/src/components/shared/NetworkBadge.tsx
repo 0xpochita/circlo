@@ -10,9 +10,7 @@ import { IS_MAINNET, NETWORK } from "@/lib/web3/network";
  * homepage in a new tab.
  */
 export default function NetworkBadge() {
-  const tone = IS_MAINNET
-    ? "bg-emerald-500"
-    : "bg-amber-500";
+  const tone = IS_MAINNET ? "bg-emerald-500" : "bg-amber-500";
   const label = IS_MAINNET ? "Celo Mainnet" : "Celo Sepolia";
 
   return (

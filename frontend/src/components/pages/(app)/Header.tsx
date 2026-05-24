@@ -95,10 +95,8 @@ export default function Header() {
         <Link href="/profile" className="cursor-pointer">
           <EmojiAvatar avatar={avatar} size={44} />
         </Link>
-      ) : isMiniPayBrowser ? (
-        // Unauthenticated AND in MiniPay → first-connect in flight.
-        null
-      ) : (
+      ) : isMiniPayBrowser ? // Unauthenticated AND in MiniPay → first-connect in flight.
+      null : (
         <button
           type="button"
           onClick={handleConnect}

@@ -16,14 +16,18 @@ import { explorerTxUrl } from "@/lib/web3/network";
  */
 export default function SettlementBadge() {
   const publicClient = usePublicClient();
-  const [latest, setLatest] = useState<{ timestamp: bigint; txHash: `0x${string}` } | null>(null);
+  const [latest, setLatest] = useState<{
+    timestamp: bigint;
+    txHash: `0x${string}`;
+  } | null>(null);
 
   useEffect(() => {
     if (!publicClient) return;
     let cancelled = false;
 
-    const settlementEvent = (predictionPoolContract.abi as readonly { type: string; name?: string }[])
-      .find((x) => x.type === "event" && x.name === "Settlement");
+    const settlementEvent = (
+      predictionPoolContract.abi as readonly { type: string; name?: string }[]
+    ).find((x) => x.type === "event" && x.name === "Settlement");
     if (!settlementEvent) return;
 
     async function backfill() {
@@ -45,7 +49,10 @@ export default function SettlementBadge() {
           args: { timestamp: bigint };
           transactionHash: `0x${string}`;
         };
-        setLatest({ timestamp: last.args.timestamp, txHash: last.transactionHash });
+        setLatest({
+          timestamp: last.args.timestamp,
+          txHash: last.transactionHash,
+        });
       } catch {
         /* RPC hiccup is non-fatal — leave the badge in idle state */
       }
@@ -63,7 +70,10 @@ export default function SettlementBadge() {
           args: { timestamp: bigint };
           transactionHash: `0x${string}`;
         };
-        setLatest({ timestamp: last.args.timestamp, txHash: last.transactionHash });
+        setLatest({
+          timestamp: last.args.timestamp,
+          txHash: last.transactionHash,
+        });
       },
     });
 
@@ -75,7 +85,10 @@ export default function SettlementBadge() {
 
   if (!latest) return null;
 
-  const ageSeconds = Math.max(0, Math.floor(Date.now() / 1000) - Number(latest.timestamp));
+  const ageSeconds = Math.max(
+    0,
+    Math.floor(Date.now() / 1000) - Number(latest.timestamp),
+  );
   const label =
     ageSeconds < 60
       ? `${ageSeconds}s ago`

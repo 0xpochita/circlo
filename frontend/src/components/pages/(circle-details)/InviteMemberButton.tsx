@@ -227,14 +227,13 @@ export default function InviteMemberButton({
                             />
                             <div className="min-w-0">
                               <p className="text-sm font-semibold text-main-text truncate">
-                                {user.name ??
-                                  user.username ?? (
-                                    <AddressLink
-                                      address={user.walletAddress}
-                                      length={8}
-                                      stopPropagation
-                                    />
-                                  )}
+                                {user.name ?? user.username ?? (
+                                  <AddressLink
+                                    address={user.walletAddress}
+                                    length={8}
+                                    stopPropagation
+                                  />
+                                )}
                               </p>
                               <p className="text-xs text-muted truncate">
                                 {user.username ? (

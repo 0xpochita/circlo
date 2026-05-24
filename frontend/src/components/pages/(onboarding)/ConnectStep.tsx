@@ -273,7 +273,9 @@ export default function ConnectStep({ onNext, onBack }: ConnectStepProps) {
               whileTap={{ scale: 0.97 }}
               className="w-full rounded-full bg-gray-900 py-4 text-base font-semibold text-white cursor-pointer"
             >
-              {statusText === "Retry sign-in" ? "Retry sign-in" : "Sign in with MiniPay"}
+              {statusText === "Retry sign-in"
+                ? "Retry sign-in"
+                : "Sign in with MiniPay"}
             </motion.button>
           )
         ) : (

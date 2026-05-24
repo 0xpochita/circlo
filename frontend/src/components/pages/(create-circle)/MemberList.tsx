@@ -174,13 +174,12 @@ export default function MemberList({ circleId }: MemberListProps) {
                     />
                     <div>
                       <p className="text-sm font-semibold text-main-text">
-                        {member.name ??
-                          member.username ?? (
-                            <AddressLink
-                              address={member.walletAddress}
-                              length={8}
-                            />
-                          )}
+                        {member.name ?? member.username ?? (
+                          <AddressLink
+                            address={member.walletAddress}
+                            length={8}
+                          />
+                        )}
                       </p>
                       <p className="text-xs text-muted">
                         {member.username ? (
