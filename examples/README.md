@@ -22,6 +22,7 @@ labelled and require a funded private key in `.env`.
 |---|---|---|
 | [`monitor-events.mjs`](./monitor-events.mjs) | Streams `CircleCreated` and `GoalCreated` events live as they hit the chain | No |
 | [`read-stats.mjs`](./read-stats.mjs) | Reads total circles + goals + lists the 5 most recent goals with their pools | No |
+| [`tap-settlement.mjs`](./tap-settlement.mjs) | Calls the permissionless `settlement()` heartbeat on PredictionPool and prints the resulting Celoscan tx link | **Yes** (tiny gas only — no USDT) |
 
 More examples land as the SDK gains methods — `stake`, `claim`, and
 resolver-vote flows are tracked but not included here yet because they
