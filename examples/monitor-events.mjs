@@ -1,9 +1,11 @@
 /**
  * monitor-events.mjs — stream Circlo events live as they hit Celo Mainnet.
  *
- * Subscribes to two event streams via the circlo-sdk watcher helpers:
+ * Subscribes to three event streams via the circlo-sdk watcher helpers:
  *   - CircleCreated  → emits when anyone makes a new circle
  *   - GoalCreated    → emits when anyone makes a new goal
+ *   - Settlement     → emits whenever the permissionless settlement()
+ *                      heartbeat is called (see tap-settlement.mjs)
  *
  * Stays running forever; Ctrl-C to stop. Useful as a starting point for
  * Discord/Telegram bots, dashboards, or alerting.
@@ -16,6 +18,7 @@ import {
   parseGoalMetadata,
   watchCircleCreated,
   watchGoalCreated,
+  watchSettlement,
 } from "circlo-sdk";
 import { createPublicClient, http } from "viem";
 import { celo } from "viem/chains";
@@ -68,10 +71,18 @@ const unsubGoals = watchGoalCreated(publicClient, (args) => {
   );
 });
 
+const unsubSettlement = watchSettlement(publicClient, (args) => {
+  console.log(
+    `[${new Date().toISOString()}] Settlement     ts=${args.timestamp} ` +
+      `(${new Date(Number(args.timestamp) * 1000).toISOString()})`,
+  );
+});
+
 // Clean unsub on Ctrl-C so the process exits promptly.
 process.on("SIGINT", () => {
   console.log("\n👋 Stopping watchers...");
   unsubCircles();
   unsubGoals();
+  unsubSettlement();
   process.exit(0);
 });
