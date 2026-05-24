@@ -1,0 +1,27 @@
+# EditorConfig — keep formatting consistent across editors for the
+# whole Circlo monorepo. See https://editorconfig.org
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+# Solidity contracts under sc/ use 4-space indentation to match the
+# OpenZeppelin + Foundry convention. Biome / Prettier leaves these
+# alone since they're outside the JS workspace.
+[sc/**.sol]
+indent_size = 4
+
+# Markdown: keep trailing whitespace because GFM uses double-space
+# as a hard line break inside paragraphs.
+[*.md]
+trim_trailing_whitespace = false
+
+# Makefiles need tab indentation.
+[Makefile]
+indent_style = tab
