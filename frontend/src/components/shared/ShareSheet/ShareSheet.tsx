@@ -191,10 +191,33 @@ export default function ShareSheet({
                 type="button"
                 onClick={handleNativeShare}
                 whileTap={{ scale: 0.97 }}
-                className="w-full rounded-full bg-brand py-4 text-base font-semibold text-white cursor-pointer"
+                className="mb-2 w-full rounded-full bg-brand py-4 text-base font-semibold text-white cursor-pointer"
               >
                 Share with friends
               </motion.button>
+
+              {/* Share on X — opens the official tweet-intent endpoint
+                  with a pre-filled message tagging @circlo_celo + @Celo.
+                  Works inside MiniPay's in-app browser too because
+                  it's a plain HTTPS link, not a native share API. */}
+              <a
+                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
+                  `Join my circle "${circleName}" on @circlo_celo — on-chain accountability stakes for friend groups, settled on @Celo Mainnet 🟢`,
+                )}&url=${encodeURIComponent(shareUrl)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex w-full items-center justify-center gap-2 rounded-full border border-gray-200 py-3 text-sm font-semibold text-main-text transition-all duration-200 active:scale-[0.97]"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  className="w-4 h-4"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+                Share on X
+              </a>
             </div>
           </motion.div>
         </>
