@@ -266,3 +266,36 @@ memilih side mana yang menang saat goal masuk status `resolving`.
   "statusCode": 404
 }
 ```
+
+---
+
+## 5. Settlement event (catatan untuk indexer + frontend)
+
+`PredictionPool` di Celo Mainnet sekarang punya fungsi
+**permissionless heartbeat** `settlement()` yang emit event
+`Settlement(uint256 indexed timestamp)`. Event ini orthogonal ke
+lifecycle goal — tidak menyentuh escrow, tidak transit status, tidak
+memodifikasi state apapun.
+
+**Implikasi untuk backend:**
+
+- **Indexer**: kalau mau ingest event ini, handler-nya cukup
+  no-op atau log saja. Tidak ada DB write yang diperlukan kecuali
+  kita ingin track liveness statistics (count per hari, dsb).
+- **REST API**: tidak ada endpoint baru yang dibutuhkan untuk MVP.
+  Frontend ambil event ini langsung dari chain via wagmi
+  `watchEvent` (lihat `SettlementBadge`) sehingga tidak perlu
+  round-trip ke backend.
+- **Jobs / cron**: tidak relevan. `settlement()` boleh dipanggil
+  siapa saja, kapan saja. Backend tidak perlu auto-trigger dari
+  service wallet.
+
+**Implikasi untuk frontend:**
+
+Komponen `<SettlementBadge />` di root layout sudah subscribe ke
+event ini via viem `watchEvent` dan menampilkan "Heartbeat: Xm ago"
+pill di pojok kiri-bawah. Tidak ada API call ke backend yang
+diperlukan untuk fitur ini.
+
+**Inspect on Celoscan:**
+[PredictionPool events](https://celoscan.io/address/0xE9cFa67358476194414ae3306888FfeCb8f41139#events)
