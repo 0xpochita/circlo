@@ -6,6 +6,7 @@ import {
   EventNotFoundError,
   TxRevertedError,
   createCircloClient,
+  isSdkError,
 } from "../dist/index.js";
 
 describe("CircloSdkError hierarchy", () => {
@@ -67,5 +68,21 @@ describe("CircloSdkError hierarchy", () => {
       operation: "getCircleInfo",
       missing: "publicClient",
     });
+  });
+
+  it("isSdkError narrows every concrete SDK error subclass", () => {
+    assert.equal(isSdkError(new CircloSdkError("base")), true);
+    assert.equal(isSdkError(new NotConfiguredError("op", "walletClient")), true);
+    assert.equal(isSdkError(new EventNotFoundError("Staked", "0x1")), true);
+    assert.equal(isSdkError(new TxRevertedError("claim", "0x2")), true);
+  });
+
+  it("isSdkError returns false for plain Errors and non-error values", () => {
+    assert.equal(isSdkError(new Error("plain")), false);
+    assert.equal(isSdkError(new TypeError("type")), false);
+    assert.equal(isSdkError("string"), false);
+    assert.equal(isSdkError(null), false);
+    assert.equal(isSdkError(undefined), false);
+    assert.equal(isSdkError({ name: "CircloSdkError", message: "fake" }), false);
   });
 });
