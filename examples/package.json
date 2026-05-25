@@ -6,11 +6,12 @@
   "type": "module",
   "scripts": {
     "monitor": "node monitor-events.mjs",
-    "stats": "node read-stats.mjs"
+    "stats": "node read-stats.mjs",
+    "tap-settlement": "node tap-settlement.mjs"
   },
   "dependencies": {
-    "circlo-sdk": "^0.2.0",
-    "circlo-types": "^0.1.0",
+    "circlo-sdk": "^0.3.1",
+    "circlo-types": "^0.1.1",
     "viem": "^2.48.0"
   }
 }
