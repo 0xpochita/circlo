@@ -3,6 +3,31 @@
 All notable changes to `circlo-sdk` are documented here. This project follows
 [Semantic Versioning](https://semver.org).
 
+## [0.3.1] — 2026-05-25
+
+### Added
+
+- **`isSdkError(e): e is CircloSdkError`** — type-guard helper that
+  returns `true` for every SDK error subclass (CircloSdkError base,
+  NotConfiguredError, EventNotFoundError, TxRevertedError). Useful
+  in transitive catch sites that don't want to import the concrete
+  classes, or as a single-line gate before assuming a specific
+  shape. Re-exported from the package root.
+- **JSDoc on `CircloSdkError` base class** — previously bare. Now
+  points at `isSdkError` so the relationship is discoverable from
+  either direction.
+
+### Tests
+
+- Suite grew 25 → 27 passing. New cases cover both the positive
+  (every subclass narrows correctly) and negative (plain Error,
+  strings, null, look-alike objects all reject) paths.
+
+### Compatibility
+
+- Additive only. Existing `instanceof CircloSdkError` checks keep
+  working unchanged.
+
 ## [0.3.0] — 2026-05-21
 
 ### Added
