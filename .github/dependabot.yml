@@ -1,0 +1,78 @@
+# Dependabot config — keep dependencies in the four package
+# manifests fresh without manual `npm outdated` runs.
+#
+# Schedule: weekly so we don't drown in PRs, with rebase strategy
+# auto so superseded PRs close cleanly when a higher version lands.
+
+version: 2
+updates:
+  # Frontend (Next.js + wagmi + viem + biome)
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    rebase-strategy: "auto"
+    labels:
+      - "deps"
+      - "frontend"
+    groups:
+      next-stack:
+        patterns:
+          - "next"
+          - "react"
+          - "react-*"
+      wagmi-viem:
+        patterns:
+          - "wagmi"
+          - "viem"
+          - "@tanstack/react-query"
+
+  # Backend (Fastify + Prisma + viem indexer)
+  - package-ecosystem: "npm"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    rebase-strategy: "auto"
+    labels:
+      - "deps"
+      - "backend"
+
+  # Published packages — keep these conservative; bumps here ship to
+  # npm consumers.
+  - package-ecosystem: "npm"
+    directory: "/packages/circlo-sdk"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    rebase-strategy: "auto"
+    labels:
+      - "deps"
+      - "sdk"
+
+  - package-ecosystem: "npm"
+    directory: "/packages/circlo-types"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    rebase-strategy: "auto"
+    labels:
+      - "deps"
+      - "types"
+
+  # GitHub Actions workflows — pin versions so `actions/checkout@v4`
+  # type drift gets surfaced as PRs instead of silent failures.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels:
+      - "deps"
+      - "ci"
