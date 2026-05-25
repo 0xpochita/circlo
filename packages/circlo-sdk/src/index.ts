@@ -93,7 +93,8 @@ export {
 
 export {
   CircloSdkError,
-  NotConfiguredError,
   EventNotFoundError,
+  isSdkError,
+  NotConfiguredError,
   TxRevertedError,
 } from "./errors.js";

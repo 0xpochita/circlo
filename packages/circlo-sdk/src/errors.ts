@@ -21,11 +21,40 @@
  * ```
  */
 
+/**
+ * Base class for every error the SDK throws. Catch this to filter
+ * library errors without accidentally swallowing arbitrary runtime
+ * exceptions (TypeError, RangeError, etc.) — see also
+ * {@link isSdkError} for a type-narrowing guard you can use without
+ * an `instanceof` import.
+ */
 export class CircloSdkError extends Error {
   constructor(message: string) {
     super(message);
     this.name = this.constructor.name;
   }
+}
+
+/**
+ * Type guard for SDK errors. Useful when the catch site can't
+ * import the error classes directly (transitive dependency cases) or
+ * when you want a single check that covers every SDK error subclass.
+ *
+ * @example
+ * ```ts
+ * try {
+ *   await settlement(wallet);
+ * } catch (e) {
+ *   if (isSdkError(e)) {
+ *     // Render e.message — known SDK failure shape.
+ *   } else {
+ *     throw e; // Unknown runtime error, re-throw.
+ *   }
+ * }
+ * ```
+ */
+export function isSdkError(e: unknown): e is CircloSdkError {
+  return e instanceof CircloSdkError;
 }
 
 /**
