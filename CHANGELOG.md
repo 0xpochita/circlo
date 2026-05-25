@@ -11,6 +11,18 @@ grouped by date instead.
 
 ### Added
 
+- **`docs/MINIPAY_INTEGRATION.md`** — standalone guide for the
+  MiniPay slice of the system. Covers detection, implicit
+  auto-connect, the isAuthenticated guard against the
+  second-signature race, UI gating, on-chain isMember probe,
+  SIWE round-trip semantics, legacy-tx requirement, PWA shell
+  wiring, and the desktop `?minipay=1` override workflow.
+- **circlo-sdk 0.3.1** — patch release with `isSdkError()` type
+  guard helper exported from the package root + JSDoc on the
+  `CircloSdkError` base. Additive; no breaking changes. Test
+  suite grew 25 → 30 with positive + negative coverage of the
+  new guard and dedicated unit tests for the `settlement()`
+  write helper.
 - **MiniPay listing readiness on Celo.** Front-end is now compliant
   with the MiniPay Mini App listing guidelines: no Connect button
   surfaces inside the MiniPay browser (Header + ProfileHero
@@ -61,6 +73,21 @@ grouped by date instead.
 - `.gitattributes` normalizes line endings to LF across platforms so
   Windows contributors no longer trigger CRLF→LF warnings on every
   commit.
+- `.editorconfig` added — 2-space LF defaults, 4-space for `.sol`
+  to match the OZ/Foundry convention, tab for Makefiles.
+
+### CI / Repo quality
+
+- `.github/dependabot.yml` — weekly grouped dep updates across the
+  five package manifests (frontend, backend, both published
+  packages) plus GitHub Actions workflow pins.
+- `.github/CODEOWNERS` — auto-assigns review per top-level area
+  (sc/, backend/, frontend/, packages/) plus repo-wide governance
+  files (README, ARCHITECTURE, SECURITY, CHANGELOG, .github).
+- `.github/pull_request_template.md` — MiniPay-specific gates
+  added: manual MiniPay-browser test for wallet flows, contract
+  verification on Celoscan after deploy, legacy-tx requirement,
+  no new personal_sign / eth_sign.
 
 ### CI
 
