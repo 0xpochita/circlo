@@ -90,6 +90,39 @@ If SIWE genuinely fails (e.g., RPC issue), the flow falls back to a
 clear "Sign-in didn't complete" toast + a manual retry button rather
 than auto-proceeding to a stuck profile-fetch error.
 
+## EIP-712 typed data (NOT supported)
+
+`personal_sign` and `signTypedData` are different EIPs. MiniPay's
+`signTypedData` support is **inconsistent across versions** — the
+call can silently hang or surface a generic failure. Currently only
+one surface relies on it: `GenerateInviteSheet.tsx` (mints the
+EIP-712 invite proof for private circles).
+
+Pattern in `GenerateInviteSheet.tsx`:
+
+```ts
+if (isMiniPayBrowser) {
+  toast.error(
+    "Generating an invite uses typed-data signing, which MiniPay " +
+    "doesn't reliably support yet. Open Circlo in a desktop browser " +
+    "to generate the link, then share the URL back here."
+  );
+  return;
+}
+```
+
+The signed link itself works in any wallet once generated — only
+the **signing step** needs the desktop fallback. The invitee can
+still accept on MiniPay.
+
+If a future feature needs typed-data signing in MiniPay, prefer
+either:
+
+- A backend-signed alternative (server signs with a hot key, frontend
+  just submits the resulting proof).
+- A non-typed-data signature scheme (e.g., raw `personal_sign` of
+  the hashed payload, with on-chain recovery via ECDSA).
+
 ## Transactions
 
 - **Legacy only.** Every `writeContract` call must use
