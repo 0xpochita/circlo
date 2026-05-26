@@ -11,7 +11,7 @@ import {
 import { toast } from "sonner";
 import type { Address } from "viem";
 import { useAccount, useSignTypedData } from "wagmi";
-import { useSheetOverflow } from "@/hooks";
+import { useMiniPay, useSheetOverflow } from "@/hooks";
 import {
   buildInviteUrl,
   INVITE_PROOF_TYPED_DATA_DOMAIN,
@@ -44,6 +44,7 @@ export default function GenerateInviteSheet({
 }: GenerateInviteSheetProps) {
   const { address: connectedAddress } = useAccount();
   const { signTypedDataAsync } = useSignTypedData();
+  const isMiniPayBrowser = useMiniPay();
   const [inviteeAddr, setInviteeAddr] = useState("");
   const [duration, setDuration] = useState<DurationKey>("1d");
   const [generated, setGenerated] = useState<string | null>(null);
@@ -73,6 +74,16 @@ export default function GenerateInviteSheet({
     }
     if (!chainId) {
       toast.error("Circle is not on-chain yet");
+      return;
+    }
+    if (isMiniPayBrowser) {
+      // MiniPay's EIP-712 (signTypedData) support is inconsistent
+      // across versions — the call may silently fail or hang. Steer
+      // owners to a desktop browser for invite generation instead of
+      // letting them watch a spinner that goes nowhere.
+      toast.error(
+        "Generating an invite uses typed-data signing, which MiniPay doesn't reliably support yet. Open Circlo in a desktop browser to generate the link, then share the URL back here.",
+      );
       return;
     }
     if (!/^0x[a-fA-F0-9]{40}$/.test(inviteeAddr.trim())) {
