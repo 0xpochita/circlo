@@ -127,8 +127,26 @@ export async function createGoal(
 }
 
 /**
- * Lock a goal after its deadline. Anyone can call this — it transitions
- * the goal to the resolution phase so resolvers can vote.
+ * Lock a goal after its deadline. Permissionless — anyone holding a
+ * tiny bit of CELO for gas can poke the goal forward, so a stuck
+ * resolver does not block the lifecycle.
+ *
+ * Transitions the goal from `Open` to `Locked` (or `Resolving` if the
+ * contract auto-starts the vote). After lock:
+ *
+ * - `stake` reverts `GoalLocked` (no new positions)
+ * - resolvers can call `submitVote` on the ResolutionModule
+ *
+ * Reverts `DeadlineNotReached` if `block.timestamp < goal.deadline`,
+ * or `WrongStatus` if the goal is already past `Open`.
+ *
+ * @throws viem `ContractFunctionExecutionError` on revert.
+ *
+ * @example
+ * ```ts
+ * await lockGoal(wallet, goalId);
+ * // resolvers can now call submitVote
+ * ```
  */
 export async function lockGoal(
   wallet: WalletClient,
