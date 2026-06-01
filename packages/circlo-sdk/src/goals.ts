@@ -166,8 +166,27 @@ export async function lockGoal(
 }
 
 /**
- * Read a single goal tuple. Field order matches the contract:
- * [circleId, creator, outcomeType, status, deadline, minStake, totalPool, winningSide, metadataURI]
+ * Read a single goal's on-chain tuple.
+ *
+ * Returned field order matches the `IPredictionPool.Goal` struct:
+ * `[circleId, creator, outcomeType, status, deadline, minStake,
+ *  totalPool, winningSide, metadataURI]`.
+ *
+ * Reverts `GoalNotFound` if `goalId` was never created. Use
+ * `getGoalNextId` to enumerate the valid range without probing.
+ *
+ * `winningSide` is `UNRESOLVED` (255) until the goal reaches
+ * `PaidOut`; treat it as nullable in your UI until then.
+ *
+ * @param client viem PublicClient pointed at the right chain.
+ * @param goalId The goal's onchain id.
+ * @returns Raw struct tuple — wrap with your own typed accessor.
+ *
+ * @example
+ * ```ts
+ * const g = await getGoal(client, 123n);
+ * const [circleId, , outcomeType, status, deadline] = g;
+ * ```
  */
 export async function getGoal(
   client: PublicClient,
