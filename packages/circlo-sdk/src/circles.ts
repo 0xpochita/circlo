@@ -208,7 +208,21 @@ export async function joinPrivateCircle(
 
 /**
  * Leave a circle the caller is currently a member of.
- * The circle owner cannot leave — they must transfer ownership first.
+ *
+ * Reverts `OwnerCannotLeave` if the caller is the circle owner — owners
+ * must transfer ownership before they can leave. Reverts `NotAMember`
+ * if the caller never joined (or already left). Emits `CircleLeft`.
+ *
+ * The membership history is append-only: a leave does NOT erase the
+ * member from `getMembers`, but `isCircleMember` flips back to `false`.
+ *
+ * @throws viem `ContractFunctionExecutionError` on revert.
+ *
+ * @example
+ * ```ts
+ * await leaveCircle(wallet, 42n);
+ * // isCircleMember(...) now returns false for this address.
+ * ```
  */
 export async function leaveCircle(
   wallet: WalletClient,
