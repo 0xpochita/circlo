@@ -103,6 +103,22 @@ export async function createCircle(
 
 /**
  * Check whether an address is a member of a circle (read-only).
+ *
+ * Backed by `CircleFactory.isCircleMember`. Never reverts — returns
+ * `false` for non-existent circles, addresses that never joined, and
+ * addresses that joined then left. Useful as the source of truth
+ * before showing a member-only CTA (e.g. Create Goal, Resolve).
+ *
+ * @param client viem PublicClient pointed at the right chain.
+ * @param circleId The circle's onchain id.
+ * @param user The address to probe.
+ * @returns `true` if currently a member, `false` otherwise.
+ *
+ * @example
+ * ```ts
+ * const isMember = await isCircleMember(publicClient, 42n, userAddr);
+ * if (!isMember) return <JoinCircleButton />;
+ * ```
  */
 export async function isCircleMember(
   client: PublicClient,
