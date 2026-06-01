@@ -277,8 +277,23 @@ export async function getCircleMembers(
 
 /**
  * Read the id that will be assigned to the next circle created.
+ *
  * Equals `(total circles ever created) + 1` — useful for indexers
- * that want to know how many circles exist.
+ * that want to know how many circles exist without iterating, and
+ * for UIs that want to show a "total circles created" counter.
+ *
+ * Note: circle ids are stable and never recycled. A deleted circle
+ * (none today, but reserved) would still leave a gap in the id range
+ * rather than freeing the id for reuse.
+ *
+ * @param client viem PublicClient pointed at the right chain.
+ * @returns The next-to-be-assigned circleId (also = total ever + 1).
+ *
+ * @example
+ * ```ts
+ * const next = await getCircleNextId(client);
+ * console.log(`Total circles so far: ${next - 1n}`);
+ * ```
  */
 export async function getCircleNextId(client: PublicClient): Promise<bigint> {
   return client.readContract({
