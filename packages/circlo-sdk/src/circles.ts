@@ -134,8 +134,21 @@ export async function isCircleMember(
 }
 
 /**
- * Join a public circle. Reverts if the circle is private — use
- * `joinPrivateCircle` with a signed inviteProof instead.
+ * Join a public circle. Reverts `CircleIsPrivate` if the circle is
+ * invite-only — use `joinPrivateCircle` with a signed inviteProof
+ * instead. Reverts `AlreadyMember` if the caller already joined.
+ *
+ * Idempotent at the indexer layer: the second join attempt reverts
+ * on-chain rather than emitting a duplicate `CircleJoined` event.
+ *
+ * @throws `Error` if walletClient has no account configured.
+ * @throws viem `ContractFunctionExecutionError` on revert.
+ *
+ * @example
+ * ```ts
+ * const hash = await joinCircle(wallet, 42n);
+ * await publicClient.waitForTransactionReceipt({ hash });
+ * ```
  */
 export async function joinCircle(
   wallet: WalletClient,
