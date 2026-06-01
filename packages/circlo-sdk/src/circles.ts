@@ -168,9 +168,25 @@ export async function joinCircle(
 }
 
 /**
- * Join a private circle using a signed EIP-712 inviteProof issued by
- * the circle owner. The proof bytes layout is defined by the
- * CircleFactory contract; build it with the helper in your dapp.
+ * Join a private (invite-only) circle using a signed EIP-712
+ * `InviteProof` issued by the circle owner.
+ *
+ * The proof is `abi.encode(bytes sig, uint256 expiry)` — `sig` is a
+ * 65-byte ECDSA signature over the `InviteProof(circleId, joiner, expiry)`
+ * struct hash. Build it with the EIP-712 helper in your dapp; this SDK
+ * only forwards the bytes.
+ *
+ * Note: MiniPay's `signTypedData` is unreliable today — see
+ * `docs/MINIPAY_INTEGRATION.md` for the desktop-fallback pattern.
+ *
+ * @throws viem `ContractFunctionExecutionError` on `InvalidInviteProof`,
+ *   `InviteExpired`, `CircleNotFound`, or `AlreadyMember`.
+ *
+ * @example
+ * ```ts
+ * const proof = await buildInviteProofForCircle(ownerWallet, circleId, joiner);
+ * const hash = await joinPrivateCircle(wallet, circleId, proof);
+ * ```
  */
 export async function joinPrivateCircle(
   wallet: WalletClient,
