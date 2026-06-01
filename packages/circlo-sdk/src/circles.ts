@@ -242,7 +242,24 @@ export async function leaveCircle(
 }
 
 /**
- * Read a page of circle members. Cursor-paginated by offset/limit.
+ * Read a page of a circle's member list.
+ *
+ * Cursor-paginated by `offset` / `limit`. Returns the append-only
+ * historical member list — addresses that joined AND later left
+ * still appear in this result. Filter via `isCircleMember` per-row
+ * if you need only-current members.
+ *
+ * @param client viem PublicClient pointed at the right chain.
+ * @param circleId The circle's onchain id.
+ * @param offset 0-indexed offset into the historical member list.
+ * @param limit Page size; defaults to 100. Large pages may revert
+ *   on RPC gas-limit caps — paginate in 100s for safety.
+ * @returns A page of member addresses, oldest-join-first.
+ *
+ * @example
+ * ```ts
+ * const page = await getCircleMembers(client, 42n, 0n, 50n);
+ * ```
  */
 export async function getCircleMembers(
   client: PublicClient,
