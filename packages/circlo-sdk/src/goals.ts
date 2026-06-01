@@ -202,8 +202,23 @@ export async function getGoal(
 
 /**
  * Read the id that will be assigned to the next goal created.
- * Equals `(total goals ever created) + 1` — useful for indexers
- * and dashboards that want to know how many goals exist.
+ *
+ * Equals `(total goals ever created) + 1`. Indexers use this to bound
+ * a fresh backfill range — sweep `[0n, nextGoalId)` for `Goal` reads
+ * + `GoalCreated` event matchups without scanning blocks-by-block.
+ *
+ * Goal ids are stable and never recycled across upgrades.
+ *
+ * @param client viem PublicClient pointed at the right chain.
+ * @returns The next-to-be-assigned goalId (also = total ever + 1).
+ *
+ * @example
+ * ```ts
+ * const next = await getGoalNextId(client);
+ * for (let id = 0n; id < next; id++) {
+ *   const g = await getGoal(client, id);
+ * }
+ * ```
  */
 export async function getGoalNextId(client: PublicClient): Promise<bigint> {
   return client.readContract({
