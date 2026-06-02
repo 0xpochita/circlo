@@ -45,10 +45,29 @@ export async function submitVote(
 }
 
 /**
- * Force-finalize a goal whose tally has reached quorum but the auto-
- * finalize path didn't trigger (e.g. partial vote with explicit close).
- * In normal flow, submitVote auto-finalizes when quorum is met, so this
- * is only needed for edge cases.
+ * Force-finalize a goal whose tally has reached quorum but the
+ * auto-finalize path didn't trigger.
+ *
+ * In normal flow, the final `submitVote` that crosses the quorum
+ * threshold auto-finalizes the goal via the `setWinner` callback
+ * into `PredictionPool`. This helper exists for two edge cases:
+ *
+ * - **Partial vote with explicit close** — quorum met but the
+ *   resolver chose not to fire the auto-finalize on their tx.
+ * - **Vote window expired with majority** — vote window past
+ *   deadline but a clear majority exists.
+ *
+ * Permissionless: anyone with gas can call this once the tally
+ * supports a decision. Reverts `NotFinalizable` if the tally is
+ * tied or no quorum was reached.
+ *
+ * @throws viem `ContractFunctionExecutionError` on revert.
+ *
+ * @example
+ * ```ts
+ * await finalize(wallet, 117n);
+ * // goal now PaidOut, stakers can claim
+ * ```
  */
 export async function finalize(
   wallet: WalletClient,
