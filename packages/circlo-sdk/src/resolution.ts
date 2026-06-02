@@ -87,8 +87,28 @@ export async function finalize(
 }
 
 /**
- * Read the current vote tally on a goal. Returns counts per choice
- * (index 0 = NO, index 1 = YES) and the total vote count.
+ * Read the current vote tally on a goal.
+ *
+ * Returns:
+ * - `counts[0]` = votes for `Side.No`
+ * - `counts[1]` = votes for `Side.Yes`
+ * - `total` = sum of all votes cast
+ *
+ * Combined with `getResolverCount(goalId)` (on `PredictionPool`),
+ * this is the primitive for "votes remaining" + "quorum reached"
+ * indicators in resolver UIs.
+ *
+ * Pre-vote / pre-lock goals return `{ counts: [0n, 0n], total: 0n }`
+ * rather than reverting.
+ *
+ * @param client viem PublicClient pointed at the right chain.
+ * @param goalId The goal's onchain id.
+ *
+ * @example
+ * ```ts
+ * const { counts, total } = await getTally(client, 117n);
+ * const yesShare = total > 0n ? Number(counts[1] * 100n / total) : 0;
+ * ```
  */
 export async function getTally(
   client: PublicClient,
