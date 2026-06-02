@@ -152,8 +152,23 @@ export function watchSettlement(
 }
 
 /**
- * Watch Staked events. Optionally filter by goalId to only get stakes
- * on a specific goal.
+ * Watch `Staked` events on the PredictionPool. Fires once per stake
+ * call — staking multiple times on the same goal/side yields
+ * multiple events (the contract emits per-call, not per-position).
+ *
+ * The `filter.goalId` option pushes the filter down to the RPC via
+ * the indexed topic, so high-traffic chains don't send irrelevant
+ * logs to the client.
+ *
+ * @param filter Optional indexed-topic filter (currently `goalId`).
+ *
+ * @example
+ * ```ts
+ * // tail every stake on goal #117 for a live leaderboard
+ * const unsub = watchStaked(client, ({ user, side, amount }) => {
+ *   leaderboard.add(user, side, amount);
+ * }, { goalId: 117n });
+ * ```
  */
 export function watchStaked(
   client: PublicClient,
