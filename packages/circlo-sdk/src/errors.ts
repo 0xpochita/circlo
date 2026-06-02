@@ -93,9 +93,30 @@ export class NotConfiguredError extends CircloSdkError {
 }
 
 /**
- * Thrown after a write tx confirms but the expected event was not
- * found in the receipt logs. This usually means the on-chain function
- * reverted silently or our event signature drifted from the contract.
+ * Thrown after a write tx confirms but the expected event was missing
+ * from the receipt logs.
+ *
+ * Two common causes:
+ * 1. The on-chain function reverted silently (status=success but no
+ *    state change) — rare, but possible with proxy delegate-call
+ *    edge cases.
+ * 2. The event signature in `circlo-types` drifted from the deployed
+ *    contract (post-upgrade ABI mismatch).
+ *
+ * The `txHash` field lets the UI link the user directly to the
+ * explorer for manual inspection, and the `eventName` field
+ * disambiguates when one SDK call could emit multiple events.
+ *
+ * @example
+ * ```ts
+ * try {
+ *   await createCircle(wallet, params);
+ * } catch (e) {
+ *   if (e instanceof EventNotFoundError) {
+ *     toast(`Tx ${e.txHash.slice(0, 10)}... may have silently failed`);
+ *   } else throw e;
+ * }
+ * ```
  */
 export class EventNotFoundError extends CircloSdkError {
   readonly txHash: `0x${string}`;
