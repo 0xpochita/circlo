@@ -51,8 +51,25 @@ export function watchCircleCreated(
 }
 
 /**
- * Watch GoalCreated events on the PredictionPool. Optionally filter by
- * circleId so you only get goals from one circle.
+ * Watch `GoalCreated` events on the PredictionPool. Returns the
+ * unsubscribe function from viem's `watchContractEvent` — call it
+ * to stop the underlying poll loop.
+ *
+ * The `filter.circleId` option uses the contract's indexed-topic
+ * filter so the RPC only ships matching logs back — much cheaper
+ * than client-side filtering when watching a high-activity chain.
+ *
+ * @param filter Optional indexed-topic filter (currently `circleId`).
+ *
+ * @example
+ * ```ts
+ * // listen for goals on circle #42 only
+ * const unsub = watchGoalCreated(client, ({ id, deadline }) => {
+ *   console.log(`goal #${id} live until ${deadline}`);
+ * }, { circleId: 42n });
+ * // ...
+ * unsub();
+ * ```
  */
 export function watchGoalCreated(
   client: PublicClient,
