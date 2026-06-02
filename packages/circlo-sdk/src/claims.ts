@@ -9,10 +9,26 @@ import { CIRCLO_CONTRACTS, PREDICTION_POOL_ABI } from "circlo-types";
  * Returns the raw tx hash — callers can wait on the receipt themselves
  * if they need to confirm the USDT transfer landed.
  *
+ * Payout formula (pre-fee):
+ *
+ *     payout = winnerStake + winnerStake * losersPool / winnersPool
+ *
+ * The protocol fee (default 0–10%) is deducted before transfer. Pair
+ * with `getPoolPerSide` to project a payout before claiming.
+ *
  * @throws `Error` if the walletClient has no account configured.
  * @throws viem `ContractFunctionExecutionError` with one of:
  *   - `NotResolved` — goal still in Open / Locked / Resolving status
  *   - `NothingToClaim` — caller staked on the losing side, or already claimed
+ *
+ * @example
+ * ```ts
+ * import { claim } from "circlo-sdk";
+ *
+ * const hash = await claim(wallet, 117n);
+ * await publicClient.waitForTransactionReceipt({ hash });
+ * // USDT now in wallet.account.address
+ * ```
  */
 export async function claim(
   wallet: WalletClient,
