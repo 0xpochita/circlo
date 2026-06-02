@@ -2,13 +2,29 @@ import type { Hash, WalletClient, PublicClient, Account, Chain } from "viem";
 import { CIRCLO_CONTRACTS, RESOLUTION_MODULE_ABI } from "circlo-types";
 
 /**
- * Submit a vote on a locked goal. Caller must be a resolver on that goal,
- * as set by the `resolverList` argument at createGoal time.
+ * Submit a vote on a locked goal. Caller must be a resolver on that
+ * goal, as set by the `resolverList` argument at `createGoal` time.
  *
  * @param choice 0 = NO (Side.No), 1 = YES (Side.Yes).
  *
  * When the quorum threshold is reached, the contract auto-finalizes —
- * no separate `finalize` call is needed for the common case.
+ * no separate `finalize` call is needed for the common case. A tied
+ * tally transitions the goal to `Disputed` instead of `PaidOut`;
+ * stakers then call `refund` to reclaim principal.
+ *
+ * @throws viem `ContractFunctionExecutionError` with one of:
+ *   - `NotResolver` — caller is not on `goal.resolverList`
+ *   - `WrongStatus` — goal is not in `Locked` / `Resolving`
+ *   - `AlreadyVoted` — caller already submitted a vote
+ *   - `VoteWindowExpired` — vote window past (Disputed if no quorum)
+ *
+ * @example
+ * ```ts
+ * import { submitVote, Side } from "circlo-sdk";
+ *
+ * await submitVote(resolverWallet, 117n, Side.Yes);
+ * // quorum auto-finalizes the goal to PaidOut(YES)
+ * ```
  */
 export async function submitVote(
   wallet: WalletClient,
