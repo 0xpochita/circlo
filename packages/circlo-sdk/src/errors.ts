@@ -58,8 +58,24 @@ export function isSdkError(e: unknown): e is CircloSdkError {
 }
 
 /**
- * Thrown when an SDK method needs a walletClient or publicClient that
- * wasn't passed to createCircloClient.
+ * Thrown when an SDK method needs a `walletClient` or `publicClient`
+ * that wasn't supplied to `createCircloClient`.
+ *
+ * Both `operation` (the SDK method name) and `missing` (which client
+ * is absent) are exposed as readable fields so consumers can render a
+ * targeted "connect wallet" prompt for `walletClient` misses without
+ * conflating them with read-side misses.
+ *
+ * @example
+ * ```ts
+ * try {
+ *   await circlo.stake({ goalId: 1n, side: 1, amount: 100n });
+ * } catch (e) {
+ *   if (e instanceof NotConfiguredError && e.missing === "walletClient") {
+ *     showConnectWalletPrompt();
+ *   } else throw e;
+ * }
+ * ```
  */
 export class NotConfiguredError extends CircloSdkError {
   readonly operation: string;
