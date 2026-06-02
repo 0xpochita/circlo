@@ -133,10 +133,31 @@ export class EventNotFoundError extends CircloSdkError {
 }
 
 /**
- * Thrown when a tx receipt comes back with `status: "reverted"`. This
- * means the on-chain function rejected the call — usually a contract
- * `require` failed (deadline too soon, insufficient allowance, caller
- * not a member, etc).
+ * Thrown when a tx receipt comes back with `status: "reverted"`.
+ *
+ * The on-chain function rejected the call. Common causes:
+ *
+ * - **createGoal**: `DeadlineTooSoon`, `NotCircleMember`, `NoResolvers`
+ * - **stake**: `GoalLocked`, `BelowMinStake`, `CannotSwitchSides`,
+ *   USDT allowance below `amount`
+ * - **claim**: `NotResolved`, `NothingToClaim`
+ * - **refund**: `NotRefundable`, `NothingToRefund`
+ * - **submitVote**: `NotResolver`, `AlreadyVoted`, `VoteWindowExpired`
+ *
+ * The base error message just points the user at the explorer —
+ * Celoscan decodes most custom errors and shows the exact name. The
+ * `txHash` field is exposed for `explorerTxUrl` builders.
+ *
+ * @example
+ * ```ts
+ * try {
+ *   await stake(wallet, params);
+ * } catch (e) {
+ *   if (e instanceof TxRevertedError) {
+ *     window.open(explorerTxUrl(e.txHash), "_blank");
+ *   } else throw e;
+ * }
+ * ```
  */
 export class TxRevertedError extends CircloSdkError {
   readonly txHash: `0x${string}`;
