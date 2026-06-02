@@ -6,14 +6,25 @@ import {
 } from "circlo-types";
 
 /**
- * Watch CircleCreated events. Returns the unsubscribe function from
- * viem's `watchContractEvent` — call it to stop polling.
+ * Watch `CircleCreated` events on the CircleFactory.
+ *
+ * Returns the unsubscribe function from viem's `watchContractEvent`
+ * — call it to stop the underlying poll loop. The handler is invoked
+ * once per matching log; viem batches logs from the same poll cycle
+ * so multiple events arrive in sequence rather than a single batch.
+ *
+ * Note: This subscription has no filter — every new circle on the
+ * factory triggers the handler. If you need a per-owner subscription,
+ * filter client-side in `onEvent` (the topic isn't indexed at the
+ * contract level today).
  *
  * @example
  * ```ts
- * const unsub = watchCircleCreated(client, ({ id, owner }) => {
- *   console.log(`new circle #${id} by ${owner}`);
+ * const unsub = watchCircleCreated(client, ({ id, owner, isPrivate }) => {
+ *   if (isPrivate) console.log(`new private circle #${id} by ${owner}`);
  * });
+ * // ...later
+ * unsub();
  * ```
  */
 export function watchCircleCreated(
