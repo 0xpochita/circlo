@@ -33,6 +33,24 @@ import { finalize, submitVote, getTally } from "./resolution.js";
 import { NotConfiguredError } from "./errors.js";
 import type { Side } from "circlo-types";
 
+/**
+ * Configuration for `createCircloClient`. Both fields are optional but
+ * at least one must be provided — a client with neither would fail
+ * with `NotConfiguredError` on every method call.
+ *
+ * Typical wagmi wiring:
+ *
+ * ```ts
+ * import { useWalletClient, usePublicClient } from "wagmi";
+ *
+ * const { data: walletClient } = useWalletClient();
+ * const publicClient = usePublicClient();
+ * const circlo = useMemo(
+ *   () => createCircloClient({ walletClient, publicClient }),
+ *   [walletClient, publicClient]
+ * );
+ * ```
+ */
 export type CircloClientConfig = {
   /**
    * viem WalletClient used for writes (createCircle, stake, claim, etc).
