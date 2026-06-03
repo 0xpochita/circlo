@@ -59,6 +59,26 @@ export type GoalMetadataInput = {
   extra?: Record<string, unknown>;
 };
 
+/**
+ * Build the `metadataURI` JSON payload for a goal.
+ *
+ * Mirrors `buildCircleMetadata` semantics: fixed field order, empty
+ * optional fields are omitted, result is JSON-stringified and ready
+ * to pass straight into `PredictionPool.createGoal`.
+ *
+ * Unlike `buildCircleMetadata`, there is **no default emoji** — the
+ * frontend renders goal cards with a status-based icon when `emoji`
+ * is absent, so injecting a fallback here would override that.
+ *
+ * @example
+ * ```ts
+ * const uri = buildGoalMetadata({
+ *   question: "Will it rain in Jakarta tomorrow?",
+ *   category: "weather",
+ *   emoji: "🌧️",
+ * });
+ * ```
+ */
 export function buildGoalMetadata(input: GoalMetadataInput): string {
   return JSON.stringify({
     question: input.question,
