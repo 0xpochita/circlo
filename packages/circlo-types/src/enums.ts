@@ -3,6 +3,18 @@
  * Numeric values match the Solidity enum positions exactly.
  */
 
+/**
+ * Outcome model for a goal.
+ *
+ * - `Binary` (0): yes/no with one winner — the only model implemented
+ *   today; every other slot reverts on `createGoal`.
+ * - `Multi` (1): reserved for multi-option outcomes (3+ choices).
+ * - `Numeric` (2): reserved for scalar/range outcomes (e.g. "BTC price
+ *   on Dec 31").
+ *
+ * Values match the on-chain `IPredictionPool.OutcomeType` enum slots
+ * exactly — passing the JS enum directly to a viem ABI call works.
+ */
 export const OutcomeType = {
   Binary: 0,
   Multi: 1,
