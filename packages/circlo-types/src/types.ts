@@ -81,6 +81,21 @@ export interface Goal {
   metadataURI: string;
 }
 
+/**
+ * Decoded payload of `Goal.metadataURI` after `parseGoalMetadata`.
+ *
+ * Mirrors `CircleMetadata` shape but for the goal's compound
+ * `avatar` field rather than separate emoji + color. The compound
+ * is a single string that survives the JSON round-trip easily and
+ * lets the frontend `parseAvatar` helper split it for rendering.
+ *
+ * Fields:
+ * - `title`: question text shown on goal cards.
+ * - `description`: optional longer copy on the goal detail page.
+ * - `avatar`: `"emoji|#hexcolor"` compound (e.g. `"🎯|#ec4899"`);
+ *   `parseAvatar` in frontend utils splits it into the renderable
+ *   pair.
+ */
 export interface GoalMetadata {
   title: string;
   description?: string;
