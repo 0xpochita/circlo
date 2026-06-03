@@ -54,6 +54,27 @@ export type CircloClientConfig = {
  *
  * Construct one per user session — it holds onto a WalletClient and
  * (optionally) a PublicClient for the duration of the session.
+ *
+ * **Read-only mode:** pass only `publicClient` (no `walletClient`).
+ * Every write method (`createCircle`, `stake`, `claim`, etc.) then
+ * throws `NotConfiguredError("opName", "walletClient")` so the UI
+ * can prompt the user to connect a wallet.
+ *
+ * **Wallet-only mode:** pass only `walletClient` — reads route through
+ * `walletClient.extend(publicActions)` automatically, so most apps
+ * don't need to construct a separate publicClient.
+ *
+ * @example
+ * ```ts
+ * import { createCircloClient } from "circlo-sdk";
+ *
+ * // Wallet-only (writes + reads via wallet client)
+ * const circlo = createCircloClient({ walletClient: wagmiWalletClient });
+ *
+ * const { circleId } = await circlo.createCircle({
+ *   name: "Gym Squad", privacy: "public",
+ * });
+ * ```
  */
 export type CircloClient = {
   /** The deployed contract addresses (Celo Mainnet). */
