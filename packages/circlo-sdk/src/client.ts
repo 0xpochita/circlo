@@ -153,6 +153,29 @@ export type CircloClient = {
   getTally(goalId: bigint): Promise<{ counts: readonly bigint[]; total: bigint }>;
 };
 
+/**
+ * Construct a `CircloClient` from a wagmi / viem config.
+ *
+ * The returned client lazily checks for the required client (wallet
+ * vs public) on each method call — there's no startup cost to passing
+ * just a publicClient, and every write method throws
+ * `NotConfiguredError` if the wallet was missing.
+ *
+ * @param config Either or both of `walletClient` and `publicClient`.
+ * @returns A typed client with high-level methods for every Circlo
+ *   contract action plus read methods backed by the public client.
+ *
+ * @example
+ * ```ts
+ * const circlo = createCircloClient({
+ *   walletClient,
+ *   publicClient,
+ * });
+ *
+ * // Throws NotConfiguredError("createCircle", "walletClient") if no wallet:
+ * await circlo.createCircle({ name: "Gym", privacy: "public" });
+ * ```
+ */
 export function createCircloClient(config: CircloClientConfig = {}): CircloClient {
   const requireWallet = (op: string): WalletClient => {
     if (!config.walletClient) {
