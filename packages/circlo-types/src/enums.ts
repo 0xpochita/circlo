@@ -50,12 +50,32 @@ export const GoalStatus = {
 } as const;
 export type GoalStatus = (typeof GoalStatus)[keyof typeof GoalStatus];
 
-/** Stake side for binary outcomes. */
+/**
+ * Stake side for binary outcomes.
+ *
+ * - `Yes` (0) — bets the goal resolves to TRUE
+ * - `No`  (1) — bets the goal resolves to FALSE
+ *
+ * The numeric values are passed through to `stake(side, amount)` and
+ * `submitVote(choice)`. **Switching sides is forbidden** — after a
+ * wallet stakes on one side, additional stakes from that wallet on
+ * the *other* side revert `CannotSwitchSides`. UIs should disable
+ * the opposite-side button after the first stake.
+ */
 export const Side = {
   Yes: 0,
   No: 1,
 } as const;
 export type Side = (typeof Side)[keyof typeof Side];
 
-/** UNRESOLVED sentinel value emitted while goal hasn't been finalized. */
+/**
+ * Sentinel value for `goal.winningSide` while the goal has not yet
+ * been finalized.
+ *
+ * Emitted in the on-chain `Goal` struct as `255` (an out-of-range
+ * value for the binary `Side` enum). Treat any value other than
+ * `Side.Yes` / `Side.No` as "not resolved yet" — `GoalResolved` events
+ * are guaranteed to carry one of the two real sides, never this
+ * sentinel.
+ */
 export const UNRESOLVED_SIDE = 255 as const;
