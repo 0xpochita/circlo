@@ -6,6 +6,18 @@
 import type { Address } from "./util.js";
 import type { GoalStatus, OutcomeType } from "./enums.js";
 
+/**
+ * High-level shape of a circle as returned by `getCircleInfo` plus an
+ * `id` field injected by the SDK / indexer.
+ *
+ * - `id`: sequential circle id assigned by `CircleFactory`.
+ * - `owner`: address that originally called `createCircle`. Cannot
+ *   leave the circle without transferring ownership first.
+ * - `isPrivate`: `true` iff joining requires a signed `InviteProof`.
+ * - `createdAt`: unix seconds when the circle was minted. Doubles as
+ *   a "circle exists" sentinel — zero means never created.
+ * - `metadataURI`: raw JSON blob; decode with `parseCircleMetadata`.
+ */
 export interface Circle {
   id: bigint;
   owner: Address;
