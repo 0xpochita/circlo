@@ -101,6 +101,11 @@ export interface ResolverVote {
   choice: number;
 }
 
+/**
+ * Decoded shape of `CircleCreated` events from the CircleFactory.
+ * `id` is the indexed circle id; the rest of the fields come from
+ * the event data section.
+ */
 export interface CircleCreatedEvent {
   id: bigint;
   owner: Address;
@@ -108,6 +113,14 @@ export interface CircleCreatedEvent {
   metadataURI: string;
 }
 
+/**
+ * Decoded shape of `GoalCreated` events from the PredictionPool.
+ *
+ * All the constructor inputs (`circleId`, `outcomeType`, `deadline`,
+ * `minStake`, `resolverList`, `metadataURI`) are mirrored in the
+ * event so indexers can backfill the goal record from a single log
+ * read without a separate `getGoal` round trip.
+ */
 export interface GoalCreatedEvent {
   id: bigint;
   circleId: bigint;
@@ -119,6 +132,12 @@ export interface GoalCreatedEvent {
   metadataURI: string;
 }
 
+/**
+ * Decoded shape of `Staked` events from the PredictionPool.
+ *
+ * Fires once per `stake()` call — see the `Stake` type for the
+ * per-call vs cumulative semantics.
+ */
 export interface StakedEvent {
   goalId: bigint;
   user: Address;
@@ -126,6 +145,12 @@ export interface StakedEvent {
   amount: bigint;
 }
 
+/**
+ * Decoded shape of `Claimed` events from the PredictionPool.
+ *
+ * `amount` is the **post-fee** USDT payout transferred to `user` —
+ * pair with `Goal.totalPool` if you need to derive the implied fee.
+ */
 export interface ClaimedEvent {
   goalId: bigint;
   user: Address;
