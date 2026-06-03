@@ -14,6 +14,32 @@ export type CircleMetadataInput = {
   extra?: Record<string, unknown>;
 };
 
+/**
+ * Build the `metadataURI` JSON payload for a circle.
+ *
+ * Field order in the output is fixed: `name`, `description` (if set),
+ * `category` (if set), `avatarEmoji`, `avatarColor` (if set), then any
+ * `extra` keys. Empty optional fields are omitted entirely — they
+ * don't write `undefined` or `null` to the chain.
+ *
+ * The result is JSON-stringified bytes — pass directly to the
+ * `CircleFactory.createCircle` `metadataURI` argument. No off-chain
+ * upload step needed.
+ *
+ * `avatarEmoji` defaults to `🎯` so circles without an explicit emoji
+ * still render a recognizable badge in the UI.
+ *
+ * @example
+ * ```ts
+ * const uri = buildCircleMetadata({
+ *   name: "Gym Squad",
+ *   privacy: "public",
+ *   avatarEmoji: "💪",
+ *   category: "fitness",
+ * });
+ * // => '{"name":"Gym Squad","category":"fitness","avatarEmoji":"💪"}'
+ * ```
+ */
 export function buildCircleMetadata(input: CircleMetadataInput): string {
   return JSON.stringify({
     name: input.name,
