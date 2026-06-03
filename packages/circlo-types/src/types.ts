@@ -72,6 +72,14 @@ export interface GoalMetadata {
   avatar?: string;
 }
 
+/**
+ * A single per-call stake record.
+ *
+ * Note this is the *per-call* event payload, not a cumulative
+ * position — a wallet that stakes 10 USDT then 5 USDT on YES has two
+ * `Stake` entries, summing to 15 USDT. Use the on-chain `stakeOf`
+ * view (or the SDK `getStakeOf` helper) for the cumulative figure.
+ */
 export interface Stake {
   goalId: bigint;
   user: Address;
@@ -79,6 +87,14 @@ export interface Stake {
   amount: bigint;
 }
 
+/**
+ * A single resolver vote record.
+ *
+ * Resolvers are immutable per-goal (set at `createGoal`), and each
+ * may only vote once. `choice` mirrors `Side` (0/1) — there is no
+ * abstain path; failing to vote within the window just keeps the
+ * goal in `Resolving` until the window closes.
+ */
 export interface ResolverVote {
   goalId: bigint;
   resolver: Address;
