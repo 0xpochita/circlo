@@ -34,6 +34,23 @@ export interface CircleMetadata {
   avatarColor?: string;
 }
 
+/**
+ * Hydrated goal record assembled from the on-chain `goals(id)` view
+ * plus the implicit `id` parameter.
+ *
+ * - `circleId`: parent circle. The creator must be a member of it.
+ * - `creator`: address that called `createGoal`. May also appear as
+ *   a resolver if `resolverList` included them.
+ * - `outcomeType`: see `OutcomeType`. Only `Binary` is wired today.
+ * - `status`: see `GoalStatus`. `Open` until deadline, then `Locked`
+ *   on first `lockGoal` call.
+ * - `deadline`: unix seconds after which `stake` reverts `GoalLocked`.
+ * - `minStake`: per-call USDT minimum (6-decimal base units).
+ * - `totalPool`: sum of all stakes across both sides at time of read.
+ * - `winningSide`: `Side.Yes`/`Side.No` once `PaidOut`, otherwise
+ *   `UNRESOLVED_SIDE` (255).
+ * - `metadataURI`: raw JSON blob; decode with `parseGoalMetadata`.
+ */
 export interface Goal {
   id: bigint;
   circleId: bigint;
