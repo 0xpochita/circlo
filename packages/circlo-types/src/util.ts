@@ -55,8 +55,25 @@ export function parseCircleMetadata(uri: string): {
 }
 
 /**
- * Parse a Goal metadataURI string (the JSON blob passed to createGoal).
- * Returns null on parse failure.
+ * Parse a Goal `metadataURI` string back into its structured fields.
+ *
+ * Same null-tolerance contract as `parseCircleMetadata` — every field
+ * gets a default if missing, and the function only returns `null` on
+ * outright unparseable JSON. Defaults:
+ *
+ *   - `title`       → `"Goal"`
+ *   - `description` → `""`
+ *   - `avatar`      → `"🎯|#ec4899"` (emoji + bg color, pipe-delimited)
+ *
+ * `avatar` is a `"emoji|#hex"` compound — `parseAvatar` (in the
+ * frontend utils) splits it. Goal cards render the emoji in front of
+ * a circle filled with the color.
+ *
+ * @example
+ * ```ts
+ * const meta = parseGoalMetadata(goal.metadataURI);
+ * if (meta) renderGoalCard(meta.title, meta.avatar);
+ * ```
  */
 export function parseGoalMetadata(uri: string): {
   title: string;
