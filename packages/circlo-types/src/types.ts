@@ -26,6 +26,22 @@ export interface Circle {
   metadataURI: string;
 }
 
+/**
+ * Decoded payload of `Circle.metadataURI` after `parseCircleMetadata`.
+ *
+ * Optional fields are exactly the ones `buildCircleMetadata` omits
+ * when their input was empty — the round-trip is:
+ *
+ *     CircleMetadataInput → buildCircleMetadata (sdk) → metadataURI →
+ *     parseCircleMetadata (types) → CircleMetadata
+ *
+ * Fields:
+ * - `name`: display name shown on the circle card.
+ * - `description`: optional longer copy on the detail page.
+ * - `category`: free-form tag (e.g. "fitness", "crypto").
+ * - `avatarEmoji`: single emoji rendered as the circle badge.
+ * - `avatarColor`: hex string for the badge background.
+ */
 export interface CircleMetadata {
   name: string;
   description?: string;
