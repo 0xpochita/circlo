@@ -7,8 +7,31 @@
 export type Address = `0x${string}`;
 
 /**
- * Parse a Circle metadataURI string (the JSON blob passed to createCircle).
- * Returns null on parse failure.
+ * Parse a Circle `metadataURI` string back into its structured fields.
+ *
+ * The input is the raw JSON blob that was passed to `createCircle` —
+ * indexers + frontends get it via `getCircle(id).metadataURI` or the
+ * `CircleCreated` event. This function tolerates malformed/missing
+ * fields by substituting safe defaults:
+ *
+ *   - `name`        → `"Circle"`
+ *   - `description` → `""`
+ *   - `category`    → `"general"`
+ *   - `avatarEmoji` → `"✨"`
+ *   - `avatarColor` → `"#fbbf24"`
+ *
+ * Returns `null` only if `uri` is not parseable as JSON at all — every
+ * other case returns the fallback-filled object so renderers don't
+ * have to null-check field by field.
+ *
+ * Pair with `buildCircleMetadata` in `circlo-sdk` for the round-trip.
+ *
+ * @example
+ * ```ts
+ * const info = await client.getCircleInfo(42n);
+ * const meta = parseCircleMetadata(info.metadataURI);
+ * if (meta) console.log(meta.name, meta.avatarEmoji);
+ * ```
  */
 export function parseCircleMetadata(uri: string): {
   name: string;
