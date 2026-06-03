@@ -22,6 +22,24 @@ export const OutcomeType = {
 } as const;
 export type OutcomeType = (typeof OutcomeType)[keyof typeof OutcomeType];
 
+/**
+ * Lifecycle states a goal can be in.
+ *
+ * Standard transitions on Celo Mainnet:
+ *
+ *     Open → Locked     via `lockGoal()` after `deadline`
+ *     Locked → Resolving via first `submitVote()`
+ *     Resolving → PaidOut via auto-finalize at quorum
+ *     Resolving → Disputed if vote ties
+ *
+ * `Resolved` (3) is reserved and unused — current flow goes straight
+ * from `Resolving` to `PaidOut`. UI / indexers can ignore that slot.
+ *
+ * `PaidOut` (5) is the terminal state for the happy path; winners
+ * call `claim` and losers' positions become inactive. `Disputed` (4)
+ * is the terminal state for tied votes; stakers call `refund` for
+ * principal.
+ */
 export const GoalStatus = {
   Open: 0,
   Locked: 1,
