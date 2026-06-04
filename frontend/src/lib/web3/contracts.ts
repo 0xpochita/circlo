@@ -5,6 +5,15 @@ import PredictionPoolJSON from "@/lib/abis/PredictionPool.min.json";
 import ResolutionModuleJSON from "@/lib/abis/ResolutionModule.min.json";
 import { NETWORK } from "./network";
 
+/**
+ * Pull the ABI array out of a Foundry/Hardhat artifact JSON.
+ *
+ * Foundry emits `{ abi: [...] }` envelopes, but our `.min.json` build
+ * step also handles the raw-array case for hand-trimmed ABIs. Returns
+ * an empty array on miss rather than throwing — the runtime
+ * `writeContract` will error loudly enough on its own and we prefer
+ * not to crash the whole module on a bad import.
+ */
 function extractAbi(json: unknown): Abi {
   const obj = json as Record<string, unknown>;
   if (Array.isArray(obj)) return obj as unknown as Abi;
