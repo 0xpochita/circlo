@@ -3,6 +3,14 @@ import { celo } from "viem/chains";
 import { createConfig, http } from "wagmi";
 import { IS_MAINNET, NETWORK } from "./network";
 
+/**
+ * viem chain definition for Celo Sepolia (testnet).
+ *
+ * viem ships `celo` as a built-in but not its Sepolia counterpart at
+ * the time this file was written — so we define it locally to keep
+ * the SDK + wagmi config in lockstep on the testnet build. RPC and
+ * explorer URLs match {@link NETWORK} for consistency.
+ */
 export const celoSepolia = defineChain({
   id: 11142220,
   name: "Celo Sepolia",
