@@ -87,6 +87,18 @@ export function useMyCircles() {
   return { circles: cached, isLoading };
 }
 
+/**
+ * Two-step circle creation hook: on-chain `createCircle()` then
+ * backend `circlesApi.create()` to record the human-readable name,
+ * category, and avatar.
+ *
+ * The split is intentional — chain tx is broadcast first via `write`,
+ * and the backend record is created via `confirmCreation` only after
+ * the user has signed (and ideally confirmed). This keeps the backend
+ * from holding orphan records when the wallet popup is dismissed.
+ *
+ * `isLoading` is `true` while either step is in flight.
+ */
 export function useCreateCircle() {
   const {
     write,
