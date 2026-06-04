@@ -52,6 +52,18 @@ async function fetchCirclesData(): Promise<CircleWithCount[]> {
   );
 }
 
+/**
+ * Read the list of circles the authenticated user belongs to.
+ *
+ * Backed by the dataCache store — re-mounts during in-app navigation
+ * return cached data immediately while a stale check decides whether
+ * to refetch in the background. `isLoading` is `true` only on the
+ * cold-start render (no cached data yet), so consumers can show a
+ * skeleton without blocking the cached items from rendering.
+ *
+ * @returns `{ circles, isLoading }` — `circles` is the cached list
+ *   plus enriched display fields (`memberCount`, `avatar`).
+ */
 export function useMyCircles() {
   const cached = useDataCache((s) => s.myCircles);
   const isStale = useDataCache((s) => s.isStale);
