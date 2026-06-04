@@ -34,6 +34,14 @@ export const circleFactoryContract = {
   abi: extractAbi(CircleFactoryJSON),
 } as const;
 
+/**
+ * Pre-bundled `{ address, abi }` for `PredictionPool` — the escrow
+ * + lifecycle contract that holds USDT stakes and pays winners.
+ *
+ * Most user-facing actions (stake, claim, refund) target this bundle.
+ * See `packages/circlo-sdk/src/stakes.ts` for the higher-level
+ * helpers that wrap these reads/writes with type-safe params.
+ */
 export const predictionPoolContract = {
   address: NETWORK.contracts.predictionPool,
   abi: extractAbi(PredictionPoolJSON),
