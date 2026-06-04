@@ -1,5 +1,12 @@
 import type { Address } from "viem";
 
+/**
+ * `true` when the frontend is wired to Celo Mainnet; `false` for
+ * Celo Sepolia. Toggled by `NEXT_PUBLIC_USE_MAINNET=true` at build
+ * time. Read from this constant (never `process.env` directly) so
+ * the build inlines the boolean and dead-code elimination drops the
+ * unused branch.
+ */
 export const IS_MAINNET = process.env.NEXT_PUBLIC_USE_MAINNET === "true";
 
 type NetworkConfig = {
