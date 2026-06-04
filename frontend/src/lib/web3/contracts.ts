@@ -47,11 +47,26 @@ export const predictionPoolContract = {
   abi: extractAbi(PredictionPoolJSON),
 } as const;
 
+/**
+ * Pre-bundled `{ address, abi }` for `ResolutionModule` — the
+ * resolver-vote contract that finalizes goals via `submitVote`,
+ * `finalize`, and the tied-vote `Disputed` path.
+ */
 export const resolutionModuleContract = {
   address: NETWORK.contracts.resolutionModule,
   abi: extractAbi(ResolutionModuleJSON),
 } as const;
 
+/**
+ * Pre-bundled `{ address, abi }` for the **MockUSDT** contract.
+ *
+ * Despite the name, on Mainnet this resolves to the **real** Celo USDT
+ * (Tether, 6 decimals) at the address configured in {@link NETWORK}.
+ * The `Mock` name is a holdover from Sepolia testnet where we deploy
+ * an OZ ERC20 stand-in. The minimal ABI exposes `balanceOf`,
+ * `transfer`, `approve`, and `allowance` — enough for the stake
+ * approve flow and `useUSDTBalance` reads.
+ */
 export const mockUSDTContract = {
   address: NETWORK.contracts.usdt,
   abi: extractAbi(MockUSDTJSON),
