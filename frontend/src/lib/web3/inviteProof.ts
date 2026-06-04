@@ -15,6 +15,15 @@ import { type Address, encodeAbiParameters, type Hex } from "viem";
 import { circleFactoryContract } from "@/lib/web3/contracts";
 import { NETWORK } from "@/lib/web3/network";
 
+/**
+ * EIP-712 domain separator for InviteProof signatures. Must match
+ * the constants encoded in `CircleFactory._EIP712_DOMAIN_TYPEHASH` —
+ * change here means a contract upgrade is required, and vice versa.
+ *
+ * `verifyingContract` is the per-network CircleFactory address (not
+ * a per-call argument) so signatures issued on Mainnet can't be
+ * replayed on Sepolia.
+ */
 export const INVITE_PROOF_TYPED_DATA_DOMAIN = {
   name: "Circlo",
   version: "1",
