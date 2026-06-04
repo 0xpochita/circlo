@@ -99,6 +99,16 @@ export function useApproveUSDT() {
   return { approve, isLoading, isSuccess, error, txHash, reset };
 }
 
+/**
+ * Mint test USDT via the MockUSDT `faucet()` call.
+ *
+ * **Sepolia-only** path — on Mainnet the deployed USDT contract has
+ * no `faucet` function and this call reverts. UIs that surface a
+ * "get test USDT" button should hide it when `IS_MAINNET` is true.
+ *
+ * Returns the standard write hook tuple (loading / success / error /
+ * txHash / reset).
+ */
 export function useFaucet() {
   const { write, isLoading, isSuccess, error, txHash, reset } = useContract();
 
