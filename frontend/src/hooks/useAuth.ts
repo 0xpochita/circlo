@@ -10,6 +10,24 @@ import { useAuthStore } from "@/stores/authStore";
 import { useNotificationStore } from "@/stores/notificationStore";
 import { useUserStore } from "@/stores/userStore";
 
+/**
+ * The session-auth hook. Wraps SIWE login, logout, JWT refresh, and
+ * automatic wallet-switch detection in one consumer-friendly object.
+ *
+ * - **`login(addr?)`**: kicks off the SIWE round-trip
+ *   (`nonce` → sign → `verify`), persists JWTs + user via Zustand
+ *   stores, and warms the notification queue. Pass `addr` to log in a
+ *   specific wallet (e.g. during a programmatic auto-connect); omit
+ *   to use the currently-connected `useAccount` address.
+ * - **`logout()`**: clears server session + every client-side store.
+ * - **`refresh()`**: rotates the access token via the refresh cookie.
+ *   Silently swallows failures so a brief 401 doesn't blow the session.
+ * - **Wallet-switch guard**: on every render, compares connected
+ *   `address` to the wallet baked into the JWT; mismatch routes the
+ *   user back to `/welcome` and resets stores. Prevents one wallet
+ *   from acting on another's authenticated session after a wagmi
+ *   account swap.
+ */
 export function useAuth() {
   const router = useRouter();
   const { address } = useAccount();
