@@ -74,8 +74,20 @@ const MAINNET: NetworkConfig = {
   usdtDecimals: 6,
 };
 
+/**
+ * Active network bundle resolved at build time from `IS_MAINNET`.
+ *
+ * Use this everywhere instead of branching on `IS_MAINNET` at call
+ * sites — the resolved object lets components stay network-agnostic
+ * and switching networks is one config flip.
+ */
 export const NETWORK: NetworkConfig = IS_MAINNET ? MAINNET : TESTNET;
 
+/**
+ * The 20-byte zero address. Used as a placeholder for unconfigured
+ * env-var contracts and as a "nobody" sentinel in some on-chain
+ * reads. Never appears as a valid signer on Celo.
+ */
 export const ZERO_ADDRESS =
   "0x0000000000000000000000000000000000000000" as Address;
 
