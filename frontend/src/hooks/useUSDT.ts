@@ -40,6 +40,21 @@ export function useUSDTBalance(address: Address | undefined) {
   };
 }
 
+/**
+ * Read the USDT allowance `owner` has granted `spender` (typically
+ * PredictionPool).
+ *
+ * Used by stake flows to decide whether to short-circuit the
+ * `approve` step. Returns `undefined` while loading or if either
+ * address is absent. Pair with `useApproveUSDT` to top up when the
+ * allowance falls below the desired stake amount.
+ *
+ * @example
+ * ```tsx
+ * const { allowance, refetch } = useUSDTAllowance(user, pool);
+ * if ((allowance ?? 0n) < stakeAmount) await approve(stakeAmount * 10n);
+ * ```
+ */
 export function useUSDTAllowance(
   owner: Address | undefined,
   spender: Address | undefined,
