@@ -31,6 +31,13 @@ export const INVITE_PROOF_TYPED_DATA_DOMAIN = {
   verifyingContract: circleFactoryContract.address,
 } as const;
 
+/**
+ * EIP-712 type definitions for the InviteProof struct.
+ *
+ * Field order is significant — the EIP-712 type hash is computed
+ * over the canonical encoding, so reordering these fields here
+ * (without a matching contract update) breaks signature verification.
+ */
 export const INVITE_PROOF_TYPES = {
   InviteProof: [
     { name: "circleId", type: "uint256" },
