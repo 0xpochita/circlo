@@ -6,6 +6,24 @@ import { mockUSDTContract, predictionPoolContract } from "@/lib/web3/contracts";
 import { fromUSDT } from "@/lib/web3/usdt";
 import { useContract } from "./useContract";
 
+/**
+ * Read a user's USDT balance, polling via wagmi's `useReadContract`.
+ *
+ * Returns both the raw `bigint` (`balance`, 6-decimal base units) and
+ * a JS-number `formatted` value via `fromUSDT` for direct display.
+ * Pass `undefined` to disable the query — useful when the wallet
+ * isn't connected yet.
+ *
+ * The `refetch` callback is useful after a confirmed stake / faucet
+ * tx to refresh the displayed balance without waiting for the next
+ * background poll.
+ *
+ * @example
+ * ```tsx
+ * const { formatted, refetch } = useUSDTBalance(address);
+ * return <span>{formatted.toFixed(2)} USDT</span>;
+ * ```
+ */
 export function useUSDTBalance(address: Address | undefined) {
   const { data, isLoading, refetch } = useReadContract({
     ...mockUSDTContract,
