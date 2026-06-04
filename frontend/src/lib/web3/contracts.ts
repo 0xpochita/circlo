@@ -21,6 +21,14 @@ function extractAbi(json: unknown): Abi {
   return [] as unknown as Abi;
 }
 
+/**
+ * Pre-bundled `{ address, abi }` for `CircleFactory`, ready to spread
+ * into a viem `{ ...circleFactoryContract, functionName: "..." }` call.
+ *
+ * The address is resolved at module-load time from {@link NETWORK},
+ * so this constant is network-aware — no per-call `chainId` switching
+ * needed. Re-imports across the app share the same trimmed ABI.
+ */
 export const circleFactoryContract = {
   address: NETWORK.contracts.circleFactory,
   abi: extractAbi(CircleFactoryJSON),
