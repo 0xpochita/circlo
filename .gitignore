@@ -47,6 +47,9 @@ scripts/
 CAMPAIGN_TRACKER.md
 LEADERBOARD_TODO.md
 
+# Local-only builder notes (carry across projects, do not publish)
+memory/
+
 # One-off DB seed/maintenance scripts (kept locally only)
 backend/name-bots.mjs
 backend/*.local.mjs
