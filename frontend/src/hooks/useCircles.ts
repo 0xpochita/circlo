@@ -158,6 +158,17 @@ export function useCreateCircle() {
   };
 }
 
+/**
+ * Fire a `joinCircle(circleId)` write to the CircleFactory.
+ *
+ * Reverts on-chain with `CircleIsPrivate` if the circle is invite-only
+ * (use the EIP-712 inviteProof flow for those — see
+ * `lib/web3/inviteProof.ts`). Reverts `AlreadyMember` if the caller
+ * already joined; the UI should hide the join button in that case via
+ * `useCircleInfo` + an `isCircleMember` probe.
+ *
+ * Returns the standard write hook tuple.
+ */
 export function useJoinCircle() {
   const { write, isLoading, isSuccess, error, txHash } = useContract();
 
