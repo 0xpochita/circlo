@@ -73,6 +73,17 @@ export function useUSDTAllowance(
   };
 }
 
+/**
+ * One-shot USDT `approve(PredictionPool, amount)` hook.
+ *
+ * Calling `approve(amount)` fires a `write` through `useContract`,
+ * which returns the standard set of states: `isLoading` (tx pending),
+ * `isSuccess`, `error`, `txHash`, and a `reset` function for re-use.
+ *
+ * Prefer granting headroom (e.g. `10 * stakeAmount`) so subsequent
+ * stakes don't need an approve round-trip. The Day-3 DAU bug —
+ * see `docs/JUNE_PLAN.md` — was caused by skipping this step.
+ */
 export function useApproveUSDT() {
   const { write, isLoading, isSuccess, error, txHash, reset } = useContract();
 
