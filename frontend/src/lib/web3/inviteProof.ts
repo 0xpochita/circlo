@@ -98,6 +98,17 @@ export function buildInviteUrl(
   return url.toString();
 }
 
+/**
+ * Inverse of {@link buildInviteUrl} — decode an `?id&chainId&...`
+ * search-param bundle back into an `InviteLinkParams`.
+ *
+ * Returns `null` (never throws) when any required field is missing
+ * or malformed. Performs cheap shape checks on `invitee` (must be a
+ * 20-byte hex address) and `sig` (must be `0x`-prefixed hex). The
+ * cryptographic signature check happens on-chain in
+ * `CircleFactory.joinCirclePrivate` — this function is just for
+ * client-side guardrails on the accept-invite page.
+ */
 export function parseInviteUrl(
   search: URLSearchParams,
 ): InviteLinkParams | null {
