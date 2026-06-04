@@ -9,6 +9,18 @@ import type { Address } from "viem";
  */
 export const IS_MAINNET = process.env.NEXT_PUBLIC_USE_MAINNET === "true";
 
+/**
+ * Per-network configuration bundle.
+ *
+ * Holds everything the frontend needs to talk to a single Celo
+ * network: chain id, display name, RPC + explorer URLs, contract
+ * address map, and the USDT decimal precision. One of these is
+ * exported as `NETWORK` after the `IS_MAINNET` switch.
+ *
+ * `id` is intentionally narrowed to the two valid Celo chain ids so
+ * misconfiguring the network at build time becomes a type error
+ * instead of a runtime "wrong chain" prompt.
+ */
 type NetworkConfig = {
   id: 42220 | 11142220;
   name: string;
