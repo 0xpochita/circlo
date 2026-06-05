@@ -12,6 +12,17 @@ import { toUSDT } from "@/lib/web3/usdt";
 import { useContract } from "./useContract";
 import { useUSDTAllowance } from "./useUSDT";
 
+/**
+ * Two-step goal creation hook: on-chain `createGoal()` to mint the
+ * goal id, then `goalsApi.confirm()` to associate the chain id with
+ * the backend record.
+ *
+ * The split prevents orphan backend records when the wallet popup
+ * is dismissed mid-flow — `confirmGoal` should only be called after
+ * the user signs and the tx hash is in hand.
+ *
+ * `isLoading` is `true` while either step is in flight.
+ */
 export function useCreateGoal() {
   const {
     write,
