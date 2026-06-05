@@ -26,6 +26,16 @@ export function parseRedisUrl(url: string) {
 
 let redisInstance: Redis | null = null;
 
+/**
+ * Lazily construct the primary Redis client and reuse it across the
+ * process. Used for cache reads/writes, rate-limit counters, and
+ * `PUBLISH` calls on the websocket gateway.
+ *
+ * Wires three event handlers to surface connection issues in logs
+ * without crashing the process — Redis blips are recoverable, so we
+ * log and reconnect rather than abort. The retry cap (3) means a
+ * single command will fail after ~3s of downtime rather than hanging.
+ */
 export function getRedis(): Redis {
   if (!redisInstance) {
     redisInstance = new Redis({
