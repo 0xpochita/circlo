@@ -1,11 +1,27 @@
 import "dotenv/config";
 
+/**
+ * Read an environment variable that the backend cannot start without
+ * (typically secrets or infra URLs).
+ *
+ * Throws at module-load time when missing — fail loud rather than
+ * crashing later with a cryptic "undefined.split is not a function".
+ * Used for DATABASE_URL today; add others here with care, since each
+ * required variable means every dev needs it in their `.env` to even
+ * boot the server.
+ */
 function required(name: string): string {
   const val = process.env[name];
   if (!val) throw new Error(`Missing required env var: ${name}`);
   return val;
 }
 
+/**
+ * Read an environment variable, falling back to a sane default when
+ * unset. Used for everything that can run in a dev environment
+ * without explicit config — RPC URLs, ports, contract address
+ * placeholders.
+ */
 function optional(name: string, fallback: string): string {
   return process.env[name] ?? fallback;
 }
