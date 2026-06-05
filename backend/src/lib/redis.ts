@@ -1,6 +1,19 @@
 import Redis from "ioredis";
 import { config } from "../config.js";
 
+/**
+ * Parse a `redis://[user:pass@]host[:port]` URL into the options
+ * shape ioredis's constructor expects.
+ *
+ * Defaults the port to `6379` when missing and `decodeURIComponent`s
+ * the credentials — needed because cloud Redis providers (Upstash,
+ * Aiven, Redis Cloud) often URL-encode passwords with `+` / `/`
+ * characters that would otherwise corrupt the auth token.
+ *
+ * Omits the `username` / `password` keys entirely when absent so
+ * ioredis doesn't try to auth against a local Redis that doesn't
+ * have ACL enabled.
+ */
 export function parseRedisUrl(url: string) {
   const parsed = new URL(url);
   return {
