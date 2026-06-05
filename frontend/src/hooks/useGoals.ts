@@ -231,6 +231,19 @@ export function useClaim() {
   return { claim, isLoading, isSuccess, error, txHash };
 }
 
+/**
+ * Hook for submitting a resolver vote on a locked goal.
+ *
+ * Caller must be on `goal.resolverList` (set at `createGoal` time).
+ * Reverts `NotResolver` for non-resolvers, `AlreadyVoted` for a
+ * second vote from the same wallet, and `VoteWindowExpired` if the
+ * vote window has closed.
+ *
+ * Once quorum is reached, the contract auto-finalizes via the
+ * `setWinner` callback into PredictionPool — no separate `finalize`
+ * call needed for the common path. Tied votes transition to
+ * `Disputed` and stakers call `refund` instead of `claim`.
+ */
 export function useSubmitVote() {
   const { write, isLoading, isSuccess, error, txHash } = useContract();
 
