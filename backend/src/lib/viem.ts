@@ -15,11 +15,25 @@ export const celoClient = createPublicClient({
   transport: http(config.celoRpcUrl),
 }) as any;
 
+/**
+ * Singleton viem PublicClient pointed at Celo Sepolia (testnet).
+ * Useful for staging deployments that talk to a parallel set of
+ * Circlo contracts during dev. Same `any` cast rationale as
+ * `celoClient`.
+ */
 export const celoSepoliaClient = createPublicClient({
   chain: celoSepolia,
   transport: http(config.celoRpcUrlTestnet),
 }) as any;
 
+/**
+ * Pick the right PublicClient for a chain id.
+ *
+ * Defaults to Mainnet — both for missing-chainId callers and any
+ * unrecognized id. Adding a new chain means extending the dispatch
+ * here AND defining the matching `_RpcUrl*` / `_ChainId*` config
+ * keys.
+ */
 export function getPublicClient(chainId?: number): any {
   if (chainId === config.celoChainIdTestnet) return celoSepoliaClient;
   return celoClient;
