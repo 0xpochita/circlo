@@ -26,6 +26,15 @@ export const goalJobQueue = new Queue("goal-jobs", {
   },
 });
 
+/**
+ * BullMQ queue for scheduled, repeating jobs (lock expired goals,
+ * detect disputes).
+ *
+ * Single-attempt by design: a cron tick that fails doesn't get
+ * retried — the next tick fires soon enough that catching up is
+ * cheaper than retrying. Lower retention than the goal queue since
+ * crons are idempotent and a missed completion log doesn't matter.
+ */
 export const cronJobQueue = new Queue("cron-jobs", {
   connection,
   defaultJobOptions: {
