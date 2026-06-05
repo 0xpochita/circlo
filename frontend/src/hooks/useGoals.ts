@@ -77,6 +77,25 @@ export function useCreateGoal() {
   };
 }
 
+/**
+ * Multi-step stake hook covering the approve-then-stake dance.
+ *
+ * Flow:
+ *   1. `stake(goalId, side, amount)` reads current allowance.
+ *   2. If `allowance < amount`, fires `approve(PredictionPool, amount)`
+ *      and sets `step = "approving"`. Caller waits for `isApproveSuccess`,
+ *      then calls `continueStake(...)` to finish.
+ *   3. If allowance is already sufficient, fires `stake(...)` directly
+ *      and sets `step = "staking"`.
+ *
+ * The split avoids batching both txs into one wallet popup — wallet UX
+ * is one prompt per tx. Each step exposes its own loading / success /
+ * error / txHash field so the UI can render distinct progress copy.
+ *
+ * Day-3 lesson: skipping the approve step entirely (assuming a previous
+ * call had set allowance) silently reverts every stake. Always check
+ * the allowance first.
+ */
 export function useStake() {
   const { address } = useAccount();
   const {
