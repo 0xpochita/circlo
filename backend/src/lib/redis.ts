@@ -63,6 +63,15 @@ export function getRedis(): Redis {
 
 let subscriberInstance: Redis | null = null;
 
+/**
+ * Lazily construct a SECOND Redis client used exclusively for
+ * `SUBSCRIBE` (websocket fan-out).
+ *
+ * Why a separate client: ioredis enters subscribe mode after the
+ * first `SUBSCRIBE` and refuses all non-pub/sub commands on that
+ * connection. Mixing `GET`/`PUBLISH` with subscriptions on the same
+ * client throws — hence the split.
+ */
 export function getSubscriber(): Redis {
   if (!subscriberInstance) {
     subscriberInstance = new Redis({
