@@ -6,6 +6,16 @@ import type { ProcessReferralJobData } from "../types/index.js";
 
 const connection = parseRedisUrl(config.redisUrl);
 
+/**
+ * BullMQ queue for one-shot, event-driven jobs (referral verification,
+ * etc). Jobs in this queue are fired by API handlers when something
+ * domain-relevant happens — they're not on a cron schedule.
+ *
+ * Retention: keep the last 100 completed and 500 failed for
+ * post-mortem visibility in the BullMQ dashboard. Failed jobs retry
+ * 3× with exponential backoff (2s → 4s → 8s) to ride out transient
+ * Postgres / Redis hiccups.
+ */
 export const goalJobQueue = new Queue("goal-jobs", {
   connection,
   defaultJobOptions: {
