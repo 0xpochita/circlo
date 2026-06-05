@@ -173,6 +173,17 @@ export function useStake() {
   };
 }
 
+/**
+ * Hook for the permissionless `lockGoal(goalId)` write.
+ *
+ * Any wallet can call this once the deadline has passed — no role gate.
+ * Transitions the goal `Open → Locked` and opens the resolver vote
+ * window. Reverts `DeadlineNotReached` if called early, or
+ * `WrongStatus` if the goal is already past `Open`.
+ *
+ * Used by the "advance lifecycle" CTA on stale goals so users can
+ * unblock resolution without waiting for the creator.
+ */
 export function useLockGoal() {
   const { write, isLoading, isSuccess, error, txHash } = useContract();
 
