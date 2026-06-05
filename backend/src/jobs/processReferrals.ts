@@ -3,6 +3,23 @@ import { prisma } from "../lib/prisma.js";
 import { redis } from "../lib/redis.js";
 import type { ProcessReferralJobData } from "../types/index.js";
 
+/**
+ * One-shot job — fired by the stake handler when a user makes their
+ * first stake, to verify a pending referral attached to that user.
+ *
+ * Verification criteria:
+ *   1. The user has a `pending` referral record (created on signup).
+ *   2. The user has exactly one `GoalParticipant` row — i.e. this
+ *      stake we're processing IS their first ever.
+ *
+ * If both hold, mark the referral verified and notify the referrer.
+ * Otherwise no-op: maybe the user signed up without a referral, or
+ * they've staked before and the referral was already processed.
+ *
+ * The `participantCount !== 1` guard is the de-dupe — without it,
+ * every stake from a freshly-referred user would re-fire the job
+ * and spam the referrer with "verified!" notifications.
+ */
 export async function processReferrals(data: ProcessReferralJobData): Promise<void> {
   const { userId } = data;
 
