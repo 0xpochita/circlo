@@ -202,6 +202,17 @@ export function useLockGoal() {
   return { lockGoal, isLoading, isSuccess, error, txHash };
 }
 
+/**
+ * Hook for claiming a winning payout from a resolved goal.
+ *
+ * Reverts `NotResolved` if the goal is still pre-`PaidOut` and
+ * `NothingToClaim` if the caller was on the losing side or already
+ * claimed. The UI should only surface the claim CTA when
+ * `getGoal().status === PaidOut` AND `getStakeOf(user, winningSide) > 0`.
+ *
+ * Payout = winnerStake + winnerStake * losersPool / winnersPool
+ * (post-fee). See `circlo-sdk/src/claims.ts` for the explicit formula.
+ */
 export function useClaim() {
   const { write, isLoading, isSuccess, error, txHash } = useContract();
 
