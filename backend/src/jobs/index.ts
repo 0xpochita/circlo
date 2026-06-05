@@ -101,6 +101,20 @@ export function startWorkers() {
   return { goalWorker, cronWorker };
 }
 
+/**
+ * Idempotently register the cron schedulers in the BullMQ instance.
+ *
+ * `upsertJobScheduler` is safe to call on every boot — duplicate
+ * registrations no-op, so backend instances spinning up after a
+ * deploy don't fight over scheduler state.
+ *
+ * Cadences:
+ *   - `lockExpiredGoals` every minute: catches deadline crossings
+ *     within ~60s for responsive UI updates.
+ *   - `detectDisputes` every 5 minutes: dispute detection only
+ *     becomes relevant 72h+1h after lock, so a tighter cadence
+ *     wastes work.
+ */
 export async function scheduleCronJobs() {
   await cronJobQueue.upsertJobScheduler(
     "cron:lockExpiredGoals",
