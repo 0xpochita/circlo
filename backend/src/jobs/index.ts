@@ -48,6 +48,17 @@ import { processReferrals } from "./processReferrals.js";
 import { lockExpiredGoals } from "./lockExpiredGoals.js";
 import { detectDisputes } from "./detectDisputes.js";
 
+/**
+ * Spin up both BullMQ workers (goal-jobs + cron-jobs) and wire
+ * `completed` / `failed` log handlers. Returns the worker pair so
+ * callers can listen for graceful-shutdown signals.
+ *
+ * `goalWorker` concurrency = 5: most goal-jobs do a Prisma round
+ * trip + a Redis publish, so we can saturate a small pool without
+ * tipping the database over. `cronWorker` concurrency = 1: cron
+ * jobs are larger sweeps (e.g. lock-expired) and serializing them
+ * prevents two ticks racing on the same goal.
+ */
 export function startWorkers() {
   const goalWorker = new Worker<ProcessReferralJobData>(
     "goal-jobs",
