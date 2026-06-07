@@ -186,6 +186,24 @@ function formatUsdt(amount: bigint): string {
   return `${integer}.${decimal}`;
 }
 
+/**
+ * Indexer handler for `GoalCreated` events from PredictionPool.
+ *
+ * Two paths converge here:
+ *   1. **Frontend-led**: the user POSTed `goals` to the API first
+ *      (`chain_id = null`), then signed the on-chain tx. We attach
+ *      the chain id to the pending row in Prisma.
+ *   2. **Direct-on-chain**: a script/bot called `createGoal` without
+ *      going through the API. We create the Goal row from the event
+ *      payload using `parseGoalMetadata` for display fields.
+ *
+ * Idempotent via `chain_id` uniqueness — re-indexing the same event
+ * no-ops.
+ *
+ * Returns early if the parent circle hasn't been indexed yet
+ * (cross-contract event-ordering race). On the next backfill the
+ * circle row exists and re-processing succeeds.
+ */
 export async function handleGoalCreated(
   args: {
     id: bigint;
