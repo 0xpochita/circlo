@@ -63,7 +63,22 @@ async function checkNonceRateLimit(ip: string): Promise<boolean> {
   return current <= NONCE_RATE_LIMIT;
 }
 
+/**
+ * SIWE auth routes — issue + verify the nonce/signature pair.
+ *
+ * Mounted unauthenticated (they ARE the login flow). Both endpoints
+ * write rate-limited state to Redis; both validate input via Zod
+ * before doing any expensive work.
+ */
 export default async function authRoutes(app: FastifyInstance) {
+  /**
+   * `POST /nonce` — issue a fresh SIWE nonce for a wallet.
+   *
+   * Per-IP rate-limited via {@link checkNonceRateLimit}. The nonce
+   * is stored in Redis under `nonce:{walletAddress}` with a 5-minute
+   * TTL; `/verify` reads it back and one-shot-deletes it on
+   * successful sign-in.
+   */
   app.post("/nonce", async (req, reply) => {
     const ip =
       (req.headers["x-forwarded-for"] as string | undefined)?.split(",")[0]?.trim() ??
