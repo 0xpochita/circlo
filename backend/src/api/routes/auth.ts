@@ -110,6 +110,22 @@ export default async function authRoutes(app: FastifyInstance) {
     return reply.send({ nonce });
   });
 
+  /**
+   * `POST /verify` — verify a signed SIWE message, mint JWTs, return
+   * the user record.
+   *
+   * Verification chain:
+   *   1. Zod parses + shape-checks the `{ message, signature }` body.
+   *   2. `SiweMessage` parses the canonical SIWE string.
+   *   3. Stored nonce matches the message's nonce (replay guard).
+   *   4. ChainId is one of our supported Celo networks.
+   *   5. `verifyMessage` confirms the signature came from the
+   *      claimed address.
+   *
+   * On any failure, returns a typed 4xx envelope and writes nothing
+   * to the session. On success, the nonce is consumed (deleted), the
+   * user row is upserted, and access + refresh JWTs are returned.
+   */
   app.post("/verify", async (req, reply) => {
     const body = verifySchema.safeParse(req.body);
     if (!body.success) {
