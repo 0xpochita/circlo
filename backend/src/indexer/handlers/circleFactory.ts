@@ -99,6 +99,19 @@ function parseCircleMetadata(uri: string): CircleMetadata {
   }
 }
 
+/**
+ * Indexer handler for `CircleCreated` events from CircleFactory.
+ *
+ * Idempotent: if a `Circle` row already exists for this `chain_id`,
+ * the handler no-ops. This protects against double-processing during
+ * indexer restarts or block re-broadcasts.
+ *
+ * Side effects:
+ *   1. Ensures a `User` row exists for the owner address.
+ *   2. Inserts the circle into Prisma with decoded metadata.
+ *   3. (Implicit, downstream) Fans out a notification to followers if
+ *      the owner has any — handled by separate notification logic.
+ */
 export async function handleCircleCreated(args: {
   id: bigint;
   owner: string;
