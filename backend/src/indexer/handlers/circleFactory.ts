@@ -277,6 +277,18 @@ export async function handleCircleJoined(args: {
   );
 }
 
+/**
+ * Indexer handler for `CircleLeft` events from CircleFactory.
+ *
+ * Removes the `CircleMember` row corresponding to the leaving wallet
+ * via `deleteMany` (idempotent — extra delete of an already-deleted
+ * row is a no-op). No notification is fired because user-facing
+ * "X left your circle" is intentionally muted; owners can see the
+ * delta in their member-count widget.
+ *
+ * Tolerates a missing circle/user the same way as `handleCircleJoined`
+ * — warns and returns without crashing the indexer.
+ */
 export async function handleCircleLeft(args: {
   id: bigint;
   member: string;
