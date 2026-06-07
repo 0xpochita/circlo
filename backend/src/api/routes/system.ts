@@ -61,6 +61,18 @@ export default async function systemRoutes(app: FastifyInstance) {
     });
   });
 
+  /**
+   * `GET /api/v1/config` — frontend boot config.
+   *
+   * Returns the contract addresses + chain ids the SPA needs before
+   * the user is authenticated, plus the canonical category list
+   * shown in the create-circle form. `minStake` is the dollar-formatted
+   * USDT minimum used as a placeholder in the create-goal UI.
+   *
+   * Adding a field here means coordinating with the frontend's
+   * `useBootConfig` hook — the response shape is part of the
+   * unwritten API contract.
+   */
   app.get("/api/v1/config", async (_req, reply) => {
     return reply.send({
       minStake: "1.000000",
