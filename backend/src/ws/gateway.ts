@@ -31,6 +31,20 @@ const userSubscriptions = new Map<string, Redis>();
  */
 const PING_INTERVAL = 30_000;
 
+/**
+ * Lazily construct (or return cached) Redis subscriber for a user's
+ * notification channel.
+ *
+ * On message receipt, fans out to every active socket in
+ * `userSockets[userId]`. Sockets in non-OPEN state (`readyState !== 1`)
+ * are skipped silently — they'll be cleaned up by `removeSocket` when
+ * the close event fires.
+ *
+ * `maxRetriesPerRequest: null` here (vs. the primary client's `3`)
+ * because subscriber-mode commands can't time out the same way —
+ * SUBSCRIBE blocks indefinitely and the client must stay alive
+ * through any transient blip.
+ */
 function getOrCreateSubscriber(userId: string): Redis {
   if (userSubscriptions.has(userId)) {
     return userSubscriptions.get(userId)!;
