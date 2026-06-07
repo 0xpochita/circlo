@@ -31,6 +31,15 @@ export const CIRCLE_FACTORY_ABI = [
   },
 ] as const;
 
+/**
+ * Push a notification payload onto the user's Redis pub/sub channel.
+ *
+ * The websocket gateway subscribes to `notifications:{userId}` and
+ * fans out incoming messages to every connected socket for that user.
+ * Keep payloads small — Redis pub/sub doesn't retry delivery, so
+ * lost messages stay lost. Persist the canonical record via Prisma
+ * first if the user must see it.
+ */
 async function publishNotification(
   userId: string,
   notification: object
