@@ -157,6 +157,15 @@ function parseGoalMetadata(uri: string): {
   }
 }
 
+/**
+ * Map the on-chain `Side` enum value to the lowercase string the
+ * backend's `Stake.side` column uses.
+ *
+ * Note the inversion: on-chain `Side.Yes = 0`, `Side.No = 1`. The
+ * mapping is preserved here verbatim — DO NOT swap the literals
+ * thinking "yes = 1 is more intuitive", the indexer test suite will
+ * catch the inversion but only via end-to-end fixture comparisons.
+ */
 function sideToString(side: number): string {
   return side === 0 ? "yes" : side === 1 ? "no" : `choice_${side}`;
 }
