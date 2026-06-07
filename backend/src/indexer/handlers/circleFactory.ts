@@ -202,6 +202,20 @@ export async function handleCircleCreated(args: {
   );
 }
 
+/**
+ * Indexer handler for `CircleJoined` events from CircleFactory.
+ *
+ * Mirrors the on-chain membership into the backend's `CircleMember`
+ * table and notifies the circle owner. The upsert pattern handles
+ * the rare case where a member rejoins (left, then joined again)
+ * without creating duplicate rows.
+ *
+ * **Race condition handling**: if `CircleCreated` for the parent
+ * circle hasn't been indexed yet (block-ordering quirk), the
+ * handler logs and returns rather than crashing. The on-chain
+ * truth is intact; the backend mirror catches up on the next
+ * backfill sweep.
+ */
 export async function handleCircleJoined(args: {
   id: bigint;
   member: string;
