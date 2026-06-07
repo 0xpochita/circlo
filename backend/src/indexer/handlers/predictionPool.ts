@@ -102,6 +102,17 @@ function outcomeTypeToString(t: number): string {
   return t === 0 ? "binary" : t === 1 ? "multi" : "numeric";
 }
 
+/**
+ * Indexer-local parser for the goal `metadataURI` JSON.
+ *
+ * Handles **two** input shapes simultaneously:
+ *   - **Bot script** writes a compound `avatar: "emoji|color"` field.
+ *   - **Frontend** writes split `avatarEmoji` + `avatarColor` fields.
+ *
+ * Split fields take precedence over the compound `avatar` when both
+ * are present — frontend writes are the canonical source going
+ * forward. Falls back to a neutral default 🎯 on any parse failure.
+ */
 function parseGoalMetadata(uri: string): {
   title: string;
   description: string;
