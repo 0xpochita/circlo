@@ -77,6 +77,15 @@ function getOrCreateSubscriber(userId: string): Redis {
   return sub;
 }
 
+/**
+ * Remove a websocket from a user's socket set and tear down the
+ * per-user Redis subscriber if no sockets remain.
+ *
+ * Avoiding the subscriber teardown on EVERY disconnect (i.e. when
+ * other devices stay connected) is important: SUBSCRIBE/UNSUBSCRIBE
+ * are not free, and bouncing a single device shouldn't reset the
+ * subscription for all of the user's other sessions.
+ */
 function removeSocket(userId: string, ws: any): void {
   const sockets = userSockets.get(userId);
   if (!sockets) return;
