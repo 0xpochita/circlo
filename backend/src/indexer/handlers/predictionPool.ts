@@ -98,6 +98,15 @@ async function ensureUser(walletAddress: string) {
   });
 }
 
+/**
+ * Map the on-chain `OutcomeType` enum value to the lowercase string
+ * the backend's enum column uses. The two namespaces are decoupled
+ * — adding a new outcome type on-chain (e.g. `Range`) requires both
+ * a Solidity enum bump AND adding the string case here.
+ *
+ * Unknown values fall through to "numeric" to keep the indexer
+ * crash-free during a partial rollout.
+ */
 function outcomeTypeToString(t: number): string {
   return t === 0 ? "binary" : t === 1 ? "multi" : "numeric";
 }
