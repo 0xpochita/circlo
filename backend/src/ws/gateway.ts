@@ -5,9 +5,30 @@ import { config } from "../config.js";
 import { parseRedisUrl } from "../lib/redis.js";
 import type { JwtPayload } from "../types/index.js";
 
+/**
+ * Per-user fan-out registry: maps `userId` → set of active websocket
+ * connections. A user can be online from multiple devices; every
+ * notification gets pushed to all of them.
+ */
 const userSockets = new Map<string, Set<any>>();
+
+/**
+ * Per-user Redis subscriber registry: maps `userId` → an ioredis
+ * client subscribed to `notifications:{userId}`. Created lazily on
+ * first connection, destroyed when the user's last socket closes.
+ *
+ * Why per-user (vs. one shared subscriber): ioredis enters
+ * subscribe-mode on a per-connection basis. A single shared
+ * subscriber would block new subscribe calls during pattern
+ * resync; per-user clients keep the fan-out independent.
+ */
 const userSubscriptions = new Map<string, Redis>();
 
+/**
+ * Ping interval (ms). Sends a heartbeat frame every 30s to keep
+ * idle connections alive through corporate / cloud proxies that
+ * close TCP streams after ~60s of silence.
+ */
 const PING_INTERVAL = 30_000;
 
 function getOrCreateSubscriber(userId: string): Redis {
