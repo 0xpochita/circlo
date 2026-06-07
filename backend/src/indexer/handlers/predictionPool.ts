@@ -152,6 +152,15 @@ function sideToString(side: number): string {
   return side === 0 ? "yes" : side === 1 ? "no" : `choice_${side}`;
 }
 
+/**
+ * Format a USDT amount in base units (6 decimals) as a fixed-precision
+ * string for log lines and notification copy.
+ *
+ * Manual implementation instead of `viem.formatUnits` because the
+ * indexer's hot path emits many of these per second and the dot-split
+ * here is faster than viem's regex-based parser. Always returns
+ * exactly 6 decimal places — pad/trim at the call site if needed.
+ */
 function formatUsdt(amount: bigint): string {
   const str = amount.toString().padStart(7, "0");
   const integer = str.slice(0, -6) || "0";
