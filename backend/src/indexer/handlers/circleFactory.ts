@@ -69,6 +69,14 @@ interface CircleMetadata {
   avatarColor: string;
 }
 
+/**
+ * Indexer-local copy of `circlo-types`'s `parseCircleMetadata` —
+ * duplicated to avoid a runtime dependency on the published SDK from
+ * the backend. Same defaults, same never-throw contract.
+ *
+ * When `circlo-types` becomes a stable peer dep, replace this with
+ * the package import and delete the local fallback.
+ */
 function parseCircleMetadata(uri: string): CircleMetadata {
   const fallback: CircleMetadata = {
     name: "Circle",
