@@ -8,9 +8,27 @@ import { redis } from "../../lib/redis.js";
 import { prisma } from "../../lib/prisma.js";
 import { config } from "../../config.js";
 
+/**
+ * SIWE nonce TTL (5 minutes).
+ *
+ * Long enough that the user can sign without time pressure, short
+ * enough that a leaked nonce becomes unusable before an attacker
+ * can replay it. SIWE's `expirationTime` field is a separate
+ * shorter window enforced by the verifier.
+ */
 const NONCE_TTL = 300;
+
+/** Redis key prefix for the per-IP nonce-rate counter. */
 const NONCE_RATE_KEY = "rate:nonce:";
+
+/**
+ * Max nonce requests per IP per `NONCE_RATE_WINDOW`. Tuned so a single
+ * user can hit `/nonce` from a few devices without tripping the limit,
+ * but a credential-stuffing script hits the wall almost immediately.
+ */
 const NONCE_RATE_LIMIT = 10;
+
+/** Sliding window (seconds) for nonce-rate counting. */
 const NONCE_RATE_WINDOW = 60;
 
 const nonceSchema = z.object({
