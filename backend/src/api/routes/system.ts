@@ -4,7 +4,22 @@ import { redis } from "../../lib/redis.js";
 import { celoClient } from "../../lib/viem.js";
 import { config } from "../../config.js";
 
+/**
+ * Public system routes: liveness probe + frontend boot config.
+ *
+ * Mounted without an auth gate — both endpoints are deliberately
+ * unauthenticated so deployment health checkers and the frontend's
+ * pre-login bundle can read them.
+ */
 export default async function systemRoutes(app: FastifyInstance) {
+  /**
+   * `GET /health` — composite health check.
+   *
+   * Returns 200 when DB + Redis are reachable, 503 otherwise. Chain
+   * connectivity and indexer lag are reported but do NOT downgrade
+   * the status — a transient RPC blip shouldn't take the API down
+   * with it.
+   */
   app.get("/health", async (_req, reply) => {
     const checks = {
       db: false,
