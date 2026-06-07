@@ -42,6 +42,18 @@ const verifySchema = z.object({
   signature: z.string().regex(/^0x[a-fA-F0-9]+$/, "Invalid signature"),
 });
 
+/**
+ * Per-IP nonce-request rate limiter.
+ *
+ * Uses the classic INCR+EXPIRE pattern in Redis: first request sets
+ * the TTL, subsequent ones just bump the counter. Returns `true`
+ * if the request is allowed, `false` if the IP exceeded its budget
+ * for the window.
+ *
+ * The TTL is set only on the first increment to keep the window
+ * sliding (vs. fixed-bucket) — otherwise an attacker could time
+ * requests around fixed bucket boundaries.
+ */
 async function checkNonceRateLimit(ip: string): Promise<boolean> {
   const key = `${NONCE_RATE_KEY}${ip}`;
   const current = await redis.incr(key);
