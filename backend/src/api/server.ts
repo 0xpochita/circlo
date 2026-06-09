@@ -75,6 +75,11 @@ export async function buildServer() {
     }),
   });
 
+  // Centralized error envelope. Mirrors the shape route handlers
+  // emit via `reply.send({ error, message, statusCode })` so the
+  // frontend can use one type for every API failure. Hides internal
+  // error messages on 5xx in production (would leak stack details);
+  // 4xx + dev mode pass through the real message for debuggability.
   app.setErrorHandler((error, _req, reply) => {
     const statusCode = error.statusCode ?? 500;
     const isDev = config.isDevelopment;
