@@ -46,11 +46,28 @@ const RESOLUTION_MODULE_ABI = [
   },
 ] as const;
 
+/**
+ * Read the highest block this contract's indexer has fully processed.
+ *
+ * Falls back to `config.indexerStartBlock` on first-ever run — the
+ * deployment block of the contract. Setting `INDEXER_START_BLOCK`
+ * higher than the actual deploy block fast-forwards past historical
+ * events (useful for fresh local DBs that don't need backfill).
+ */
 async function getLastBlock(contract: string): Promise<bigint> {
   const state = await prisma.indexerState.findUnique({ where: { contract } });
   return state?.last_block ?? config.indexerStartBlock;
 }
 
+/**
+ * Persist the indexer's cursor for a contract.
+ *
+ * Called after every successful batch. If the process crashes
+ * between batches, the next boot resumes from the last persisted
+ * cursor — at-least-once delivery for events. All handlers are
+ * idempotent (chain_id uniqueness, upserts) so double-processing
+ * the boundary batch on resume is safe.
+ */
 async function setLastBlock(contract: string, block: bigint): Promise<void> {
   await prisma.indexerState.upsert({
     where: { contract },
