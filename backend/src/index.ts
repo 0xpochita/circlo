@@ -6,6 +6,26 @@ import { redis } from "./lib/redis.js";
 import { startWorkers, scheduleCronJobs } from "./jobs/index.js";
 import { startIndexer } from "./indexer/index.js";
 
+/**
+ * Backend process bootstrap.
+ *
+ * Boot sequence is intentionally serial — each step depends on the
+ * previous one being healthy:
+ *   1. Prisma connect (DB schema available)
+ *   2. Redis ping (cache / pubsub available)
+ *   3. BullMQ workers + cron schedules (job queue alive)
+ *   4. Indexer (catches up on missed events, then streams)
+ *   5. Fastify HTTP server (accepts API traffic)
+ *
+ * The indexer is fire-and-forget via `.catch(...)` — if it crashes,
+ * the API stays up and the orchestrator restarts the whole process.
+ * This favors API availability over event freshness during outages.
+ *
+ * `SIGINT` / `SIGTERM` trigger graceful shutdown: stop accepting
+ * connections → drain pending → close DB + Redis. Forced-kill
+ * (SIGKILL) skips this and risks half-applied batches; the indexer
+ * cursor's at-least-once delivery covers that.
+ */
 async function main() {
   console.log(`[Server] Starting Circlo backend (${config.nodeEnv})...`);
 
