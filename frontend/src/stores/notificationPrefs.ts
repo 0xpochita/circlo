@@ -19,6 +19,16 @@ type NotifPrefsState = {
   reset: () => void;
 };
 
+/**
+ * Per-category notification preferences, persisted to localStorage.
+ *
+ * All four categories default to ON — opt-out model, not opt-in.
+ * Persisted under `circlo-notification-prefs` so settings survive
+ * a session restart (vs. notifications themselves which re-fetch).
+ *
+ * The `setAll` helper exists so the settings UI can offer a single
+ * "mute everything" toggle without iterating categories manually.
+ */
 export const useNotificationPrefs = create<NotifPrefsState>()(
   persist(
     (set) => ({
