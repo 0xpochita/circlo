@@ -15,6 +15,20 @@ import referralRoutes from "./routes/referrals.js";
 import systemRoutes from "./routes/system.js";
 import { registerWsGateway } from "../ws/gateway.js";
 
+/**
+ * Build the Fastify application — registers plugins, mounts routes,
+ * and wires the error handler.
+ *
+ * Plugin order matters:
+ *   1. CORS first (responds to OPTIONS preflight before anything else)
+ *   2. Cookies (parsed before JWT can read the refresh cookie)
+ *   3. JWT (depends on cookie parser for the refresh path)
+ *   4. WebSocket (registered before any ws routes)
+ *   5. Rate limit (covers every later-registered route)
+ *
+ * The returned app is NOT listening — call `.listen({ port, host })`
+ * after `buildServer()` resolves.
+ */
 export async function buildServer() {
   const app = Fastify({
     logger: {
