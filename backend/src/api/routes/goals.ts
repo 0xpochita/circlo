@@ -37,6 +37,15 @@ const createGoalSchema = z.object({
   sides: z.array(z.string()).optional(),
 });
 
+/**
+ * Validation schema for `POST /goals/:id/confirm`.
+ *
+ * Called by the frontend AFTER the user's `createGoal` tx confirms
+ * on-chain to attach the chain id to the previously-created pending
+ * backend row. Both fields are strict — a malformed tx hash here
+ * would silently break the indexer's later attempt to match the
+ * `GoalCreated` event.
+ */
 const confirmGoalSchema = z.object({
   chainId: z.number(),
   txHash: z.string().regex(/^0x[a-fA-F0-9]{64}$/),
