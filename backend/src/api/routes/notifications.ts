@@ -3,8 +3,21 @@ import { z } from "zod";
 import { prisma } from "../../lib/prisma.js";
 import { requireAuth } from "../middlewares/auth.js";
 
+/**
+ * Notifications page size. Larger than circles' 20 because the list
+ * is the primary surface for catching up after being offline —
+ * fewer round trips matter more than payload size here.
+ */
 const PAGE_SIZE = 30;
 
+/**
+ * Validation schema for `POST /notifications/mark-read`.
+ *
+ * Accepts EITHER an `ids` array (mark these specific notifications)
+ * OR `all: true` (mark every unread for the current user). The
+ * `.refine` enforces that at least one is set — passing `{}` would
+ * otherwise be a no-op API call.
+ */
 const markReadSchema = z
   .object({
     ids: z.array(z.string().uuid()).optional(),
