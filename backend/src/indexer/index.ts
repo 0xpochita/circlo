@@ -157,6 +157,16 @@ async function backfillResolutionModule(client: any, fromBlock: bigint, toBlock:
   }
 }
 
+/**
+ * Walk every PredictionPool event in `[fromBlock, toBlock]` and
+ * dispatch to the matching handler.
+ *
+ * This is the busiest of the three backfill loops — `Staked` alone
+ * dominates during normal operation. Handlers are dispatched
+ * serially within a batch to keep transaction ordering deterministic
+ * (a `Staked` after `GoalCreated` should never see a missing parent
+ * goal row).
+ */
 async function backfillPredictionPool(client: any, fromBlock: bigint, toBlock: bigint): Promise<void> {
   let current = fromBlock;
   while (current <= toBlock) {
