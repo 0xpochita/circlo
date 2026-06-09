@@ -118,6 +118,17 @@ async function backfillCircleFactory(client: any, fromBlock: bigint, toBlock: bi
   }
 }
 
+/**
+ * Walk every ResolutionModule event in `[fromBlock, toBlock]` and
+ * dispatch to the matching handler.
+ *
+ * Currently only `VoteSubmitted` — `finalize` doesn't have its own
+ * event (the on-chain transition fires `GoalResolved` on the parent
+ * PredictionPool instead, indexed by `backfillPredictionPool`).
+ *
+ * Same per-batch resume + crash-tolerant error handling as the
+ * CircleFactory backfill.
+ */
 async function backfillResolutionModule(client: any, fromBlock: bigint, toBlock: bigint): Promise<void> {
   let current = fromBlock;
   while (current <= toBlock) {
