@@ -8,6 +8,19 @@ import { config } from "../../config.js";
 
 const PAGE_SIZE = 20;
 
+/**
+ * Validation schema for `POST /goals`.
+ *
+ * - `title`: 3-200 char question text. Cap matches what fits in the
+ *   goal card without truncation.
+ * - `minStake`: USDT amount as a decimal string (max 6 places to match
+ *   USDT's 6-decimal precision). String rather than number to dodge
+ *   IEEE-754 dust in the round-trip.
+ * - `resolverIds`: 1-10 backend user UUIDs. Lower bound enforces at
+ *   least one resolver (cycle without one is unresolvable);
+ *   upper bound matches the on-chain resolverList cap of 10.
+ * - `sides`: reserved for multi-outcome goals; ignored on binary today.
+ */
 const createGoalSchema = z.object({
   circleId: z.string().uuid(),
   title: z.string().min(3).max(200),
