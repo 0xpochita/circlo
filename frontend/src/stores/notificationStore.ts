@@ -16,6 +16,18 @@ function countUnread(notifs: NotificationResponse[]): number {
   return notifs.filter((n) => n.unread).length;
 }
 
+/**
+ * Notification Zustand store with optimistic mark-as-read.
+ *
+ * `markAsRead` / `markAllAsRead` flip the local state FIRST, then
+ * fire the backend call. On API failure the optimistic state stays
+ * — no flicker for the user, and the next `fetchNotifications`
+ * reconciles the truth if needed. Acceptable tradeoff: the worst
+ * case is a "read" notification that resurfaces as unread later.
+ *
+ * Not persisted — fresh load on every session start (`useAuth.login`
+ * calls `fetchNotifications`).
+ */
 export const useNotificationStore = create<NotificationState>((set, get) => ({
   notifications: [],
   unreadCount: 0,
