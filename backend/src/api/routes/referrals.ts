@@ -4,6 +4,15 @@ import { v4 as uuidv4 } from "uuid";
 import { prisma } from "../../lib/prisma.js";
 import { requireAuth } from "../middlewares/auth.js";
 
+/**
+ * Validation schema for `POST /referrals/track`.
+ *
+ * `referralCode` is the referrer's wallet address (the canonical
+ * referral code in Circlo — no separate code table). The 3-50 char
+ * bounds are generous: real wallet addresses are 42 chars, but the
+ * lower bound catches obviously malformed input without rejecting
+ * potential future short-link formats.
+ */
 const trackSchema = z.object({
   referralCode: z.string().min(3).max(50),
 });
