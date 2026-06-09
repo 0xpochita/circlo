@@ -544,6 +544,18 @@ export async function handleGoalLocked(
   console.log(`[PredictionPool] GoalLocked: goalId=${goal.id}`);
 }
 
+/**
+ * Indexer handler for `GoalResolved` events.
+ *
+ * The big one — flips the goal to `paid_out`, sets the winning side,
+ * and fans out notifications to every participant. Winners get a
+ * "you won" notification with a CTA to claim; losers get a "goal
+ * settled" message so the UI can stop showing the "pending" state.
+ *
+ * `winningSide` is one of `Side.Yes` / `Side.No` (never the
+ * `UNRESOLVED_SIDE` sentinel — the contract only fires this event
+ * with a real side).
+ */
 export async function handleGoalResolved(
   args: {
     goalId: bigint;
