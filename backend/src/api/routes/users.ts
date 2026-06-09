@@ -29,6 +29,15 @@ const updateMeSchema = z.object({
     .optional(),
 });
 
+/**
+ * Map a Prisma `User` row to the public JSON envelope returned by
+ * every user-shaped endpoint.
+ *
+ * Strips internal fields (`updated_at` is computed for sync use but
+ * never sent to clients) and renames snake_case columns to the
+ * camelCase keys the frontend expects. Keep this in lockstep with
+ * the User type the SDK / frontend types module exports.
+ */
 function serializeUser(user: {
   id: string;
   wallet_address: string;
