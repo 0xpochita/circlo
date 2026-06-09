@@ -3,6 +3,17 @@ import { z } from "zod";
 import { prisma } from "../../lib/prisma.js";
 import { requireAuth } from "../middlewares/auth.js";
 
+/**
+ * Validation schema for `PATCH /users/me`.
+ *
+ * All fields are optional — clients send only what they're changing.
+ * - `name`: 1-80 char display label, shown on profile + notifications.
+ * - `username`: 3-20 char handle, used in invite-by-handle and URLs.
+ *   Regex restricts to alphanumeric + underscore to keep handles
+ *   URL-safe without escaping.
+ * - `avatarEmoji` / `avatarColor`: same constraints as
+ *   `createCircleSchema` so both surfaces render consistently.
+ */
 const updateMeSchema = z.object({
   name: z.string().min(1).max(80).optional(),
   username: z
