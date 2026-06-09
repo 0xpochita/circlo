@@ -49,6 +49,14 @@ export const useNotificationPrefs = create<NotifPrefsState>()(
   ),
 );
 
+/**
+ * Mapping from backend notification `type` to the user-facing
+ * category toggle that gates it.
+ *
+ * Add new notification types here when the backend adds them; an
+ * unmapped type falls through to `true` (always shown) so a
+ * brand-new event never gets silently muted by a stale mapping.
+ */
 const TYPE_TO_CATEGORY: Record<string, NotifCategory> = {
   goal_created: "goal",
   goal_staked: "goal",
@@ -60,6 +68,15 @@ const TYPE_TO_CATEGORY: Record<string, NotifCategory> = {
   referral_reward: "referral",
 };
 
+/**
+ * Decide whether a notification of `type` should be surfaced under
+ * the user's current preferences.
+ *
+ * Used by `useNotificationStore.fetchNotifications` to filter
+ * server-pushed events before they hit the UI. Pair with
+ * `useNotificationPrefs.getState().prefs` at the call site so the
+ * function stays a pure helper.
+ */
 export function isNotificationEnabled(
   type: string,
   prefs: NotifPrefs,
