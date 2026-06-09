@@ -26,6 +26,17 @@ const initialState = {
   inviteUsernames: [] as string[],
 };
 
+/**
+ * Multi-step create-circle form state.
+ *
+ * Mirrors `useCreateGoalStore` semantics: per-field setters,
+ * non-persisted, reset on close/submit. Defaults to category
+ * "general" + public privacy + a 🌟 avatar — pre-filled so the
+ * happy path can submit without touching the avatar step.
+ *
+ * `toggleInvite` is the only complex setter: deduped add/remove
+ * for the invite-checklist multi-select.
+ */
 export const useCreateCircleStore = create<CreateCircleState>((set) => ({
   ...initialState,
   setName: (name) => set({ name }),
