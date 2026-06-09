@@ -57,6 +57,11 @@ export async function buildServer() {
 
   await app.register(fastifyWebsocket);
 
+  // Global rate limit: 100 req/min per source IP.
+  // `keyGenerator` falls back through `x-forwarded-for` first so the
+  // limit behaves correctly behind Vercel/Cloudflare/etc. Backed by
+  // Redis so multi-instance deployments share the counter (otherwise
+  // each pod would have its own 100/min budget).
   await app.register(fastifyRateLimit, {
     max: 100,
     timeWindow: "1 minute",
