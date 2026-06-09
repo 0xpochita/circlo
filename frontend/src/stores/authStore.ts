@@ -20,6 +20,19 @@ type AuthState = {
   setLoading: (loading: boolean) => void;
 };
 
+/**
+ * Persistent auth Zustand store.
+ *
+ * Holds the JWT pair, the resolved User row, and a derived
+ * `isAuthenticated` flag. Persists to localStorage under
+ * `circlo-auth` so a refresh doesn't drop the session — but the
+ * persisted token is checked against the wallet on every render via
+ * `useAuth`'s effect, so a stale JWT can't authenticate a different
+ * wallet.
+ *
+ * `isLoading` is owned by the login round-trip so the connect button
+ * can show a spinner without a separate local state.
+ */
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
