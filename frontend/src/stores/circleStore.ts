@@ -15,6 +15,15 @@ type CircleState = {
   reset: () => void;
 };
 
+/**
+ * Legacy circle store — kept around for the imperative `useFetchCircles`
+ * + `selectedCircle` flow. The newer `useDataCache` + `useMyCircles`
+ * hooks supersede most of its responsibilities; this store stays
+ * because the circle-detail sheet still leans on `selectedCircle`
+ * for sheet-to-page state hand-off.
+ *
+ * Not persisted — fully derived from API state.
+ */
 export const useCircleStore = create<CircleState>()((set) => ({
   circles: [],
   selectedCircle: null,
