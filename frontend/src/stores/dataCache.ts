@@ -6,8 +6,17 @@ import type {
   GoalWithMyStake,
 } from "@/lib/api/endpoints";
 
+/**
+ * Stale-while-revalidate window. Cached entries served instantly
+ * within 60s; older entries trigger a refetch in the background
+ * but still render the cached value first to avoid skeleton flash.
+ */
 const STALE_MS = 60_000;
 
+/**
+ * Identifiers for each cached collection. Keep narrow — adding a
+ * key means adding both a `set*` method and a timestamp field.
+ */
 type CacheKey = "myCircles" | "myGoals" | "feedGoal" | "publicCircles";
 
 type DataCacheState = {
