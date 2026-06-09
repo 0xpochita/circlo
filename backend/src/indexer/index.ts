@@ -76,6 +76,16 @@ async function setLastBlock(contract: string, block: bigint): Promise<void> {
   });
 }
 
+/**
+ * Walk every CircleFactory event in `[fromBlock, toBlock]` and
+ * dispatch to the matching handler.
+ *
+ * Per-batch persistence (`setLastBlock` after each chunk) means a
+ * crash mid-backfill resumes from the last completed chunk, not
+ * from scratch. Handler errors are logged but do NOT abort the
+ * backfill — losing one event to a Prisma constraint shouldn't
+ * stall the indexer for hours.
+ */
 async function backfillCircleFactory(client: any, fromBlock: bigint, toBlock: bigint): Promise<void> {
   let current = fromBlock;
   while (current <= toBlock) {
