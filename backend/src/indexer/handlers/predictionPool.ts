@@ -433,6 +433,18 @@ export async function handleStaked(
   );
 }
 
+/**
+ * Indexer handler for `VoteSubmitted` events from ResolutionModule.
+ *
+ * Records the resolver's choice in `Vote`. Upserts the `GoalResolver`
+ * row defensively — normally `GoalCreated` registers them, but
+ * out-of-order RPC delivery can mean we see a vote before the
+ * resolver registration. The upsert keeps the indexer crash-free
+ * either way.
+ *
+ * No notification fires from this handler; the goal's `GoalResolved`
+ * event (when quorum auto-finalizes) is what pings stakers.
+ */
 export async function handleVoteSubmitted(args: {
   goalId: bigint;
   resolver: string;
