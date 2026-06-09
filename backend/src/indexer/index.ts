@@ -23,6 +23,15 @@ const CIRCLE_FACTORY = config.contractCircleFactory as `0x${string}`;
 const PREDICTION_POOL = config.contractPredictionPool as `0x${string}`;
 const RESOLUTION_MODULE = config.contractResolutionModule as `0x${string}`;
 
+/**
+ * Block range pulled in a single `getLogs` call during backfill.
+ *
+ * 1000 blocks (~16 min on Celo at 1s block time) is the sweet spot
+ * for Forno — large enough to keep round-trips low, small enough to
+ * stay under the public RPC's response size cap. Bumping this
+ * higher trips occasional `query returned more than 10000 results`
+ * errors during high-activity windows.
+ */
 const BATCH_SIZE = 1000n;
 
 const RESOLUTION_MODULE_ABI = [
