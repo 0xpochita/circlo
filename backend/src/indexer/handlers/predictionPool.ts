@@ -331,6 +331,20 @@ export async function handleGoalCreated(
   );
 }
 
+/**
+ * Indexer handler for `Staked` events from PredictionPool.
+ *
+ * Each call mirrors a per-stake row into the backend's `Stake`
+ * table. Refreshes the canonical per-side total via on-chain
+ * `stakeOf` read rather than summing event amounts client-side —
+ * cheaper than tracking a running tally and immune to event-replay
+ * double-counting.
+ *
+ * Race tolerance: if `GoalCreated` for the parent goal hasn't been
+ * indexed yet (RPC re-ordering edge case), the handler warns and
+ * returns. The next backfill sweep catches it once the parent row
+ * exists.
+ */
 export async function handleStaked(
   args: {
     goalId: bigint;
