@@ -30,6 +30,17 @@ const CIRCLE_CATEGORIES: CircleCategory[] = [
  */
 const PAGE_SIZE = 20;
 
+/**
+ * Validation schema for `POST /circles`.
+ *
+ * - `chainId` is optional because the API row is created BEFORE the
+ *   on-chain `createCircle` tx confirms — the indexer fills it in
+ *   later via the `CircleCreated` event handler.
+ * - `name`: 3-40 chars. Short floor catches blank submits; the cap
+ *   is what fits in the goal card without truncation.
+ * - `avatarColor`: hex literal, exact format `#rrggbb` (no shorthand,
+ *   no alpha channel) to keep CSS rendering deterministic.
+ */
 const createCircleSchema = z.object({
   chainId: z.number().optional(),
   name: z.string().min(3).max(40),
