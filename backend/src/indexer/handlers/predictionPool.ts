@@ -622,6 +622,15 @@ export async function handleGoalResolved(
   );
 }
 
+/**
+ * Indexer handler for `GoalRefunded` events.
+ *
+ * Marks the goal `disputed` (the on-chain state at this point) and
+ * notifies stakers that refund is available. Refund is per-staker
+ * — the event fires only ONCE per goal (on first call), so the
+ * handler can't assume one event per refund recipient. Notification
+ * goes to every participant so each can come back and refund.
+ */
 export async function handleGoalRefunded(
   args: {
     goalId: bigint;
