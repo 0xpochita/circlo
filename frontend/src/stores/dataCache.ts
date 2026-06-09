@@ -38,6 +38,19 @@ type DataCacheState = {
   invalidate: (key: CacheKey) => void;
 };
 
+/**
+ * Cross-component data cache with stale-while-revalidate semantics.
+ *
+ * Consumer pattern:
+ *   1. Render cached value immediately (no skeleton).
+ *   2. Call `isStale(key)` — if stale, kick off a background refetch.
+ *   3. On refetch success, `set*` updates the cache and re-triggers
+ *      subscribers (Zustand's referential equality).
+ *
+ * Use `invalidate(key)` after a mutation (created circle, claimed
+ * reward) to force the next read through. Reset on logout (clears
+ * authStore) via `useUserStore.reset()` → `useDataCache.reset()`.
+ */
 export const useDataCache = create<DataCacheState>((set, get) => ({
   myCircles: [],
   myCirclesAt: 0,
