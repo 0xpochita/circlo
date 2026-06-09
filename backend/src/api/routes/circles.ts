@@ -7,6 +7,13 @@ import { redis } from "../../lib/redis.js";
 import { requireAuth } from "../middlewares/auth.js";
 import type { CircleCategory } from "../../types/index.js";
 
+/**
+ * Canonical category list shown in the create-circle form.
+ *
+ * Mirrored in `/api/v1/config` so the frontend can render the same
+ * options without a separate endpoint. Adding a category here means
+ * adding it to the Zod enum below AND to the system config response.
+ */
 const CIRCLE_CATEGORIES: CircleCategory[] = [
   "general",
   "crypto",
@@ -16,6 +23,11 @@ const CIRCLE_CATEGORIES: CircleCategory[] = [
   "other",
 ];
 
+/**
+ * Page size for paginated circle list endpoints. 20 balances payload
+ * size against pagination chatter — large enough that most users
+ * see all their circles in one round-trip.
+ */
 const PAGE_SIZE = 20;
 
 const createCircleSchema = z.object({
