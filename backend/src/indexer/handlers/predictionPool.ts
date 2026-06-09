@@ -688,6 +688,18 @@ export async function handleGoalRefunded(
   console.log(`[PredictionPool] GoalRefunded: goalId=${goal.id}`);
 }
 
+/**
+ * Indexer handler for `Claimed` events from PredictionPool.
+ *
+ * Records the claim transaction in `Stake.claimed_at` so the UI can
+ * stop showing the "claim available" CTA on that stake. `amount` is
+ * the post-fee payout — pair with `Stake.amount` if you need the
+ * implied protocol-fee delta.
+ *
+ * No user notification here — the user just got USDT delivered, the
+ * wallet activity surface is the more reliable signal. Updating the
+ * Stake row is enough for the in-app history view.
+ */
 export async function handleClaimed(args: {
   goalId: bigint;
   user: string;
