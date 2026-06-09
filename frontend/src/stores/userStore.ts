@@ -18,6 +18,17 @@ const initialState = {
   avatar: { emoji: "🚀", color: "#ec4899" } as UserAvatar,
 };
 
+/**
+ * Persistent user profile Zustand store.
+ *
+ * Holds display name, username, and avatar — mirroring the backend
+ * `User` row. Persisted to localStorage under `circlo-user` so the
+ * UI can render the profile chrome immediately on cold load before
+ * `useAuth.login` finishes hydrating from the API.
+ *
+ * `reset()` clears back to default placeholders ("Player", 🚀
+ * avatar) — fired on logout / wallet swap.
+ */
 export const useUserStore = create<UserState>()(
   persist(
     (set) => ({
