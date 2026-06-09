@@ -58,6 +58,14 @@ const joinCircleSchema = z.object({
   inviteCode: z.string().optional(),
 });
 
+/**
+ * Validation schema for `POST /circles/:id/invite`.
+ *
+ * Accepts a batch of 1-50 usernames per call. The upper bound
+ * matches what fits cleanly in a single MiniPay notification fan-out
+ * — splitting a 100-person invite into two server requests is
+ * cheaper than one timeout.
+ */
 const inviteSchema = z.object({
   usernames: z.array(z.string().min(3).max(20)).min(1).max(50),
 });
