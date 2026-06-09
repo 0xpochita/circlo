@@ -51,6 +51,18 @@ const confirmGoalSchema = z.object({
   txHash: z.string().regex(/^0x[a-fA-F0-9]{64}$/),
 });
 
+/**
+ * Map a Prisma `Goal` row to the public JSON envelope returned by
+ * every goal-shaped endpoint.
+ *
+ * Notes:
+ *   - `chainId` is stringified because JS numbers can't represent
+ *     uint256s safely. Frontend treats it as a bigint string.
+ *   - `minStake` keeps its decimal string form (USDT precision); we
+ *     never convert to a float on the way out.
+ *   - `winning_side` is `null` until `PaidOut`. UI shows the
+ *     resolver-pending banner while null.
+ */
 function serializeGoal(goal: {
   id: string;
   chain_id: bigint | null;
