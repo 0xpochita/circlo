@@ -479,6 +479,14 @@ export async function handleVoteSubmitted(args: {
   );
 }
 
+/**
+ * Indexer handler for `GoalLocked` events.
+ *
+ * Flips the backend mirror to `locked` and notifies every staker
+ * that the resolution vote window is open. Stakers don't *do*
+ * anything with this signal directly (they wait for `GoalResolved`),
+ * but the notification keeps the per-goal timeline visible in the UI.
+ */
 export async function handleGoalLocked(
   args: {
     goalId: bigint;
