@@ -72,7 +72,5 @@ export async function processReferrals(data: ProcessReferralJobData): Promise<vo
     JSON.stringify(notification)
   );
 
-  console.log(
-    `[processReferrals] Verified referral ${referral.id} for user ${userId}`
-  );
+  process.stdout.write(`[processReferrals] verified referral ${referral.id} for user ${userId}\n`);
 }
