@@ -33,7 +33,7 @@ export async function lockExpiredGoals(): Promise<void> {
 
   if (expiredGoals.length === 0) return;
 
-  console.log(`[lockExpiredGoals] Locking ${expiredGoals.length} expired goal(s)`);
+  process.stdout.write(`[lockExpiredGoals] locking ${expiredGoals.length} expired goal(s)\n`);
 
   for (const goal of expiredGoals) {
     await prisma.goal.update({
@@ -74,6 +74,6 @@ export async function lockExpiredGoals(): Promise<void> {
       );
     }
 
-    console.log(`[lockExpiredGoals] Locked goal ${goal.id}`);
+    process.stdout.write(`[lockExpiredGoals] locked goal ${goal.id}\n`);
   }
 }
