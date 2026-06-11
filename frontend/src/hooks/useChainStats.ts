@@ -4,6 +4,9 @@ import { createCircloClient } from "circlo-sdk";
 import { useEffect, useMemo, useState } from "react";
 import { usePublicClient } from "wagmi";
 
+const BIGINT_ZERO = BigInt(0);
+const BIGINT_ONE = BigInt(1);
+
 /**
  * Reads the total count of circles + goals straight from the on-chain
  * `nextCircleId` / `nextGoalId` counters. Useful for landing-page
@@ -32,12 +35,8 @@ export function useChainStats() {
     Promise.all([circlo.getCircleNextId(), circlo.getGoalNextId()])
       .then(([nextCircle, nextGoal]) => {
         if (cancelled) return;
-        // nextId is one past the last assigned — subtract to get the count.
-        // Guard against the cold-start case where nextId is 0.
-        const ZERO = BigInt(0);
-        const ONE = BigInt(1);
-        const circles = nextCircle > ZERO ? nextCircle - ONE : ZERO;
-        const goals = nextGoal > ZERO ? nextGoal - ONE : ZERO;
+        const circles = nextCircle > BIGINT_ZERO ? nextCircle - BIGINT_ONE : BIGINT_ZERO;
+        const goals = nextGoal > BIGINT_ZERO ? nextGoal - BIGINT_ONE : BIGINT_ZERO;
         setData({ circles, goals });
       })
       .catch((e: unknown) => {
