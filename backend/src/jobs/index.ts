@@ -83,19 +83,19 @@ export function startWorkers() {
   );
 
   goalWorker.on("completed", (job) => {
-    console.log(`[Jobs] ✓ ${job.name} #${job.id}`);
+    process.stdout.write(`[Jobs] done ${job.name} #${job.id}\n`);
   });
 
   goalWorker.on("failed", (job, err) => {
-    console.error(`[Jobs] ✗ ${job?.name} #${job?.id}:`, err.message);
+    process.stderr.write(`[Jobs] fail ${job?.name} #${job?.id}: ${err.message}\n`);
   });
 
   cronWorker.on("completed", (job) => {
-    console.log(`[Cron] ✓ ${job.name}`);
+    process.stdout.write(`[Cron] done ${job.name}\n`);
   });
 
   cronWorker.on("failed", (job, err) => {
-    console.error(`[Cron] ✗ ${job?.name}:`, err.message);
+    process.stderr.write(`[Cron] fail ${job?.name}: ${err.message}\n`);
   });
 
   return { goalWorker, cronWorker };
@@ -128,18 +128,18 @@ export async function scheduleCronJobs() {
     { name: "detectDisputes", data: {} }
   );
 
-  console.log("[Jobs] Cron schedulers upserted: lockExpiredGoals (1m), detectDisputes (5m)");
+  process.stdout.write("[Jobs] cron schedulers upserted: lockExpiredGoals (1m), detectDisputes (5m)\n");
 }
 
 const argv1 = (process.argv[1] ?? "").replace(/\\/g, "/");
 if (argv1.includes("/jobs/index")) {
-  console.log("[Jobs] Starting workers...");
+  process.stdout.write("[Jobs] starting workers\n");
 
   startWorkers();
   scheduleCronJobs()
-    .then(() => console.log("[Jobs] Workers running"))
+    .then(() => process.stdout.write("[Jobs] workers running\n"))
     .catch((err) => {
-      console.error("[Jobs] Fatal:", err);
+      process.stderr.write(`[Jobs] fatal: ${err}\n`);
       process.exit(1);
     });
 }
