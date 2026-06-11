@@ -487,7 +487,6 @@ export default function StakeButton({
       }, 1500);
       timeoutRefs.current.push(t1);
     } catch (err) {
-      console.error("[Stake] Full error:", err);
       const errObj = err as {
         shortMessage?: string;
         message?: string;
@@ -495,10 +494,7 @@ export default function StakeButton({
         code?: number | string;
         cause?: { shortMessage?: string; message?: string };
       };
-      console.error("[Stake] Error name:", errObj?.name);
-      console.error("[Stake] Error cause:", errObj?.cause);
-      console.error("[Stake] Error code:", errObj?.code);
-      console.error("[Stake] Error shortMessage:", errObj?.shortMessage);
+      console.error("[Stake]", errObj?.name, errObj?.code, errObj?.shortMessage);
       const shortMsg =
         errObj?.shortMessage ||
         errObj?.cause?.shortMessage ||
@@ -590,16 +586,8 @@ export default function StakeButton({
         timeoutRefs.current.push(t);
       }
     } catch (err) {
-      console.error("[SubmitVote] Full error:", err);
-      const errObj = err as {
-        name?: string;
-        code?: number | string;
-        cause?: unknown;
-        message?: string;
-      };
-      console.error("[SubmitVote] Error name:", errObj?.name);
-      console.error("[SubmitVote] Error cause:", errObj?.cause);
-      console.error("[SubmitVote] Error code:", errObj?.code);
+      const errObj = err as { name?: string; code?: number | string; message?: string };
+      console.error("[SubmitVote]", errObj?.name, errObj?.code);
       const msg = err instanceof Error ? err.message : "";
       if (msg.includes("User rejected") || msg.includes("denied")) {
         toast("Transaction cancelled");
@@ -652,16 +640,8 @@ export default function StakeButton({
         timeoutRefs.current.push(t);
       }
     } catch (err) {
-      console.error("[Claim] Full error:", err);
-      const errObj = err as {
-        name?: string;
-        code?: number | string;
-        cause?: unknown;
-        message?: string;
-      };
-      console.error("[Claim] Error name:", errObj?.name);
-      console.error("[Claim] Error cause:", errObj?.cause);
-      console.error("[Claim] Error code:", errObj?.code);
+      const errObj = err as { name?: string; code?: number | string; message?: string };
+      console.error("[Claim]", errObj?.name, errObj?.code);
       const msg = err instanceof Error ? err.message : "";
       if (msg.includes("User rejected") || msg.includes("denied")) {
         toast("Transaction cancelled");
