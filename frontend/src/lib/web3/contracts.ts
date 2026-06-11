@@ -58,14 +58,9 @@ export const resolutionModuleContract = {
 } as const;
 
 /**
- * Pre-bundled `{ address, abi }` for the **MockUSDT** contract.
- *
- * Despite the name, on Mainnet this resolves to the **real** Celo USDT
- * (Tether, 6 decimals) at the address configured in {@link NETWORK}.
- * The `Mock` name is a holdover from Sepolia testnet where we deploy
- * an OZ ERC20 stand-in. The minimal ABI exposes `balanceOf`,
- * `transfer`, `approve`, and `allowance` — enough for the stake
- * approve flow and `useUSDTBalance` reads.
+ * Pre-bundled `{ address, abi }` for the USDT contract (Celo USDT /
+ * Tether, 6 decimals). On testnet this is a MockERC20 stand-in; on
+ * mainnet it resolves to the real token at {@link NETWORK}.contracts.usdt.
  */
 export const usdtContract = {
   address: NETWORK.contracts.usdt,
