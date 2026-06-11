@@ -65,7 +65,8 @@ export async function buildServer() {
   await app.register(fastifyRateLimit, {
     max: 100,
     timeWindow: "1 minute",
-    redis: redis as any,
+    // @ts-expect-error ioredis is compatible but @fastify/rate-limit types expect RedisClient
+    redis,
     keyGenerator: (req) =>
       req.headers["x-forwarded-for"]?.toString() ?? req.ip,
     errorResponseBuilder: (_req, context) => ({
