@@ -58,7 +58,7 @@ function getOrCreateSubscriber(userId: string): Redis {
   });
 
   sub.subscribe(`notifications:${userId}`, (err) => {
-    if (err) console.error(`[WS] Failed to subscribe for user ${userId}:`, err);
+    if (err) process.stderr.write(`[WS] subscribe fail ${userId}: ${err.message}\n`);
   });
 
   sub.on("message", (_channel: string, message: string) => {
@@ -137,7 +137,7 @@ export function registerWsGateway(app: FastifyInstance): void {
 
       getOrCreateSubscriber(userId);
 
-      console.log(`[WS] User ${userId} connected (${userSockets.get(userId)?.size} conn)`);
+      app.log.info(`[WS] user ${userId} connected (${userSockets.get(userId)?.size} conn)`);
 
       const pingTimer = setInterval(() => {
         if (ws.readyState === 1) {
@@ -159,11 +159,11 @@ export function registerWsGateway(app: FastifyInstance): void {
       ws.on("close", () => {
         clearInterval(pingTimer);
         removeSocket(userId, ws);
-        console.log(`[WS] User ${userId} disconnected`);
+        app.log.debug(`[WS] user ${userId} disconnected`);
       });
 
       ws.on("error", (err: Error) => {
-        console.error(`[WS] Socket error for user ${userId}:`, err.message);
+        app.log.error(`[WS] socket error for user ${userId}: ${err.message}`);
         clearInterval(pingTimer);
         removeSocket(userId, ws);
       });
