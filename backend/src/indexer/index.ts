@@ -1,4 +1,5 @@
 import "dotenv/config";
+import type { PublicClient } from "viem";
 import { prisma } from "../lib/prisma.js";
 import { config } from "../config.js";
 import { createIndexerClient } from "./client.js";
@@ -86,7 +87,7 @@ async function setLastBlock(contract: string, block: bigint): Promise<void> {
  * backfill — losing one event to a Prisma constraint shouldn't
  * stall the indexer for hours.
  */
-async function backfillCircleFactory(client: any, fromBlock: bigint, toBlock: bigint): Promise<void> {
+async function backfillCircleFactory(client: PublicClient, fromBlock: bigint, toBlock: bigint): Promise<void> {
   let current = fromBlock;
   while (current <= toBlock) {
     const end = current + BATCH_SIZE - 1n < toBlock ? current + BATCH_SIZE - 1n : toBlock;
@@ -129,7 +130,7 @@ async function backfillCircleFactory(client: any, fromBlock: bigint, toBlock: bi
  * Same per-batch resume + crash-tolerant error handling as the
  * CircleFactory backfill.
  */
-async function backfillResolutionModule(client: any, fromBlock: bigint, toBlock: bigint): Promise<void> {
+async function backfillResolutionModule(client: PublicClient, fromBlock: bigint, toBlock: bigint): Promise<void> {
   let current = fromBlock;
   while (current <= toBlock) {
     const end = current + BATCH_SIZE - 1n < toBlock ? current + BATCH_SIZE - 1n : toBlock;
@@ -167,7 +168,7 @@ async function backfillResolutionModule(client: any, fromBlock: bigint, toBlock:
  * (a `Staked` after `GoalCreated` should never see a missing parent
  * goal row).
  */
-async function backfillPredictionPool(client: any, fromBlock: bigint, toBlock: bigint): Promise<void> {
+async function backfillPredictionPool(client: PublicClient, fromBlock: bigint, toBlock: bigint): Promise<void> {
   let current = fromBlock;
   while (current <= toBlock) {
     const end = current + BATCH_SIZE - 1n < toBlock ? current + BATCH_SIZE - 1n : toBlock;
@@ -208,7 +209,7 @@ async function backfillPredictionPool(client: any, fromBlock: bigint, toBlock: b
 
 const REALTIME_POLL_MS = 6_000;
 
-async function pollOnce(client: any): Promise<void> {
+async function pollOnce(client: PublicClient): Promise<void> {
   let latest: bigint;
   try {
     latest = await client.getBlockNumber();
@@ -242,7 +243,7 @@ async function pollOnce(client: any): Promise<void> {
   ]);
 }
 
-function startRealtimePolling(client: any): void {
+function startRealtimePolling(client: PublicClient): void {
   console.log(`[Indexer] Realtime polling every ${REALTIME_POLL_MS}ms`);
   let running = false;
   setInterval(async () => {
