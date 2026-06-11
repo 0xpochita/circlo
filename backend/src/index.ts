@@ -27,27 +27,27 @@ import { startIndexer } from "./indexer/index.js";
  * cursor's at-least-once delivery covers that.
  */
 async function main() {
-  console.log(`[Server] Starting Circlo backend (${config.nodeEnv})...`);
+  process.stdout.write(`[Server] starting Circlo backend (${config.nodeEnv})\n`);
 
   await prisma.$connect();
-  console.log("[Server] PostgreSQL connected");
+  process.stdout.write("[Server] PostgreSQL connected\n");
 
   await redis.ping();
-  console.log("[Server] Redis connected");
+  process.stdout.write("[Server] Redis connected\n");
 
   startWorkers();
   await scheduleCronJobs();
-  console.log("[Server] Background workers started");
+  process.stdout.write("[Server] background workers started\n");
 
-  startIndexer().catch((err) => console.error("[Indexer] Fatal:", err));
+  startIndexer().catch((err) => process.stderr.write(`[Indexer] fatal: ${err}\n`));
 
   const app = await buildServer();
 
   await app.listen({ port: config.port, host: "0.0.0.0" });
-  console.log(`[Server] Listening on http://0.0.0.0:${config.port}`);
+  process.stdout.write(`[Server] listening on http://0.0.0.0:${config.port}\n`);
 
   const shutdown = async (signal: string) => {
-    console.log(`[Server] ${signal} received — shutting down...`);
+    process.stdout.write(`[Server] ${signal} received — shutting down\n`);
     await app.close();
     await prisma.$disconnect();
     await redis.quit();
@@ -59,6 +59,6 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error("[Server] Fatal error:", err);
+  process.stderr.write(`[Server] fatal: ${err}\n`);
   process.exit(1);
 });
