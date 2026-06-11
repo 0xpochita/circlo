@@ -91,7 +91,7 @@ async function backfillCircleFactory(client: PublicClient, fromBlock: bigint, to
   let current = fromBlock;
   while (current <= toBlock) {
     const end = current + BATCH_SIZE - 1n < toBlock ? current + BATCH_SIZE - 1n : toBlock;
-    console.log(`[CircleFactory Backfill] Fetching logs ${current}–${end}`);
+    process.stdout.write(`[CircleFactory] backfill ${current}–${end}\n`);
 
     const logs: any[] = await client.getLogs({
       address: CIRCLE_FACTORY,
@@ -110,7 +110,7 @@ async function backfillCircleFactory(client: PublicClient, fromBlock: bigint, to
           await handleCircleLeft(log.args as { id: bigint; member: string });
         }
       } catch (err) {
-        console.error("[CircleFactory Backfill] Handler error:", err);
+        process.stderr.write(`[CircleFactory] handler error: ${err}\n`);
       }
     }
 
@@ -134,7 +134,7 @@ async function backfillResolutionModule(client: PublicClient, fromBlock: bigint,
   let current = fromBlock;
   while (current <= toBlock) {
     const end = current + BATCH_SIZE - 1n < toBlock ? current + BATCH_SIZE - 1n : toBlock;
-    console.log(`[ResolutionModule Backfill] Fetching logs ${current}–${end}`);
+    process.stdout.write(`[ResolutionModule] backfill ${current}–${end}\n`);
 
     const logs: any[] = await client.getLogs({
       address: RESOLUTION_MODULE,
@@ -149,7 +149,7 @@ async function backfillResolutionModule(client: PublicClient, fromBlock: bigint,
           await handleVoteSubmitted(log.args as { goalId: bigint; resolver: string; choice: number });
         }
       } catch (err) {
-        console.error("[ResolutionModule Backfill] Handler error:", err);
+        process.stderr.write(`[ResolutionModule] handler error: ${err}\n`);
       }
     }
 
@@ -172,7 +172,7 @@ async function backfillPredictionPool(client: PublicClient, fromBlock: bigint, t
   let current = fromBlock;
   while (current <= toBlock) {
     const end = current + BATCH_SIZE - 1n < toBlock ? current + BATCH_SIZE - 1n : toBlock;
-    console.log(`[PredictionPool Backfill] Fetching logs ${current}–${end}`);
+    process.stdout.write(`[PredictionPool] backfill ${current}–${end}\n`);
 
     const logs: any[] = await client.getLogs({
       address: PREDICTION_POOL,
@@ -198,7 +198,7 @@ async function backfillPredictionPool(client: PublicClient, fromBlock: bigint, t
           await handleClaimed(log.args as { goalId: bigint; user: string; amount: bigint });
         }
       } catch (err) {
-        console.error("[PredictionPool Backfill] Handler error:", err);
+        process.stderr.write(`[PredictionPool] handler error: ${err}\n`);
       }
     }
 
@@ -214,7 +214,7 @@ async function pollOnce(client: PublicClient): Promise<void> {
   try {
     latest = await client.getBlockNumber();
   } catch (err) {
-    console.error("[Indexer] getBlockNumber error:", (err as Error).message);
+    process.stderr.write(`[Indexer] getBlockNumber error: ${(err as Error).message}\n`);
     return;
   }
 
@@ -227,24 +227,24 @@ async function pollOnce(client: PublicClient): Promise<void> {
   await Promise.all([
     cf < latest
       ? backfillCircleFactory(client, cf + 1n, latest).catch((err) =>
-          console.error("[CircleFactory] poll error:", (err as Error).message),
+          process.stderr.write(`[CircleFactory] poll error: ${(err as Error).message}\n`),
         )
       : Promise.resolve(),
     pp < latest
       ? backfillPredictionPool(client, pp + 1n, latest).catch((err) =>
-          console.error("[PredictionPool] poll error:", (err as Error).message),
+          process.stderr.write(`[PredictionPool] poll error: ${(err as Error).message}\n`),
         )
       : Promise.resolve(),
     rm < latest
       ? backfillResolutionModule(client, rm + 1n, latest).catch((err) =>
-          console.error("[ResolutionModule] poll error:", (err as Error).message),
+          process.stderr.write(`[ResolutionModule] poll error: ${(err as Error).message}\n`),
         )
       : Promise.resolve(),
   ]);
 }
 
 function startRealtimePolling(client: PublicClient): void {
-  console.log(`[Indexer] Realtime polling every ${REALTIME_POLL_MS}ms`);
+  process.stdout.write(`[Indexer] realtime polling every ${REALTIME_POLL_MS}ms\n`);
   let running = false;
   setInterval(async () => {
     if (running) return; // skip overlap
@@ -258,13 +258,13 @@ function startRealtimePolling(client: PublicClient): void {
 }
 
 export async function startIndexer() {
-  console.log("[Indexer] Starting...");
+  process.stdout.write("[Indexer] starting\n");
 
   const indexerClient = createIndexerClient(false);
   const httpClient = indexerClient.getClient();
 
   const currentBlock: bigint = await httpClient.getBlockNumber();
-  console.log(`[Indexer] Current block: ${currentBlock}`);
+  process.stdout.write(`[Indexer] current block: ${currentBlock}\n`);
 
   const [cfLastBlock, ppLastBlock, rmLastBlock] = await Promise.all([
     getLastBlock(CIRCLE_FACTORY),
@@ -276,15 +276,15 @@ export async function startIndexer() {
   // Handlers are idempotent so overlap is safe.
   const backfills: Promise<void>[] = [];
   if (cfLastBlock < currentBlock) {
-    console.log(`[Indexer] Backfilling CircleFactory from ${cfLastBlock} to ${currentBlock}`);
+    process.stdout.write(`[Indexer] backfilling CircleFactory ${cfLastBlock}→${currentBlock}\n`);
     backfills.push(backfillCircleFactory(httpClient, cfLastBlock, currentBlock));
   }
   if (ppLastBlock < currentBlock) {
-    console.log(`[Indexer] Backfilling PredictionPool from ${ppLastBlock} to ${currentBlock}`);
+    process.stdout.write(`[Indexer] backfilling PredictionPool ${ppLastBlock}→${currentBlock}\n`);
     backfills.push(backfillPredictionPool(httpClient, ppLastBlock, currentBlock));
   }
   if (rmLastBlock < currentBlock) {
-    console.log(`[Indexer] Backfilling ResolutionModule from ${rmLastBlock} to ${currentBlock}`);
+    process.stdout.write(`[Indexer] backfilling ResolutionModule ${rmLastBlock}→${currentBlock}\n`);
     backfills.push(backfillResolutionModule(httpClient, rmLastBlock, currentBlock));
   }
 
@@ -292,19 +292,19 @@ export async function startIndexer() {
   // would duplicate work since both call getLogs over the same range.
   Promise.all(backfills)
     .then(() => {
-      console.log("[Indexer] All backfills completed");
+      process.stdout.write("[Indexer] all backfills completed\n");
       startRealtimePolling(httpClient);
     })
     .catch((err) => {
-      console.error("[Indexer] Backfill error:", err);
+      process.stderr.write(`[Indexer] backfill error: ${err}\n`);
       // Still start realtime polling so we don't get stuck on backfill failure.
       startRealtimePolling(httpClient);
     });
 
-  console.log("[Indexer] Running. Press Ctrl+C to stop.");
+  process.stdout.write("[Indexer] running\n");
 
   process.on("SIGINT", () => {
-    console.log("[Indexer] Shutting down...");
+    process.stdout.write("[Indexer] shutting down\n");
     indexerClient.destroy();
     process.exit(0);
   });
@@ -318,7 +318,7 @@ export async function startIndexer() {
 const argv1 = (process.argv[1] ?? "").replace(/\\/g, "/");
 if (argv1.includes("/indexer/index")) {
   startIndexer().catch((err) => {
-    console.error("[Indexer] Fatal error:", err);
+    process.stderr.write(`[Indexer] fatal: ${err}\n`);
     process.exit(1);
   });
 }
