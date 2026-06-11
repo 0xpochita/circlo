@@ -244,15 +244,13 @@ export default function ConfirmButton() {
         });
         updateStep(stepIdx, "done");
       } catch (err) {
-        console.error("[createGoal] Full error:", err);
         const errObj = err as {
           name?: string;
           code?: number | string;
           cause?: unknown;
+          message?: string;
         };
-        console.error("[createGoal] Error name:", errObj?.name);
-        console.error("[createGoal] Error code:", errObj?.code);
-        console.error("[createGoal] Error cause:", errObj?.cause);
+        console.error("[createGoal]", errObj?.name, errObj?.code, errObj?.message);
         updateStep(stepIdx, "error");
         const message = err instanceof Error ? err.message : "";
         if (message.includes("User rejected") || message.includes("denied")) {
