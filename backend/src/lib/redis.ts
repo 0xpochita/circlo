@@ -46,15 +46,15 @@ export function getRedis(): Redis {
     });
 
     redisInstance.on("connect", () => {
-      console.log("[Redis] Connected");
+      process.stdout.write("[Redis] connected\n");
     });
 
     redisInstance.on("error", (err) => {
-      console.error("[Redis] Error:", err.message);
+      process.stderr.write(`[Redis] error: ${err.message}\n`);
     });
 
     redisInstance.on("reconnecting", () => {
-      console.log("[Redis] Reconnecting...");
+      process.stdout.write("[Redis] reconnecting\n");
     });
   }
 
@@ -82,11 +82,11 @@ export function getSubscriber(): Redis {
     });
 
     subscriberInstance.on("connect", () => {
-      console.log("[Redis:Sub] Connected");
+      process.stdout.write("[Redis:Sub] connected\n");
     });
 
     subscriberInstance.on("error", (err) => {
-      console.error("[Redis:Sub] Error:", err.message);
+      process.stderr.write(`[Redis:Sub] error: ${err.message}\n`);
     });
   }
 
