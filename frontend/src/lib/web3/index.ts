@@ -1,7 +1,7 @@
 export { activeChain, celoSepolia, config } from "./config";
 export {
   circleFactoryContract,
-  mockUSDTContract,
+  usdtContract,
   predictionPoolContract,
   resolutionModuleContract,
 } from "./contracts";

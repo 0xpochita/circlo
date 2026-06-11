@@ -19,7 +19,7 @@ import {
 import { DepositSheet, WithdrawSheet } from "@/components/pages/(profile)";
 import { UsdtLabel } from "@/components/shared";
 import { useSheetOverflow } from "@/hooks";
-import { mockUSDTContract } from "@/lib/web3/contracts";
+import { usdtContract } from "@/lib/web3/contracts";
 import { IS_MAINNET } from "@/lib/web3/network";
 import { fromUSDT } from "@/lib/web3/usdt";
 
@@ -41,7 +41,7 @@ export default function BalanceCard() {
     isLoading,
     refetch,
   } = useReadContract({
-    ...mockUSDTContract,
+    ...usdtContract,
     functionName: "balanceOf",
     args: address ? [address] : undefined,
     query: { enabled: !!address },
@@ -57,8 +57,8 @@ export default function BalanceCard() {
     setIsFauceting(true);
     try {
       const txHash = await writeContractAsync({
-        address: mockUSDTContract.address,
-        abi: mockUSDTContract.abi,
+        address: usdtContract.address,
+        abi: usdtContract.abi,
         functionName: "faucet",
         args: [],
         gas: BigInt(200_000),

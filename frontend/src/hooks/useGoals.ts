@@ -4,7 +4,7 @@ import { useCallback, useState } from "react";
 import { useAccount } from "wagmi";
 import { goalsApi } from "@/lib/api/endpoints";
 import {
-  mockUSDTContract,
+  usdtContract,
   predictionPoolContract,
   resolutionModuleContract,
 } from "@/lib/web3/contracts";
@@ -128,8 +128,8 @@ export function useStake() {
       if (currentAllowance < amountBigInt) {
         setStep("approving");
         writeApprove({
-          address: mockUSDTContract.address,
-          abi: mockUSDTContract.abi,
+          address: usdtContract.address,
+          abi: usdtContract.abi,
           functionName: "approve",
           args: [predictionPoolContract.address, amountBigInt],
         });

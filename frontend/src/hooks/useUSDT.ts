@@ -2,7 +2,7 @@
 
 import type { Address } from "viem";
 import { useReadContract } from "wagmi";
-import { mockUSDTContract, predictionPoolContract } from "@/lib/web3/contracts";
+import { usdtContract, predictionPoolContract } from "@/lib/web3/contracts";
 import { fromUSDT } from "@/lib/web3/usdt";
 import { useContract } from "./useContract";
 
@@ -26,7 +26,7 @@ import { useContract } from "./useContract";
  */
 export function useUSDTBalance(address: Address | undefined) {
   const { data, isLoading, refetch } = useReadContract({
-    ...mockUSDTContract,
+    ...usdtContract,
     functionName: "balanceOf",
     args: address ? [address] : undefined,
     query: { enabled: !!address },
@@ -60,7 +60,7 @@ export function useUSDTAllowance(
   spender: Address | undefined,
 ) {
   const { data, isLoading, refetch } = useReadContract({
-    ...mockUSDTContract,
+    ...usdtContract,
     functionName: "allowance",
     args: owner && spender ? [owner, spender] : undefined,
     query: { enabled: !!owner && !!spender },
@@ -89,8 +89,8 @@ export function useApproveUSDT() {
 
   function approve(amount: bigint) {
     write({
-      address: mockUSDTContract.address,
-      abi: mockUSDTContract.abi,
+      address: usdtContract.address,
+      abi: usdtContract.abi,
       functionName: "approve",
       args: [predictionPoolContract.address, amount],
     });
@@ -114,8 +114,8 @@ export function useFaucet() {
 
   function faucet() {
     write({
-      address: mockUSDTContract.address,
-      abi: mockUSDTContract.abi,
+      address: usdtContract.address,
+      abi: usdtContract.abi,
       functionName: "faucet",
       args: [],
     });

@@ -67,7 +67,7 @@ export const resolutionModuleContract = {
  * `transfer`, `approve`, and `allowance` — enough for the stake
  * approve flow and `useUSDTBalance` reads.
  */
-export const mockUSDTContract = {
+export const usdtContract = {
   address: NETWORK.contracts.usdt,
   abi: extractAbi(MockUSDTJSON),
 } as const;

@@ -12,7 +12,7 @@ import { circlesApi, goalsApi } from "@/lib/api/endpoints";
 import { normalizeSide } from "@/lib/utils";
 import {
   circleFactoryContract,
-  mockUSDTContract,
+  usdtContract,
   predictionPoolContract,
   resolutionModuleContract,
 } from "@/lib/web3/contracts";
@@ -426,8 +426,8 @@ export default function StakeButton({
 
       const usdtAmount = toUSDT(parsed);
       const approveTx = await writeContractAsync({
-        address: mockUSDTContract.address,
-        abi: mockUSDTContract.abi,
+        address: usdtContract.address,
+        abi: usdtContract.abi,
         functionName: "approve",
         args: [predictionPoolContract.address, usdtAmount],
         chainId: NETWORK.id,
