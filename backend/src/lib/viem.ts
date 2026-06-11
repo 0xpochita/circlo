@@ -1,4 +1,4 @@
-import { createPublicClient, http } from "viem";
+import { createPublicClient, http, type PublicClient } from "viem";
 import { celo, celoSepolia } from "viem/chains";
 import { config } from "../config.js";
 
@@ -7,24 +7,22 @@ import { config } from "../config.js";
  *
  * Used by the indexer and read-only API routes that need to peek at
  * on-chain state (e.g. resolving the canonical winning side for a
- * goal). The cast to `any` sidesteps viem's union-type explosion on
- * `chain.id`; we know exactly which chain we're talking to.
+ * goal).
  */
-export const celoClient = createPublicClient({
+export const celoClient: PublicClient = createPublicClient({
   chain: celo,
   transport: http(config.celoRpcUrl),
-}) as any;
+});
 
 /**
  * Singleton viem PublicClient pointed at Celo Sepolia (testnet).
  * Useful for staging deployments that talk to a parallel set of
- * Circlo contracts during dev. Same `any` cast rationale as
- * `celoClient`.
+ * Circlo contracts during dev.
  */
-export const celoSepoliaClient = createPublicClient({
+export const celoSepoliaClient: PublicClient = createPublicClient({
   chain: celoSepolia,
   transport: http(config.celoRpcUrlTestnet),
-}) as any;
+});
 
 /**
  * Pick the right PublicClient for a chain id.
@@ -34,7 +32,7 @@ export const celoSepoliaClient = createPublicClient({
  * here AND defining the matching `_RpcUrl*` / `_ChainId*` config
  * keys.
  */
-export function getPublicClient(chainId?: number): any {
+export function getPublicClient(chainId?: number): PublicClient {
   if (chainId === config.celoChainIdTestnet) return celoSepoliaClient;
   return celoClient;
 }
