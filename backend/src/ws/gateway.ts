@@ -1,5 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import type { SocketStream } from "@fastify/websocket";
+import type WebSocket from "ws";
 import Redis from "ioredis";
 import { config } from "../config.js";
 import { parseRedisUrl } from "../lib/redis.js";
@@ -10,7 +11,7 @@ import type { JwtPayload } from "../types/index.js";
  * connections. A user can be online from multiple devices; every
  * notification gets pushed to all of them.
  */
-const userSockets = new Map<string, Set<any>>();
+const userSockets = new Map<string, Set<WebSocket>>();
 
 /**
  * Per-user Redis subscriber registry: maps `userId` → an ioredis
@@ -86,7 +87,7 @@ function getOrCreateSubscriber(userId: string): Redis {
  * are not free, and bouncing a single device shouldn't reset the
  * subscription for all of the user's other sessions.
  */
-function removeSocket(userId: string, ws: any): void {
+function removeSocket(userId: string, ws: WebSocket): void {
   const sockets = userSockets.get(userId);
   if (!sockets) return;
 
