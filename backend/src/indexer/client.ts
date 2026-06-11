@@ -1,11 +1,9 @@
-import { createPublicClient, http } from "viem";
+import { createPublicClient, http, type PublicClient } from "viem";
 import { celo, celoSepolia } from "viem/chains";
 import { config } from "../config.js";
 
-export type AnyPublicClient = any;
-
 export interface IndexerClient {
-  getClient: () => AnyPublicClient;
+  getClient: () => PublicClient;
   onReconnect: (cb: () => Promise<void>) => void;
   triggerReconnect: (delayMs?: number) => void;
   destroy: () => void;
