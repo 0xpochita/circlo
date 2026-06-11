@@ -1,5 +1,5 @@
 import "dotenv/config";
-import type { PublicClient } from "viem";
+import type { Log, PublicClient } from "viem";
 import { prisma } from "../lib/prisma.js";
 import { config } from "../config.js";
 import { createIndexerClient } from "./client.js";
@@ -93,7 +93,7 @@ async function backfillCircleFactory(client: PublicClient, fromBlock: bigint, to
     const end = current + BATCH_SIZE - 1n < toBlock ? current + BATCH_SIZE - 1n : toBlock;
     process.stdout.write(`[CircleFactory] backfill ${current}–${end}\n`);
 
-    const logs: any[] = await client.getLogs({
+    const logs = await client.getLogs({
       address: CIRCLE_FACTORY,
       events: CIRCLE_FACTORY_ABI,
       fromBlock: current,
@@ -136,7 +136,7 @@ async function backfillResolutionModule(client: PublicClient, fromBlock: bigint,
     const end = current + BATCH_SIZE - 1n < toBlock ? current + BATCH_SIZE - 1n : toBlock;
     process.stdout.write(`[ResolutionModule] backfill ${current}–${end}\n`);
 
-    const logs: any[] = await client.getLogs({
+    const logs = await client.getLogs({
       address: RESOLUTION_MODULE,
       events: RESOLUTION_MODULE_ABI,
       fromBlock: current,
@@ -174,7 +174,7 @@ async function backfillPredictionPool(client: PublicClient, fromBlock: bigint, t
     const end = current + BATCH_SIZE - 1n < toBlock ? current + BATCH_SIZE - 1n : toBlock;
     process.stdout.write(`[PredictionPool] backfill ${current}–${end}\n`);
 
-    const logs: any[] = await client.getLogs({
+    const logs = await client.getLogs({
       address: PREDICTION_POOL,
       events: PREDICTION_POOL_ABI,
       fromBlock: current,
