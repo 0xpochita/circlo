@@ -37,7 +37,7 @@ export async function detectDisputes(): Promise<void> {
 
   if (disputedGoals.length === 0) return;
 
-  console.log(`[detectDisputes] Found ${disputedGoals.length} disputed goal(s)`);
+  process.stdout.write(`[detectDisputes] found ${disputedGoals.length} disputed goal(s)\n`);
 
   for (const goal of disputedGoals) {
     await prisma.goal.update({
@@ -78,6 +78,6 @@ export async function detectDisputes(): Promise<void> {
       );
     }
 
-    console.log(`[detectDisputes] Marked goal ${goal.id} as disputed`);
+    process.stdout.write(`[detectDisputes] marked goal ${goal.id} as disputed\n`);
   }
 }
