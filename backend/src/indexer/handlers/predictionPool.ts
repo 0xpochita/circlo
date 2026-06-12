@@ -100,8 +100,13 @@ async function ensureUser(walletAddress: string) {
  * Unknown values fall through to "numeric" to keep the indexer
  * crash-free during a partial rollout.
  */
+const OUTCOME_TYPE_NAMES: Record<number, string> = {
+  0: "binary",
+  1: "multi",
+};
+
 function outcomeTypeToString(t: number): string {
-  return t === 0 ? "binary" : t === 1 ? "multi" : "numeric";
+  return OUTCOME_TYPE_NAMES[t] ?? "numeric";
 }
 
 /**
