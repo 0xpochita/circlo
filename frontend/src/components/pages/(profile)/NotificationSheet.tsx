@@ -152,7 +152,7 @@ export default function NotificationSheet({
                   {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
                     <div
                       key={i}
-                      className="animate-pulse rounded-2xl bg-gray-100 h-[80px]"
+                      className="animate-pulse rounded-2xl bg-gray-100 h-20"
                     />
                   ))}
                 </div>
