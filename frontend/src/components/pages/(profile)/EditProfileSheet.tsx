@@ -12,6 +12,7 @@ import { useUserStore } from "@/stores/userStore";
 import type { UserAvatar } from "@/types";
 
 const NAME_MAX_LENGTH = 80;
+const USERNAME_MAX_LENGTH = 20;
 
 type EditProfileSheetProps = {
   open: boolean;
@@ -187,7 +188,7 @@ export default function EditProfileSheet({
                         )
                       }
                       placeholder="username"
-                      maxLength={20}
+                      maxLength={USERNAME_MAX_LENGTH}
                       className="flex-1 bg-transparent text-sm text-main-text placeholder:text-muted outline-none"
                     />
                   </div>
