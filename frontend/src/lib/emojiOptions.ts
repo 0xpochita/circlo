@@ -1,4 +1,4 @@
-export const EMOJI_OPTIONS = [
+export const EMOJI_OPTIONS: readonly string[] = [
   "🔗",
   "💰",
   "💳",
@@ -41,7 +41,7 @@ export const EMOJI_OPTIONS = [
   "🏆",
 ];
 
-export const COLOR_OPTIONS = [
+export const COLOR_OPTIONS: readonly string[] = [
   "#1a1a1a",
   "#60a5fa",
   "#a78bfa",
