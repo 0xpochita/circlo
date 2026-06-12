@@ -7,6 +7,8 @@ import { HiOutlineUserGroup, HiXMark } from "react-icons/hi2";
 import { EmojiAvatar } from "@/components/shared";
 import { useMyCircles, useSheetOverflow } from "@/hooks";
 
+const PREVIEW_COUNT = 5;
+
 export default function ActiveCircles() {
   const { circles, isLoading } = useMyCircles();
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -72,7 +74,7 @@ export default function ActiveCircles() {
           </button>
         </div>
         <div className="flex gap-3 overflow-x-auto scrollbar-none pb-1">
-          {circles.slice(0, 5).map((c) => (
+          {circles.slice(0, PREVIEW_COUNT).map((c) => (
             <Link
               key={c.id}
               href={`/circle-details?id=${c.id}`}
