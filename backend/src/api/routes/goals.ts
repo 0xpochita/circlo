@@ -261,10 +261,10 @@ export default async function goalRoutes(app: FastifyInstance) {
     }
   );
 
-  app.get(
+  app.get<{ Querystring: { cursor?: string } }>(
     "/feed",
     async (req, reply) => {
-      const { cursor } = req.query as { cursor?: string };
+      const { cursor } = req.query;
 
       const goals = await prisma.goal.findMany({
         where: {
@@ -291,11 +291,11 @@ export default async function goalRoutes(app: FastifyInstance) {
     }
   );
 
-  app.get(
+  app.get<{ Querystring: { cursor?: string } }>(
     "/mine",
     { preHandler: requireAuth },
     async (req, reply) => {
-      const { cursor } = req.query as { cursor?: string };
+      const { cursor } = req.query;
 
       const [created, participated] = await Promise.all([
         prisma.goal.findMany({
