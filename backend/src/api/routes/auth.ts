@@ -31,6 +31,10 @@ const NONCE_RATE_LIMIT = 10;
 /** Sliding window (seconds) for nonce-rate counting. */
 const NONCE_RATE_WINDOW = 60;
 
+const ACCESS_TOKEN_EXPIRY = "1h";
+const REFRESH_TOKEN_EXPIRY = "30d";
+const REFRESH_COOKIE_MAX_AGE = 30 * 24 * 60 * 60;
+
 const nonceSchema = z.object({
   walletAddress: z
     .string()
@@ -208,12 +212,12 @@ export default async function authRoutes(app: FastifyInstance) {
 
     const accessToken = app.jwt.sign(
       { sub: user.id, wallet: user.wallet_address },
-      { expiresIn: "1h" }
+      { expiresIn: ACCESS_TOKEN_EXPIRY }
     );
 
     const refreshToken = app.jwt.sign(
       { sub: user.id, wallet: user.wallet_address, type: "refresh" },
-      { expiresIn: "30d" }
+      { expiresIn: REFRESH_TOKEN_EXPIRY }
     );
 
     reply.setCookie("refreshToken", refreshToken, {
@@ -221,7 +225,7 @@ export default async function authRoutes(app: FastifyInstance) {
       secure: config.isProduction,
       sameSite: "lax",
       path: "/api/v1/auth",
-      maxAge: 30 * 24 * 60 * 60,
+      maxAge: REFRESH_COOKIE_MAX_AGE,
     });
 
     return reply.send({
