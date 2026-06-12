@@ -107,13 +107,15 @@ export default async function userRoutes(app: FastifyInstance) {
       );
       const pnl = totalClaimed - stakedOnClaimed;
 
+      const STAKE_DECIMALS = 4;
+      const PERCENTAGE_DECIMALS = 2;
       return reply.send({
-        totalStaked: stakedOnClaimed.toFixed(4),
-        totalClaimed: totalClaimed.toFixed(4),
-        pnl: formatWithSign(pnl, 4),
+        totalStaked: stakedOnClaimed.toFixed(STAKE_DECIMALS),
+        totalClaimed: totalClaimed.toFixed(STAKE_DECIMALS),
+        pnl: formatWithSign(pnl, STAKE_DECIMALS),
         pnlPercentage:
           stakedOnClaimed > 0
-            ? formatWithSign((pnl / stakedOnClaimed) * 100, 2)
+            ? formatWithSign((pnl / stakedOnClaimed) * 100, PERCENTAGE_DECIMALS)
             : null,
       });
     }
