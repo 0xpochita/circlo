@@ -11,6 +11,8 @@ import { goalsApi } from "@/lib/api/endpoints";
 import { normalizeSide, toAvatar } from "@/lib/utils";
 import { useDataCache } from "@/stores/dataCache";
 
+const PREVIEW_COUNT = 5;
+
 function getResultLabel(goal: GoalWithMyStake): {
   label: string;
   positive: boolean;
@@ -117,7 +119,7 @@ export default function RecentPredictions() {
           </button>
         </div>
         <div className="flex gap-3 overflow-x-auto scrollbar-none pb-1">
-          {goals.slice(0, 5).map((g) => {
+          {goals.slice(0, PREVIEW_COUNT).map((g) => {
             const result = getResultLabel(g);
             return (
               <Link
