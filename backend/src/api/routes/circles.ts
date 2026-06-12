@@ -389,11 +389,11 @@ export default async function circleRoutes(app: FastifyInstance) {
     }
   );
 
-  app.post(
+  app.post<{ Params: { id: string } }>(
     "/:id/invite",
     { preHandler: requireAuth },
     async (req, reply) => {
-      const { id } = req.params as { id: string };
+      const { id } = req.params;
 
       const body = inviteSchema.safeParse(req.body);
       if (!body.success) {
