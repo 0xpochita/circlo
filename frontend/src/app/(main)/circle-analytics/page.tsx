@@ -25,6 +25,7 @@ const PARTICIPANT_BATCH_SIZE = 5;
 const TOP_COUNT = 5;
 const USDT_DISPLAY_DECIMALS = 3;
 const STATUS_ORDER = ["open", "locked", "resolving", "resolved", "paidout", "disputed"] as const;
+const SKELETON_COUNT = 4;
 
 type StakerStat = {
   userId: string;
@@ -222,7 +223,7 @@ function CircleAnalyticsContent() {
           <div className="px-4 py-2">
             <div className="rounded-3xl bg-white animate-pulse h-40" />
             <div className="mt-3 grid grid-cols-2 gap-3">
-              {Array.from({ length: 4 }).map((_, i) => (
+              {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
                 <div
                   key={`s-${i}`}
                   className="rounded-2xl bg-white animate-pulse h-24"
