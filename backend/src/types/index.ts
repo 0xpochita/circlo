@@ -64,6 +64,6 @@ export interface ProcessReferralJobData {
   goalId: string;
 }
 
-export interface LockExpiredGoalsJobData {}
+export type LockExpiredGoalsJobData = Record<string, never>;
 
-export interface DetectDisputesJobData {}
+export type DetectDisputesJobData = Record<string, never>;
