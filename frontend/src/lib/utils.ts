@@ -61,6 +61,10 @@ export function normalizeSide(
   return null;
 }
 
+const MS_PER_DAY = 86_400_000;
+const MS_PER_HOUR = 3_600_000;
+const MS_PER_MINUTE = 60_000;
+
 /**
  * Render a deadline timestamp as a compact countdown string for
  * goal cards: `2d 5h`, `5h 12m`, or `Ended` for past deadlines.
@@ -70,9 +74,9 @@ export function normalizeSide(
 export function formatTimeLeft(deadline: string): string {
   const diff = new Date(deadline).getTime() - Date.now();
   if (diff <= 0) return "Ended";
-  const days = Math.floor(diff / 86400000);
-  const hours = Math.floor((diff % 86400000) / 3600000);
+  const days = Math.floor(diff / MS_PER_DAY);
+  const hours = Math.floor((diff % MS_PER_DAY) / MS_PER_HOUR);
   if (days > 0) return `${days}d ${hours}h`;
-  const mins = Math.floor((diff % 3600000) / 60000);
+  const mins = Math.floor((diff % MS_PER_HOUR) / MS_PER_MINUTE);
   return `${hours}h ${mins}m`;
 }
