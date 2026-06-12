@@ -12,6 +12,8 @@ import { predictionPoolContract } from "@/lib/web3/contracts";
 import { fromUSDT } from "@/lib/web3/usdt";
 import { useUserStore } from "@/stores/userStore";
 
+const STAKE_DISPLAY_DECIMALS = 4;
+
 type ParticipantListProps = {
   goalId?: string;
   goalChainId?: string;
@@ -120,7 +122,7 @@ export default function ParticipantList({
                   {userName || "You"}
                 </p>
                 <p className="text-xs text-muted inline-flex items-center gap-1">
-                  Staked {parseFloat(myAmount.toFixed(4)).toString()}{" "}
+                  Staked {parseFloat(myAmount.toFixed(STAKE_DISPLAY_DECIMALS)).toString()}{" "}
                   <UsdtLabel size={11} />
                 </p>
               </div>
@@ -163,7 +165,7 @@ export default function ParticipantList({
                 </p>
                 <p className="text-xs text-muted inline-flex items-center gap-1">
                   Staked{" "}
-                  {parseFloat(parseFloat(p.staked).toFixed(4)).toString()}{" "}
+                  {parseFloat(parseFloat(p.staked).toFixed(STAKE_DISPLAY_DECIMALS)).toString()}{" "}
                   <UsdtLabel size={11} />
                 </p>
               </div>
