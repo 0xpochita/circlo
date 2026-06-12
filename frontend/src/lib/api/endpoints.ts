@@ -1,5 +1,15 @@
 import { fetchApi } from "./client";
 
+export type UserApiResponse = {
+  id: string;
+  walletAddress: string;
+  name: string | null;
+  username: string | null;
+  avatarEmoji: string | null;
+  avatarColor: string | null;
+  createdAt: string;
+};
+
 export const authApi = {
   nonce: (walletAddress: string) =>
     fetchApi<{ nonce: string }>("/auth/nonce", {
