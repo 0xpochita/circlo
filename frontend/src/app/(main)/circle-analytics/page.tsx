@@ -21,6 +21,9 @@ import {
 } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
 
+const PARTICIPANT_BATCH_SIZE = 5;
+const TOP_COUNT = 5;
+
 type StakerStat = {
   userId: string;
   walletAddress: string;
@@ -83,9 +86,8 @@ function CircleAnalyticsContent() {
           goalId: string;
           parts: ParticipantResponse[];
         }> = [];
-        const BATCH = 5;
-        for (let i = 0; i < goals.length; i += BATCH) {
-          const batch = goals.slice(i, i + BATCH);
+        for (let i = 0; i < goals.length; i += PARTICIPANT_BATCH_SIZE) {
+          const batch = goals.slice(i, i + PARTICIPANT_BATCH_SIZE);
           const results = await Promise.all(
             batch.map(async (g) => {
               try {
@@ -151,18 +153,18 @@ function CircleAnalyticsContent() {
 
         const topStakers = Array.from(stakerMap.values())
           .sort((a, b) => b.totalStaked - a.totalStaked)
-          .slice(0, 5);
+          .slice(0, TOP_COUNT);
 
         const topGoals = [...goalStats]
           .sort((a, b) => b.stakeCount - a.stakeCount)
-          .slice(0, 5);
+          .slice(0, TOP_COUNT);
 
         const recentGoals = [...goals]
           .sort(
             (a, b) =>
               new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
           )
-          .slice(0, 5);
+          .slice(0, TOP_COUNT);
 
         setAnalytics({
           totalGoals: goals.length,
