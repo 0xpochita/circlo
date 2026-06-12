@@ -12,6 +12,7 @@ import { normalizeSide, toAvatar } from "@/lib/utils";
 import { useDataCache } from "@/stores/dataCache";
 
 const STAKE_DISPLAY_DECIMALS = 4;
+const SKELETON_COUNT = 5;
 
 type StakeStatus = "active" | "won" | "lost" | "claimed";
 type FilterTab = "all" | StakeStatus;
@@ -226,7 +227,7 @@ export default function StakeHistoryPage() {
         <div className="px-4 pt-2 pb-4">
           {isLoading ? (
             <div className="flex flex-col gap-2">
-              {Array.from({ length: 5 }).map((_, i) => (
+              {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
                 <div
                   key={`skel-${i}`}
                   className="animate-pulse rounded-2xl bg-white p-3 h-20"
