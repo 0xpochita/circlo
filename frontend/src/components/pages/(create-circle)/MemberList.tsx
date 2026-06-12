@@ -9,6 +9,8 @@ import { circlesApi, usersApi } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
 import { useCreateCircleStore } from "@/stores/createCircleStore";
 
+const SEARCH_DEBOUNCE_MS = 300;
+
 type SearchUser = {
   id: string;
   walletAddress: string;
@@ -53,7 +55,7 @@ export default function MemberList({ circleId }: MemberListProps) {
           setUsers([]);
         })
         .finally(() => setIsLoading(false));
-    }, 300);
+    }, SEARCH_DEBOUNCE_MS);
 
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
