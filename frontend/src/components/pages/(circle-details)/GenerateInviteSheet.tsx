@@ -20,7 +20,7 @@ import {
 
 type DurationKey = "1h" | "1d" | "7d" | "30d";
 
-const DURATIONS: Array<{ key: DurationKey; label: string; seconds: number }> = [
+const DURATIONS: readonly { key: DurationKey; label: string; seconds: number }[] = [
   { key: "1h", label: "1 hour", seconds: 3600 },
   { key: "1d", label: "1 day", seconds: 86400 },
   { key: "7d", label: "7 days", seconds: 86400 * 7 },
