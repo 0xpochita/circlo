@@ -141,14 +141,10 @@ export default async function circleRoutes(app: FastifyInstance) {
     }
   );
 
-  app.get(
+  app.get<{ Querystring: { category?: string; search?: string; cursor?: string } }>(
     "/public",
     async (req, reply) => {
-      const { category, search, cursor } = req.query as {
-        category?: string;
-        search?: string;
-        cursor?: string;
-      };
+      const { category, search, cursor } = req.query;
 
       const circles = await prisma.circle.findMany({
         where: {
