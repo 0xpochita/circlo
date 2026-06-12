@@ -160,11 +160,11 @@ export default async function userRoutes(app: FastifyInstance) {
     }
   );
 
-  app.get(
+  app.get<{ Querystring: { q?: string } }>(
     "/search",
     { preHandler: requireAuth },
     async (req, reply) => {
-      const q = (req.query as Record<string, string>).q ?? "";
+      const { q = "" } = req.query;
       if (q.length < 2) {
         return reply.send([]);
       }
