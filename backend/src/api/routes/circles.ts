@@ -281,11 +281,11 @@ export default async function circleRoutes(app: FastifyInstance) {
     }
   );
 
-  app.post(
+  app.post<{ Params: { id: string } }>(
     "/:id/join",
     { preHandler: requireAuth },
     async (req, reply) => {
-      const { id } = req.params as { id: string };
+      const { id } = req.params;
       const body = joinCircleSchema.safeParse(req.body);
 
       const circle = await prisma.circle.findUnique({ where: { id } });
