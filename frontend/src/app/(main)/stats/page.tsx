@@ -18,6 +18,7 @@ import { useDataCache } from "@/stores/dataCache";
 
 const USDT_DISPLAY_DECIMALS = 3;
 const STAKE_DISPLAY_DECIMALS = 4;
+const SKELETON_COUNT = 3;
 const PERCENTAGE_DECIMALS = 0;
 
 type StakeOutcome = "active" | "won" | "lost" | "claimed";
@@ -241,7 +242,7 @@ export default function StatsPage() {
           </p>
           {isLoading ? (
             <div className="flex flex-col gap-2">
-              {Array.from({ length: 3 }).map((_, i) => (
+              {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
                 <div
                   key={`csk-${i}`}
                   className="animate-pulse rounded-2xl bg-white p-4 h-20"
