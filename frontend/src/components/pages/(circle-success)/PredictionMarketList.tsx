@@ -9,7 +9,9 @@ import { toast } from "sonner";
 import { EmojiAvatar, UsdtLabel } from "@/components/shared";
 import type { GoalResponse } from "@/lib/api/endpoints";
 import { circlesApi } from "@/lib/api/endpoints";
-import { formatTimeLeft, toAvatar } from "@/lib/utils";
+import { formatTimeLeft, MS_PER_DAY, toAvatar } from "@/lib/utils";
+
+const CLOSING_SOON_THRESHOLD_MS = MS_PER_DAY * 2;
 
 type PredictionMarketListProps = {
   circleId?: string;
@@ -36,7 +38,7 @@ export default function PredictionMarketList({
 
   const isClosing = (deadline: string) => {
     const diff = new Date(deadline).getTime() - Date.now();
-    return diff > 0 && diff < 86400000 * 2;
+    return diff > 0 && diff < CLOSING_SOON_THRESHOLD_MS;
   };
 
   return (
