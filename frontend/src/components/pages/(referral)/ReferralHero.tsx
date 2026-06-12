@@ -27,6 +27,12 @@ const gridCells: readonly { highlight?: "soft" | "active"; initials?: string }[]
   { highlight: "soft" },
 ];
 
+const HIGHLIGHT_CLASSES: Record<string, string> = {
+  active: "bg-main-text",
+  soft: "bg-gray-100",
+};
+const DEFAULT_CELL_CLASS = "bg-white";
+
 export default function ReferralHero() {
   return (
     <div className="px-4 py-2">
@@ -54,11 +60,7 @@ export default function ReferralHero() {
               damping: 25,
             }}
             className={`aspect-square rounded-xl flex items-center justify-center ${
-              cell.highlight === "active"
-                ? "bg-main-text"
-                : cell.highlight === "soft"
-                  ? "bg-gray-100"
-                  : "bg-white"
+              HIGHLIGHT_CLASSES[cell.highlight ?? ""] ?? DEFAULT_CELL_CLASS
             }`}
           >
             {cell.initials && (
