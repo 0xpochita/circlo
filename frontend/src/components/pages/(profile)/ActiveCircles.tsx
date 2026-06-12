@@ -8,6 +8,7 @@ import { EmojiAvatar } from "@/components/shared";
 import { useMyCircles, useSheetOverflow } from "@/hooks";
 
 const PREVIEW_COUNT = 5;
+const SKELETON_COUNT = 3;
 
 export default function ActiveCircles() {
   const { circles, isLoading } = useMyCircles();
@@ -22,7 +23,7 @@ export default function ActiveCircles() {
           <p className="text-base font-bold text-main-text">Your circles</p>
         </div>
         <div className="flex gap-3 overflow-x-auto scrollbar-none pb-1">
-          {Array.from({ length: 3 }).map((_, i) => (
+          {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
             <div
               key={`skel-${i}`}
               className="animate-pulse min-w-[160px] rounded-2xl bg-white p-1"
