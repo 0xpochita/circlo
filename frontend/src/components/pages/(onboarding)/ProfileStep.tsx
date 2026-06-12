@@ -10,6 +10,8 @@ import { useAuthStore } from "@/stores/authStore";
 import { useUserStore } from "@/stores/userStore";
 import type { UserAvatar } from "@/types";
 
+const USERNAME_MAX_LENGTH = 20;
+
 type ProfileStepProps = {
   onNext: () => void;
   onBack: () => void;
@@ -121,7 +123,7 @@ export default function ProfileStep({ onNext, onBack }: ProfileStepProps) {
               value={username}
               onChange={(e) => setUsernameLocal(e.target.value)}
               placeholder="Your username"
-              maxLength={20}
+              maxLength={USERNAME_MAX_LENGTH}
               className="w-full rounded-xl bg-gray-50 px-4 py-3 text-sm text-main-text placeholder:text-muted outline-none transition-all duration-200 focus:ring-2 focus:ring-brand"
             />
           </div>
