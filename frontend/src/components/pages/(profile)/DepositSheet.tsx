@@ -17,6 +17,7 @@ const QR_SIZE = 168;
 const COPIED_TIMEOUT_MS = 2000;
 const ADDR_PREFIX_LEN = 6;
 const ADDR_SUFFIX_LEN = 4;
+const SHEET_MAX_HEIGHT = "90dvh";
 
 type DepositSheetProps = {
   open: boolean;
@@ -78,7 +79,7 @@ export default function DepositSheet({
               damping: 32,
             }}
             className="fixed bottom-0 left-1/2 z-101 w-full max-w-md -translate-x-1/2 flex flex-col rounded-t-3xl bg-white"
-            style={{ maxHeight: "90dvh" }}
+            style={{ maxHeight: SHEET_MAX_HEIGHT }}
           >
             <div className="flex items-start justify-between px-6 pt-6 pb-4 shrink-0">
               <div>
