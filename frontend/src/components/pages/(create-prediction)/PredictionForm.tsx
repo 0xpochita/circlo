@@ -14,13 +14,13 @@ const durations = [
   { label: "7D", full: "7 Days", hours: 168 },
   { label: "14D", full: "14 Days", hours: 336 },
   { label: "30D", full: "30 Days", hours: 720 },
-];
+] as const;
 
 const outcomes = [
   { label: "Yes / No", value: 0, enabled: true },
   { label: "Multiple Choice", value: 1, enabled: false },
   { label: "Numeric Range", value: 2, enabled: false },
-];
+] as const;
 
 export default function PredictionForm() {
   const store = useCreateGoalStore();
