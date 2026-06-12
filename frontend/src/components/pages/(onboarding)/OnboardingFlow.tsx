@@ -11,13 +11,16 @@ import ConnectStep from "./ConnectStep";
 import ProfileStep from "./ProfileStep";
 import WelcomeStep from "./WelcomeStep";
 
+const LS_ONBOARDING_DONE = LS_ONBOARDING_DONE;
+const LS_REDIRECT_AFTER_LOGIN = LS_REDIRECT_AFTER_LOGIN;
+
 export default function OnboardingFlow() {
   const router = useRouter();
   const [step, setStep] = useState(0);
 
   useEffect(() => {
-    const completed = localStorage.getItem("circlo-onboarding-done");
-    const hasRedirect = localStorage.getItem("circlo-redirect-after-login");
+    const completed = localStorage.getItem(LS_ONBOARDING_DONE);
+    const hasRedirect = localStorage.getItem(LS_REDIRECT_AFTER_LOGIN);
 
     // Don't redirect to "/" unless user is actually authenticated — otherwise
     // OnboardingGuard will bounce them right back here, causing a flicker loop.
@@ -36,10 +39,10 @@ export default function OnboardingFlow() {
   }, [router]);
 
   function handleComplete() {
-    localStorage.setItem("circlo-onboarding-done", "true");
-    const redirect = localStorage.getItem("circlo-redirect-after-login");
+    localStorage.setItem(LS_ONBOARDING_DONE, "true");
+    const redirect = localStorage.getItem(LS_REDIRECT_AFTER_LOGIN);
     if (redirect) {
-      localStorage.removeItem("circlo-redirect-after-login");
+      localStorage.removeItem(LS_REDIRECT_AFTER_LOGIN);
       window.location.href = redirect;
     } else {
       router.replace("/");
