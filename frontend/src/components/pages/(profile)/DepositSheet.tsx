@@ -15,6 +15,8 @@ import { explorerAddressUrl } from "@/lib/web3/network";
 
 const QR_SIZE = 168;
 const COPIED_TIMEOUT_MS = 2000;
+const ADDR_PREFIX_LEN = 6;
+const ADDR_SUFFIX_LEN = 4;
 
 type DepositSheetProps = {
   open: boolean;
@@ -52,7 +54,7 @@ export default function DepositSheet({
   }
 
   const shortAddress = walletAddress
-    ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+    ? `${walletAddress.slice(0, ADDR_PREFIX_LEN)}...${walletAddress.slice(-ADDR_SUFFIX_LEN)}`
     : "";
 
   return (
