@@ -12,6 +12,8 @@ import {
 } from "react-icons/hi2";
 import { toast } from "sonner";
 
+const COPIED_TIMEOUT_MS = 2000;
+
 type DetailHeaderProps = {
   goalId?: string;
   title?: string;
@@ -32,7 +34,7 @@ export default function DetailHeader({ goalId, title }: DetailHeaderProps) {
       await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
       toast("Copied to clipboard");
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), COPIED_TIMEOUT_MS);
     } catch {}
   }
 
