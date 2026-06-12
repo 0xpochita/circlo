@@ -41,6 +41,7 @@ function isActiveGoal(g: GoalResponse): boolean {
 }
 
 const PREVIEW_COUNT = 3;
+const SKELETON_COUNT = 3;
 
 const STATUS_BADGE_STYLES: Record<string, string> = {
   open: "bg-emerald-50 text-emerald-500",
@@ -161,7 +162,7 @@ export default function DetailsGoals({ circleId }: DetailsGoalsProps) {
 
         {loading ? (
           <div className="flex flex-col gap-3">
-            {Array.from({ length: 3 }).map((_, i) => (
+            {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
               <div
                 key={`skel-${i}`}
                 className="flex items-center gap-3 rounded-2xl bg-white p-3 animate-pulse"
