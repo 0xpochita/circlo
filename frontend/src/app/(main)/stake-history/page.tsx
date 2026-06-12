@@ -11,6 +11,8 @@ import { type GoalWithMyStake, goalsApi } from "@/lib/api/endpoints";
 import { normalizeSide, toAvatar } from "@/lib/utils";
 import { useDataCache } from "@/stores/dataCache";
 
+const STAKE_DISPLAY_DECIMALS = 4;
+
 type StakeStatus = "active" | "won" | "lost" | "claimed";
 type FilterTab = "all" | StakeStatus;
 
@@ -106,9 +108,9 @@ export default function StakeHistoryPage() {
 
     return {
       totalStakes: staked.length,
-      totalStaked: totalStaked.toFixed(4),
-      totalClaimed: totalClaimed.toFixed(4),
-      pnl: pnl.toFixed(4),
+      totalStaked: totalStaked.toFixed(STAKE_DISPLAY_DECIMALS),
+      totalClaimed: totalClaimed.toFixed(STAKE_DISPLAY_DECIMALS),
+      pnl: pnl.toFixed(STAKE_DISPLAY_DECIMALS),
       pnlPositive: pnl >= 0,
       winRate,
       counts: { active, won, lost },
