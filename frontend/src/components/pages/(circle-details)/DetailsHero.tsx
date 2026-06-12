@@ -17,7 +17,7 @@ type DetailsHeroProps = {
   circle?: CircleDetailResponse;
 };
 
-const defaultPositions: {
+const defaultPositions: readonly {
   avatar: UserAvatar;
   x: number;
   y: number;
@@ -61,7 +61,7 @@ const defaultPositions: {
   },
 ];
 
-const layoutCoords = [
+const layoutCoords: readonly { x: number; y: number; size: number }[] = [
   { x: 0, y: 0, size: 72 },
   { x: 78, y: -8, size: 72 },
   { x: 156, y: 4, size: 72 },
