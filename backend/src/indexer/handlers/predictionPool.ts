@@ -557,7 +557,7 @@ export async function handleGoalResolved(
   });
 
   if (!goal) {
-    console.warn(`[PredictionPool] GoalResolved: goal not found (chainId=${args.goalId})`);
+    process.stderr.write(`[PredictionPool] GoalResolved: goal not found chainId=${args.goalId}\n`);
     return;
   }
 
@@ -605,9 +605,7 @@ export async function handleGoalResolved(
     })
   );
 
-  console.log(
-    `[PredictionPool] GoalResolved: goalId=${goal.id}, winningSide=${winningSideStr}`
-  );
+  process.stdout.write(`[PredictionPool] GoalResolved: goalId=${goal.id} winningSide=${winningSideStr}\n`);
 }
 
 /**
