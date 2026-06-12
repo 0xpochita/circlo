@@ -14,6 +14,7 @@ type GoalDetail = GoalResponse & {
 };
 
 const STAKE_DECIMALS = 4;
+const STAT_PAD_LENGTH = 2;
 
 function formatStake(total: number): string {
   return parseFloat(total.toFixed(STAKE_DECIMALS)).toString();
@@ -62,12 +63,12 @@ export default function CircleStats({ circleId }: CircleStatsProps) {
 
   const stats = [
     {
-      value: String(memberCount).padStart(2, "0"),
+      value: String(memberCount).padStart(STAT_PAD_LENGTH, "0"),
       label: "Members",
       usdt: false,
     },
     {
-      value: String(goalCount).padStart(2, "0"),
+      value: String(goalCount).padStart(STAT_PAD_LENGTH, "0"),
       label: "Predictions",
       usdt: false,
     },
