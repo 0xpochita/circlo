@@ -222,9 +222,7 @@ export async function handleCircleJoined(args: {
 
   const circle = await prisma.circle.findFirst({ where: { chain_id: args.id } });
   if (!circle) {
-    console.warn(
-      `[CircleFactory] CircleJoined: circle not found for chain_id=${args.id} (member=${user.wallet_address}). Indexer race?`
-    );
+    process.stderr.write(`[CircleFactory] CircleJoined: circle not found chain_id=${args.id} member=${user.wallet_address}\n`);
     return;
   }
 
@@ -270,9 +268,7 @@ export async function handleCircleJoined(args: {
 
   await publishNotification(circle.owner_id, notification);
 
-  console.log(
-    `[CircleFactory] CircleJoined: circleId=${circle.id} member=${user.wallet_address}`
-  );
+  process.stdout.write(`[CircleFactory] CircleJoined: circleId=${circle.id} member=${user.wallet_address}\n`);
 }
 
 /**
