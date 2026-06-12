@@ -33,7 +33,6 @@ export function isMiniPay(): boolean {
     return true;
   }
 
-  const eth = (window as unknown as { ethereum?: { isMiniPay?: boolean } })
-    .ethereum;
+  const eth = (window as { ethereum?: { isMiniPay?: boolean } }).ethereum;
   return Boolean(eth?.isMiniPay);
 }
