@@ -177,10 +177,12 @@ function sideToString(side: number): string {
  * here is faster than viem's regex-based parser. Always returns
  * exactly 6 decimal places — pad/trim at the call site if needed.
  */
+const USDT_DECIMALS = 6;
+
 function formatUsdt(amount: bigint): string {
-  const str = amount.toString().padStart(7, "0");
-  const integer = str.slice(0, -6) || "0";
-  const decimal = str.slice(-6);
+  const str = amount.toString().padStart(USDT_DECIMALS + 1, "0");
+  const integer = str.slice(0, -USDT_DECIMALS) || "0";
+  const decimal = str.slice(-USDT_DECIMALS);
   return `${integer}.${decimal}`;
 }
 
