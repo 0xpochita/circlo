@@ -7,6 +7,8 @@ import { predictionPoolContract } from "@/lib/web3/contracts";
 import { explorerTxUrl } from "@/lib/web3/network";
 
 const SCAN_BLOCK_RANGE = BigInt(120);
+const SECONDS_PER_MINUTE = 60;
+const SECONDS_PER_HOUR = 3600;
 
 /**
  * Compact pill showing the most recent PredictionPool.Settlement()
@@ -91,11 +93,11 @@ export default function SettlementBadge() {
     Math.floor(Date.now() / 1000) - Number(latest.timestamp),
   );
   const label =
-    ageSeconds < 60
+    ageSeconds < SECONDS_PER_MINUTE
       ? `${ageSeconds}s ago`
-      : ageSeconds < 3600
-        ? `${Math.floor(ageSeconds / 60)}m ago`
-        : `${Math.floor(ageSeconds / 3600)}h ago`;
+      : ageSeconds < SECONDS_PER_HOUR
+        ? `${Math.floor(ageSeconds / SECONDS_PER_MINUTE)}m ago`
+        : `${Math.floor(ageSeconds / SECONDS_PER_HOUR)}h ago`;
 
   return (
     <a
