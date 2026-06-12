@@ -21,6 +21,8 @@ import { DEFAULT_MIN_STAKE, fromUSDT, toUSDT } from "@/lib/web3/usdt";
 import { useAuthStore } from "@/stores/authStore";
 
 const STAKED_CALLBACK_DELAY_MS = 1000;
+const ERROR_TOAST_DURATION_MS = 10_000;
+const ERROR_MSG_SLICE_LEN = 100;
 
 type ResolverInfo = {
   userId: string;
@@ -526,13 +528,13 @@ export default function StakeButton({
       ) {
         toast.error(
           `RPC Error | name: ${errObj?.name ?? "?"} | code: ${errObj?.code ?? "?"} — disconnect+reconnect wallet`,
-          { duration: 10000 },
+          { duration: ERROR_TOAST_DURATION_MS },
         );
       } else {
         toast.error(
-          `Failed [${errObj?.name ?? "?"}]: ${message.slice(0, 100)}`,
+          `Failed [${errObj?.name ?? "?"}]: ${message.slice(0, ERROR_MSG_SLICE_LEN)}`,
           {
-            duration: 10000,
+            duration: ERROR_TOAST_DURATION_MS,
           },
         );
       }
