@@ -17,6 +17,8 @@ import { explorerTxUrl, NETWORK } from "@/lib/web3/network";
 import { DEFAULT_MIN_STAKE, toUSDT } from "@/lib/web3/usdt";
 import { useCreateGoalStore } from "@/stores/createGoalStore";
 
+const MS_PER_HOUR = 3_600_000;
+
 type StepStatus = "pending" | "active" | "done" | "error";
 type Step = { label: string; status: StepStatus };
 
@@ -40,7 +42,7 @@ export default function ConfirmButton() {
         year: "numeric",
       });
     }
-    const deadline = new Date(Date.now() + store.durationHours * 3600000);
+    const deadline = new Date(Date.now() + store.durationHours * MS_PER_HOUR);
     return deadline.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
