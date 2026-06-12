@@ -11,6 +11,8 @@ import { useSheetOverflow } from "@/hooks";
 import { circlesApi } from "@/lib/api/endpoints";
 import { useAuthStore } from "@/stores/authStore";
 
+const REDIRECT_DELAY_MS = 600;
+
 type LeaveButtonProps = {
   circleId?: number;
   circleBackendId?: string;
@@ -58,7 +60,7 @@ export default function LeaveButton({
 
       toast.success("Left circle");
       setOpen(false);
-      setTimeout(() => router.push("/circles"), 600);
+      setTimeout(() => router.push("/circles"), REDIRECT_DELAY_MS);
     } catch (err) {
       const message = err instanceof Error ? err.message : "";
       if (message.includes("User rejected") || message.includes("denied")) {
