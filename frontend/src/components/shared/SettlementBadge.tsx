@@ -6,6 +6,8 @@ import { usePublicClient } from "wagmi";
 import { predictionPoolContract } from "@/lib/web3/contracts";
 import { explorerTxUrl } from "@/lib/web3/network";
 
+const SCAN_BLOCK_RANGE = BigInt(120);
+
 /**
  * Compact pill showing the most recent PredictionPool.Settlement()
  * heartbeat — "Heartbeat: 5m ago" — clickable to open the latest
@@ -34,8 +36,7 @@ export default function SettlementBadge() {
       if (!publicClient) return;
       try {
         const latestBlock = await publicClient.getBlockNumber();
-        // Scan roughly the last ~5 minutes worth of Celo blocks (5s/block ≈ 60 blocks).
-        const span = BigInt(120);
+            const span = SCAN_BLOCK_RANGE;
         const fromBlock = latestBlock > span ? latestBlock - span : BigInt(0);
         const logs = await publicClient.getLogs({
           address: predictionPoolContract.address,
