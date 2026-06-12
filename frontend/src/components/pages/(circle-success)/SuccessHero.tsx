@@ -29,6 +29,7 @@ const layoutPositions: readonly { x: number; y: number; size: number }[] = [
 ];
 
 const MEMBERS_PREVIEW_COUNT = 5;
+const AVATAR_STAGGER_DELAY = 0.15;
 
 type SuccessHeroProps = {
   circle?: CircleDetailResponse | null;
@@ -90,7 +91,7 @@ export default function SuccessHero({ circle }: SuccessHeroProps) {
                   type: "spring" as const,
                   stiffness: 300,
                   damping: 20,
-                  delay: 0.15 * i,
+                  delay: AVATAR_STAGGER_DELAY * i,
                 }}
                 className="absolute"
                 style={{ left: p.x, top: p.y }}
