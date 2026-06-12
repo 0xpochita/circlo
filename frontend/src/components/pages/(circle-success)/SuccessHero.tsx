@@ -7,7 +7,7 @@ import type { CircleDetailResponse } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
 import type { UserAvatar } from "@/types";
 
-const defaultPositions: {
+const defaultPositions: readonly {
   avatar: UserAvatar;
   x: number;
   y: number;
@@ -20,7 +20,7 @@ const defaultPositions: {
   { avatar: { emoji: "💡", color: "#8b5cf6" }, x: 104, y: 68, size: 68 },
 ];
 
-const layoutPositions = [
+const layoutPositions: readonly { x: number; y: number; size: number }[] = [
   { x: 0, y: 0, size: 72 },
   { x: 78, y: -8, size: 72 },
   { x: 156, y: 4, size: 72 },
