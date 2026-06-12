@@ -20,6 +20,8 @@ import { explorerTxUrl, NETWORK } from "@/lib/web3/network";
 import { DEFAULT_MIN_STAKE, fromUSDT, toUSDT } from "@/lib/web3/usdt";
 import { useAuthStore } from "@/stores/authStore";
 
+const STAKED_CALLBACK_DELAY_MS = 1000;
+
 type ResolverInfo = {
   userId: string;
   vote: number | null;
@@ -481,7 +483,7 @@ export default function StakeButton({
         setSelectedSide(null);
         setSteps([]);
         if (onStaked) {
-          const t2 = setTimeout(onStaked, 1000);
+          const t2 = setTimeout(onStaked, STAKED_CALLBACK_DELAY_MS);
           timeoutRefs.current.push(t2);
         }
       }, 1500);
@@ -582,7 +584,7 @@ export default function StakeButton({
       });
       setResolveSheetOpen(false);
       if (onStaked) {
-        const t = setTimeout(onStaked, 1000);
+        const t = setTimeout(onStaked, STAKED_CALLBACK_DELAY_MS);
         timeoutRefs.current.push(t);
       }
     } catch (err) {
@@ -636,7 +638,7 @@ export default function StakeButton({
         },
       });
       if (onStaked) {
-        const t = setTimeout(onStaked, 1000);
+        const t = setTimeout(onStaked, STAKED_CALLBACK_DELAY_MS);
         timeoutRefs.current.push(t);
       }
     } catch (err) {
