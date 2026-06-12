@@ -39,16 +39,7 @@ export const authApi = {
 };
 
 export const usersApi = {
-  me: () =>
-    fetchApi<{
-      id: string;
-      walletAddress: string;
-      name: string | null;
-      username: string | null;
-      avatarEmoji: string | null;
-      avatarColor: string | null;
-      createdAt: string;
-    }>("/users/me"),
+  me: () => fetchApi<UserApiResponse>("/users/me"),
 
   update: (data: {
     name?: string;
