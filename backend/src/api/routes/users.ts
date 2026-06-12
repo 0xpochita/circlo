@@ -14,6 +14,8 @@ import { requireAuth } from "../middlewares/auth.js";
  * - `avatarEmoji` / `avatarColor`: same constraints as
  *   `createCircleSchema` so both surfaces render consistently.
  */
+const PAGE_SIZE = 20;
+
 const updateMeSchema = z.object({
   name: z.string().min(1).max(80).optional(),
   username: z
@@ -59,6 +61,11 @@ function serializeUser(user: {
   };
 }
 
+function formatWithSign(n: number, decimals: number): string {
+  const abs = Math.abs(n).toFixed(decimals);
+  return n >= 0 ? `+${abs}` : `-${abs}`;
+}
+
 export default async function userRoutes(app: FastifyInstance) {
   app.get(
     "/me",
@@ -99,11 +106,6 @@ export default async function userRoutes(app: FastifyInstance) {
         0,
       );
       const pnl = totalClaimed - stakedOnClaimed;
-
-      const formatWithSign = (n: number, decimals: number): string => {
-        const abs = Math.abs(n).toFixed(decimals);
-        return n >= 0 ? `+${abs}` : `-${abs}`;
-      };
 
       return reply.send({
         totalStaked: stakedOnClaimed.toFixed(4),
@@ -178,7 +180,7 @@ export default async function userRoutes(app: FastifyInstance) {
           ],
           id: { not: req.jwtUser.sub },
         },
-        take: 20,
+        take: PAGE_SIZE,
       });
 
       return reply.send(users.map(serializeUser));
