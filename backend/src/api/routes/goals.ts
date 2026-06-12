@@ -424,11 +424,11 @@ export default async function goalRoutes(app: FastifyInstance) {
     }
   );
 
-  app.get(
+  app.get<{ Params: { id: string } }>(
     "/:id/my-stake",
     { preHandler: requireAuth },
     async (req, reply) => {
-      const { id } = req.params as { id: string };
+      const { id } = req.params;
 
       const participant = await prisma.goalParticipant.findUnique({
         where: {
