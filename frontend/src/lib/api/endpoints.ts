@@ -324,12 +324,5 @@ export type ParticipantResponse = {
   claimed: boolean;
   claimedAmount: string | null;
   createdAt: string;
-  user: {
-    id: string;
-    walletAddress: string;
-    name: string | null;
-    username: string | null;
-    avatarEmoji: string | null;
-    avatarColor: string | null;
-  };
+  user: UserPreview;
 };
