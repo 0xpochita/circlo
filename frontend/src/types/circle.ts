@@ -1,10 +1,9 @@
 export type CircleCategory =
+  | "general"
+  | "crypto"
   | "fitness"
-  | "finance"
-  | "education"
-  | "health"
-  | "productivity"
-  | "social"
+  | "gaming"
+  | "music"
   | "other";
 
 export type CirclePrivacy = "public" | "private";
