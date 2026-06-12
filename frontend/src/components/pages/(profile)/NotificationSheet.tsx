@@ -13,6 +13,7 @@ const MS_PER_MINUTE = 60_000;
 const MINUTES_PER_HOUR = 60;
 const HOURS_PER_DAY = 24;
 const SKELETON_COUNT = 4;
+const LIST_STAGGER_DELAY = 0.05;
 
 const TYPE_AVATARS: Record<string, UserAvatar> = {
   goal_created: { emoji: "\u{1F3AF}", color: "#60a5fa" },
@@ -180,7 +181,7 @@ export default function NotificationSheet({
                       }}
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: 0.05 * i }}
+                      transition={{ duration: 0.3, delay: LIST_STAGGER_DELAY * i }}
                       className={`flex items-start gap-3 rounded-2xl p-3 cursor-pointer transition-all duration-200 active:scale-[0.98] ${
                         n.unread ? "bg-gray-50" : "bg-white"
                       }`}
