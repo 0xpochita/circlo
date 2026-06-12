@@ -14,7 +14,7 @@ const tabs = [
   { icon: HiOutlineMagnifyingGlass, label: "Search", href: "/explore" },
   { icon: HiOutlineUserGroup, label: "Circles", href: "/circles" },
   { icon: HiOutlineUser, label: "Profile", href: "/profile" },
-];
+] as const;
 
 const labelVariants: Variants = {
   hidden: { width: 0, opacity: 0 },
