@@ -18,6 +18,8 @@ import { DEFAULT_MIN_STAKE, toUSDT } from "@/lib/web3/usdt";
 import { useCreateGoalStore } from "@/stores/createGoalStore";
 
 const MS_PER_HOUR = 3_600_000;
+const REDIRECT_DELAY_MS = 1200;
+const ERROR_MSG_MAX_LEN = 120;
 
 type StepStatus = "pending" | "active" | "done" | "error";
 type Step = { label: string; status: StepStatus };
@@ -328,13 +330,13 @@ export default function ConfirmButton() {
       setTimeout(() => {
         setSheetOpen(false);
         router.push(`/circle-details?id=${circleIdForRedirect}`);
-      }, 1200);
+      }, REDIRECT_DELAY_MS);
     } catch (err) {
       const message = err instanceof Error ? err.message : "";
       if (message.includes("chain") || message.includes("Chain")) {
         toast("Please switch to Celo Sepolia network");
       } else {
-        toast.error(message.length > 120 ? "Failed to create goal" : message);
+        toast.error(message.length > ERROR_MSG_MAX_LEN ? "Failed to create goal" : message);
       }
     } finally {
       setIsCreating(false);
