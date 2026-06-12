@@ -53,6 +53,14 @@ interface CircleMetadata {
   avatarColor: string;
 }
 
+const DEFAULT_CIRCLE_METADATA: Readonly<CircleMetadata> = {
+  name: "Circle",
+  description: "",
+  category: "general",
+  avatarEmoji: "✨",
+  avatarColor: "#fbbf24",
+};
+
 /**
  * Indexer-local copy of `circlo-types`'s `parseCircleMetadata` —
  * duplicated to avoid a runtime dependency on the published SDK from
@@ -62,13 +70,7 @@ interface CircleMetadata {
  * the package import and delete the local fallback.
  */
 function parseCircleMetadata(uri: string): CircleMetadata {
-  const fallback: CircleMetadata = {
-    name: "Circle",
-    description: "",
-    category: "general",
-    avatarEmoji: "✨",
-    avatarColor: "#fbbf24",
-  };
+  const fallback = DEFAULT_CIRCLE_METADATA;
   try {
     const parsed = JSON.parse(uri);
     return {
