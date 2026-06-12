@@ -15,6 +15,7 @@ import type { ExploreSortKey } from "./ExploreHeader";
 
 const SEARCH_DEBOUNCE_MS = 300;
 const SKELETON_COUNT = 4;
+const CARD_STAGGER_DELAY = 0.08;
 
 type CircleListProps = {
   search?: string;
@@ -180,7 +181,7 @@ export default function CircleList({
             key={circle.id}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, delay: 0.08 * i }}
+            transition={{ duration: 0.35, delay: CARD_STAGGER_DELAY * i }}
           >
             <Link
               href={`/circle-details?id=${circle.id}`}
