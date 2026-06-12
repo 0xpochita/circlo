@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { prisma } from "../../lib/prisma.js";
-import { redis } from "../../lib/redis.js";
+import { publishNotification } from "../../lib/notifications.js";
 
 export const CIRCLE_FACTORY_ABI = [
   {
@@ -30,22 +30,6 @@ export const CIRCLE_FACTORY_ABI = [
     ],
   },
 ] as const;
-
-/**
- * Push a notification payload onto the user's Redis pub/sub channel.
- *
- * The websocket gateway subscribes to `notifications:{userId}` and
- * fans out incoming messages to every connected socket for that user.
- * Keep payloads small — Redis pub/sub doesn't retry delivery, so
- * lost messages stay lost. Persist the canonical record via Prisma
- * first if the user must see it.
- */
-async function publishNotification(
-  userId: string,
-  notification: object
-): Promise<void> {
-  await redis.publish(`notifications:${userId}`, JSON.stringify(notification));
-}
 
 /**
  * Find or create a User row for a wallet address.
