@@ -31,6 +31,7 @@ const userSubscriptions = new Map<string, Redis>();
  * close TCP streams after ~60s of silence.
  */
 const PING_INTERVAL = 30_000;
+const WS_CLOSE_POLICY_VIOLATION = 1008;
 
 /**
  * Lazily construct (or return cached) Redis subscriber for a user's
@@ -115,7 +116,7 @@ export function registerWsGateway(app: FastifyInstance): void {
 
       if (!token) {
         ws.send(JSON.stringify({ error: "Unauthorized", message: "Missing token" }));
-        ws.close(1008, "Missing token");
+        ws.close(WS_CLOSE_POLICY_VIOLATION, "Missing token");
         return;
       }
 
@@ -124,7 +125,7 @@ export function registerWsGateway(app: FastifyInstance): void {
         payload = app.jwt.verify<JwtPayload>(token);
       } catch {
         ws.send(JSON.stringify({ error: "Unauthorized", message: "Invalid token" }));
-        ws.close(1008, "Invalid token");
+        ws.close(WS_CLOSE_POLICY_VIOLATION, "Invalid token");
         return;
       }
 
