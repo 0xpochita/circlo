@@ -629,7 +629,7 @@ export async function handleGoalRefunded(
   });
 
   if (!goal) {
-    console.warn(`[PredictionPool] GoalRefunded: goal not found (chainId=${args.goalId})`);
+    process.stderr.write(`[PredictionPool] GoalRefunded: goal not found chainId=${args.goalId}\n`);
     return;
   }
 
@@ -671,7 +671,7 @@ export async function handleGoalRefunded(
     })
   );
 
-  console.log(`[PredictionPool] GoalRefunded: goalId=${goal.id}`);
+  process.stdout.write(`[PredictionPool] GoalRefunded: goalId=${goal.id}\n`);
 }
 
 /**
