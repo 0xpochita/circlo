@@ -14,14 +14,14 @@ import type { CircleCategory } from "../../types/index.js";
  * options without a separate endpoint. Adding a category here means
  * adding it to the Zod enum below AND to the system config response.
  */
-const CIRCLE_CATEGORIES: CircleCategory[] = [
+const CIRCLE_CATEGORIES: readonly CircleCategory[] = [
   "general",
   "crypto",
   "fitness",
   "gaming",
   "music",
   "other",
-];
+] as const;
 
 /**
  * Page size for paginated circle list endpoints. 20 balances payload
