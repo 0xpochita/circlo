@@ -446,9 +446,7 @@ export async function handleVoteSubmitted(args: {
 
   const goal = await prisma.goal.findFirst({ where: { chain_id: args.goalId } });
   if (!goal) {
-    console.warn(
-      `[PredictionPool] VoteSubmitted: goal not found for chain_id=${args.goalId}`
-    );
+    process.stderr.write(`[PredictionPool] VoteSubmitted: goal not found chain_id=${args.goalId}\n`);
     return;
   }
 
@@ -466,9 +464,7 @@ export async function handleVoteSubmitted(args: {
     update: { vote: choiceStr, voted_at: new Date() },
   });
 
-  console.log(
-    `[PredictionPool] VoteSubmitted: goalId=${goal.id}, resolver=${user.wallet_address}, choice=${choiceStr}`
-  );
+  process.stdout.write(`[PredictionPool] VoteSubmitted: goalId=${goal.id} resolver=${user.wallet_address} choice=${choiceStr}\n`);
 }
 
 /**
