@@ -14,6 +14,8 @@ import { EmojiAvatar } from "@/components/shared";
 import { useSheetOverflow } from "@/hooks";
 import { toAvatar } from "@/lib/utils";
 
+const COPIED_TIMEOUT_MS = 2000;
+
 type ShareSheetProps = {
   open: boolean;
   onClose: () => void;
@@ -51,7 +53,7 @@ export default function ShareSheet({
       await navigator.clipboard.writeText(text);
       setCopied(type);
       toast("Copied to clipboard");
-      setTimeout(() => setCopied(null), 2000);
+      setTimeout(() => setCopied(null), COPIED_TIMEOUT_MS);
     } catch {}
   }
 
