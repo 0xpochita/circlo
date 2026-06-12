@@ -23,6 +23,7 @@ import { toAvatar } from "@/lib/utils";
 
 const PARTICIPANT_BATCH_SIZE = 5;
 const TOP_COUNT = 5;
+const STATUS_ORDER = ["open", "locked", "resolving", "resolved", "paidout", "disputed"] as const;
 
 type StakerStat = {
   userId: string;
@@ -191,15 +192,7 @@ function CircleAnalyticsContent() {
 
   const statusEntries = useMemo(() => {
     if (!analytics) return [];
-    const statusOrder = [
-      "open",
-      "locked",
-      "resolving",
-      "resolved",
-      "paidout",
-      "disputed",
-    ];
-    const entries = statusOrder
+    const entries = STATUS_ORDER
       .map((s) => ({ status: s, count: analytics.byStatus[s] ?? 0 }))
       .filter((e) => e.count > 0);
     const total = entries.reduce((acc, e) => acc + e.count, 0);
