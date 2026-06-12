@@ -52,6 +52,9 @@ export const cronJobQueue = new Queue("cron-jobs", {
   },
 });
 
+const GOAL_WORKER_CONCURRENCY = 5;
+const CRON_WORKER_CONCURRENCY = 1;
+
 import { processReferrals } from "./processReferrals.js";
 import { lockExpiredGoals } from "./lockExpiredGoals.js";
 import { detectDisputes } from "./detectDisputes.js";
@@ -75,7 +78,7 @@ export function startWorkers() {
         await processReferrals(job.data);
       }
     },
-    { connection, concurrency: 5 }
+    { connection, concurrency: GOAL_WORKER_CONCURRENCY }
   );
 
   const cronWorker = new Worker(
@@ -87,7 +90,7 @@ export function startWorkers() {
         await detectDisputes();
       }
     },
-    { connection, concurrency: 1 }
+    { connection, concurrency: CRON_WORKER_CONCURRENCY }
   );
 
   goalWorker.on("completed", (job) => {
