@@ -4,13 +4,14 @@ import { UsdtLabel } from "@/components/shared";
 import { useCreateGoalStore } from "@/stores/createGoalStore";
 
 const PLATFORM_FEE_BPS = 100;
+const BPS_DENOMINATOR = 10_000;
 const NETWORK_FEE = 0.001;
 
 export default function PredictionSummary() {
   const stakeAmount = useCreateGoalStore((s) => s.stakeAmount);
 
   const stake = parseFloat(stakeAmount) || 0;
-  const platformFee = (stake * PLATFORM_FEE_BPS) / 10000;
+  const platformFee = (stake * PLATFORM_FEE_BPS) / BPS_DENOMINATOR;
   const total = stake + platformFee + NETWORK_FEE;
 
   function fmt(n: number): string {
