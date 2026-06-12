@@ -20,6 +20,7 @@ import { useCreateGoalStore } from "@/stores/createGoalStore";
 const MS_PER_HOUR = 3_600_000;
 const REDIRECT_DELAY_MS = 1200;
 const ERROR_MSG_MAX_LEN = 120;
+const ERROR_TOAST_DURATION_MS = 8000;
 
 const OUTCOME_LABELS: Record<number, string> = {
   0: "Yes / No",
@@ -263,7 +264,7 @@ export default function ConfirmButton() {
         const message = err instanceof Error ? err.message : "";
         if (message.includes("User rejected") || message.includes("denied")) {
           toast(`Cancelled [${errObj?.name ?? "?"}|${errObj?.code ?? "?"}]`, {
-            duration: 8000,
+            duration: ERROR_TOAST_DURATION_MS,
           });
         } else {
           toast.error("Failed to send transaction");
