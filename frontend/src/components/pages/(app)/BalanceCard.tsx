@@ -25,6 +25,7 @@ import { IS_MAINNET } from "@/lib/web3/network";
 
 const FAUCET_GAS_LIMIT = BigInt(200_000);
 const ERROR_MSG_MAX_LEN = 80;
+const BALANCE_DISPLAY_DECIMALS = 2;
 import { fromUSDT } from "@/lib/web3/usdt";
 
 export default function BalanceCard() {
@@ -128,7 +129,7 @@ export default function BalanceCard() {
                   <div className="h-7 w-20 rounded-lg bg-white/20 animate-pulse" />
                 ) : (
                   <p className="text-2xl font-bold text-white">
-                    {balance.toFixed(2)}
+                    {balance.toFixed(BALANCE_DISPLAY_DECIMALS)}
                   </p>
                 )}
                 <div className="flex items-center gap-1 rounded-full bg-white/30 px-2 py-0.5">
@@ -189,7 +190,7 @@ export default function BalanceCard() {
       <WithdrawSheet
         open={withdrawOpen}
         onClose={() => setWithdrawOpen(false)}
-        balance={balance.toFixed(2)}
+        balance={balance.toFixed(BALANCE_DISPLAY_DECIMALS)}
       />
 
       <AnimatePresence>
@@ -259,7 +260,7 @@ export default function BalanceCard() {
                 <div className="flex items-center justify-between py-1">
                   <p className="text-xs text-muted">Current balance</p>
                   <p className="text-xs font-medium text-main-text">
-                    {balance.toFixed(2)} USDT
+                    {balance.toFixed(BALANCE_DISPLAY_DECIMALS)} USDT
                   </p>
                 </div>
               </div>
