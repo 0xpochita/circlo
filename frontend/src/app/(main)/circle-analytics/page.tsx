@@ -457,22 +457,17 @@ function CircleAnalyticsContent() {
   );
 }
 
+const STATUS_COLORS: Record<string, string> = {
+  open: "bg-blue-400",
+  locked: "bg-amber-400",
+  resolving: "bg-purple-400",
+  resolved: "bg-emerald-400",
+  paidout: "bg-emerald-500",
+  disputed: "bg-red-400",
+};
+
 function statusColor(status: string): string {
-  switch (status) {
-    case "open":
-      return "bg-blue-400";
-    case "locked":
-      return "bg-amber-400";
-    case "resolving":
-      return "bg-purple-400";
-    case "resolved":
-      return "bg-emerald-400";
-    case "paidout":
-      return "bg-emerald-500";
-    case "disputed":
-      return "bg-red-400";
-    default:
-      return "bg-gray-300";
+  return STATUS_COLORS[status] ?? "bg-gray-300";
   }
 }
 
