@@ -487,7 +487,7 @@ export async function handleGoalLocked(
   });
 
   if (!goal) {
-    console.warn(`[PredictionPool] GoalLocked: goal not found (chainId=${args.goalId})`);
+    process.stderr.write(`[PredictionPool] GoalLocked: goal not found chainId=${args.goalId}\n`);
     return;
   }
 
@@ -529,7 +529,7 @@ export async function handleGoalLocked(
     })
   );
 
-  console.log(`[PredictionPool] GoalLocked: goalId=${goal.id}`);
+  process.stdout.write(`[PredictionPool] GoalLocked: goalId=${goal.id}\n`);
 }
 
 /**
