@@ -261,18 +261,20 @@ export type CircleDetailResponse = CircleResponse & {
   membersPreview: MemberResponse[];
 };
 
+export type UserPreview = {
+  id: string;
+  walletAddress: string;
+  name: string | null;
+  username: string | null;
+  avatarEmoji: string | null;
+  avatarColor: string | null;
+};
+
 export type MemberResponse = {
   userId: string;
   role: string;
   joinedAt: string;
-  user: {
-    id: string;
-    walletAddress: string;
-    name: string | null;
-    username: string | null;
-    avatarEmoji: string | null;
-    avatarColor: string | null;
-  };
+  user: UserPreview;
 };
 
 export type GoalResponse = {
