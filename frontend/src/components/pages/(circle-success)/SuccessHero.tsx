@@ -28,6 +28,8 @@ const layoutPositions: readonly { x: number; y: number; size: number }[] = [
   { x: 104, y: 68, size: 68 },
 ];
 
+const MEMBERS_PREVIEW_COUNT = 5;
+
 type SuccessHeroProps = {
   circle?: CircleDetailResponse | null;
 };
@@ -39,7 +41,7 @@ export default function SuccessHero({ circle }: SuccessHeroProps) {
     : null;
 
   const memberAvatars = circle?.membersPreview?.length
-    ? circle.membersPreview.slice(0, 5).map((m, i) => ({
+    ? circle.membersPreview.slice(0, MEMBERS_PREVIEW_COUNT).map((m, i) => ({
         avatar: toAvatar(m.user.avatarEmoji, m.user.avatarColor),
         ...layoutPositions[i % layoutPositions.length],
       }))
