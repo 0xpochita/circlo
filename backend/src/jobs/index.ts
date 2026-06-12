@@ -31,6 +31,9 @@ export const goalJobQueue = new Queue("goal-jobs", {
   },
 });
 
+const CRON_QUEUE_RETAIN_COMPLETE = 10;
+const CRON_QUEUE_RETAIN_FAIL = 50;
+
 /**
  * BullMQ queue for scheduled, repeating jobs (lock expired goals,
  * detect disputes).
@@ -43,8 +46,8 @@ export const goalJobQueue = new Queue("goal-jobs", {
 export const cronJobQueue = new Queue("cron-jobs", {
   connection,
   defaultJobOptions: {
-    removeOnComplete: 10,
-    removeOnFail: 50,
+    removeOnComplete: CRON_QUEUE_RETAIN_COMPLETE,
+    removeOnFail: CRON_QUEUE_RETAIN_FAIL,
     attempts: 1,
   },
 });
