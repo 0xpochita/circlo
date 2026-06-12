@@ -16,7 +16,7 @@ const categories = [
   { emoji: "⚡", label: "Fitness", value: "fitness" },
   { emoji: "🎮", label: "Gaming", value: "gaming" },
   { emoji: "🎧", label: "Music", value: "music" },
-];
+] as const;
 
 export default function CircleSetupForm() {
   const store = useCreateCircleStore();
