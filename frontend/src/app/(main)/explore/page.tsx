@@ -18,7 +18,7 @@ const categories = [
   { label: "Gaming", emoji: "🎮", value: "gaming" },
   { label: "Global", emoji: "🌈", value: "other" },
   { label: "Music", emoji: "🎧", value: "music" },
-];
+] as const;
 
 export default function ExplorePage() {
   const [search, setSearch] = useState("");
