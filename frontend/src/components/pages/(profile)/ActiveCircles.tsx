@@ -9,6 +9,7 @@ import { useMyCircles, useSheetOverflow } from "@/hooks";
 
 const PREVIEW_COUNT = 5;
 const SKELETON_COUNT = 3;
+const LIST_STAGGER_DELAY = 0.05;
 
 export default function ActiveCircles() {
   const { circles, isLoading } = useMyCircles();
@@ -161,7 +162,7 @@ export default function ActiveCircles() {
                         key={c.id}
                         initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3, delay: 0.05 * i }}
+                        transition={{ duration: 0.3, delay: LIST_STAGGER_DELAY * i }}
                       >
                         <Link
                           href={`/circle-details?id=${c.id}`}
