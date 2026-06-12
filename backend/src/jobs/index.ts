@@ -6,6 +6,11 @@ import type { ProcessReferralJobData } from "../types/index.js";
 
 const connection = parseRedisUrl(config.redisUrl);
 
+const GOAL_QUEUE_RETAIN_COMPLETE = 100;
+const GOAL_QUEUE_RETAIN_FAIL = 500;
+const GOAL_QUEUE_ATTEMPTS = 3;
+const GOAL_QUEUE_BACKOFF_MS = 2000;
+
 /**
  * BullMQ queue for one-shot, event-driven jobs (referral verification,
  * etc). Jobs in this queue are fired by API handlers when something
@@ -19,10 +24,10 @@ const connection = parseRedisUrl(config.redisUrl);
 export const goalJobQueue = new Queue("goal-jobs", {
   connection,
   defaultJobOptions: {
-    removeOnComplete: 100,
-    removeOnFail: 500,
-    attempts: 3,
-    backoff: { type: "exponential", delay: 2000 },
+    removeOnComplete: GOAL_QUEUE_RETAIN_COMPLETE,
+    removeOnFail: GOAL_QUEUE_RETAIN_FAIL,
+    attempts: GOAL_QUEUE_ATTEMPTS,
+    backoff: { type: "exponential", delay: GOAL_QUEUE_BACKOFF_MS },
   },
 });
 
