@@ -2,7 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
 import { prisma } from "../../lib/prisma.js";
-import { redis } from "../../lib/redis.js";
+import { publishNotification } from "../../lib/notifications.js";
 import { requireAuth } from "../middlewares/auth.js";
 import { config } from "../../config.js";
 
@@ -99,10 +99,6 @@ function serializeGoal(goal: {
     txHash: goal.tx_hash,
     createdAt: goal.created_at,
   };
-}
-
-async function publishNotification(userId: string, notification: object): Promise<void> {
-  await redis.publish(`notifications:${userId}`, JSON.stringify(notification));
 }
 
 export default async function goalRoutes(app: FastifyInstance) {
