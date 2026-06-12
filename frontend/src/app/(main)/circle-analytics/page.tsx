@@ -23,6 +23,7 @@ import { toAvatar } from "@/lib/utils";
 
 const PARTICIPANT_BATCH_SIZE = 5;
 const TOP_COUNT = 5;
+const USDT_DISPLAY_DECIMALS = 3;
 const STATUS_ORDER = ["open", "locked", "resolving", "resolved", "paidout", "disputed"] as const;
 
 type StakerStat = {
@@ -266,7 +267,7 @@ function CircleAnalyticsContent() {
                   Total volume
                 </p>
                 <p className="mt-1 text-3xl font-bold inline-flex items-center gap-2">
-                  {analytics.totalVolume.toFixed(3)} <UsdtLabel size={20} />
+                  {analytics.totalVolume.toFixed(USDT_DISPLAY_DECIMALS)} <UsdtLabel size={20} />
                 </p>
                 <div className="mt-5 grid grid-cols-3 gap-3 text-center">
                   <div className="rounded-xl bg-white/5 py-3">
@@ -376,11 +377,11 @@ function CircleAnalyticsContent() {
                       </div>
                       <div className="text-right shrink-0">
                         <p className="text-sm font-bold text-main-text inline-flex items-center gap-1">
-                          {s.totalStaked.toFixed(3)} <UsdtLabel size={10} />
+                          {s.totalStaked.toFixed(USDT_DISPLAY_DECIMALS)} <UsdtLabel size={10} />
                         </p>
                         {s.totalClaimed > 0 && (
                           <p className="text-xs text-emerald-500 inline-flex items-center gap-1">
-                            +{s.totalClaimed.toFixed(3)} won
+                            +{s.totalClaimed.toFixed(USDT_DISPLAY_DECIMALS)} won
                           </p>
                         )}
                       </div>
@@ -423,7 +424,7 @@ function CircleAnalyticsContent() {
                         </p>
                       </div>
                       <p className="text-xs font-bold text-main-text inline-flex items-center gap-1 shrink-0">
-                        {gs.totalStaked.toFixed(3)} <UsdtLabel size={9} />
+                        {gs.totalStaked.toFixed(USDT_DISPLAY_DECIMALS)} <UsdtLabel size={9} />
                       </p>
                     </motion.div>
                   ))}
