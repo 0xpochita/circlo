@@ -11,6 +11,7 @@ import { useCreateCircleStore } from "@/stores/createCircleStore";
 
 const SEARCH_DEBOUNCE_MS = 300;
 const SKELETON_COUNT = 3;
+const LIST_STAGGER_DELAY = 0.05;
 
 type SearchUser = {
   id: string;
@@ -167,7 +168,7 @@ export default function MemberList({ circleId }: MemberListProps) {
                   key={member.id}
                   initial={{ opacity: 0, x: -12 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3, delay: 0.05 * i }}
+                  transition={{ duration: 0.3, delay: LIST_STAGGER_DELAY * i }}
                   className="flex items-center justify-between px-4 py-3.5"
                 >
                   <div className="flex items-center gap-3">
