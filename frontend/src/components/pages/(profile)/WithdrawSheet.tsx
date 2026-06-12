@@ -18,6 +18,8 @@ type WithdrawSheetProps = {
 const quickAmounts = ["25%", "50%", "75%", "Max"] as const;
 
 const NETWORK_FEE_USDT = 0.001;
+const AMOUNT_DECIMALS = 2;
+const RECEIVE_DECIMALS = 3;
 
 export default function WithdrawSheet({
   open,
@@ -48,7 +50,7 @@ export default function WithdrawSheet({
       return;
     }
     const pct = parseInt(label, 10) / 100;
-    setAmount((balanceNum * pct).toFixed(2));
+    setAmount((balanceNum * pct).toFixed(AMOUNT_DECIMALS));
   }
 
   const canWithdraw = parseFloat(amount) > 0 && address.trim().length > 0;
@@ -194,7 +196,7 @@ export default function WithdrawSheet({
                   </p>
                   <p className="text-sm font-bold text-main-text">
                     {amount
-                      ? `${(parseFloat(amount) - NETWORK_FEE_USDT).toFixed(3)} USDT`
+                      ? `${(parseFloat(amount) - NETWORK_FEE_USDT).toFixed(RECEIVE_DECIMALS)} USDT`
                       : "0.00 USDT"}
                   </p>
                 </div>
