@@ -21,6 +21,8 @@ import { useCreateGoalStore } from "@/stores/createGoalStore";
 const REDIRECT_DELAY_MS = 1200;
 const ERROR_MSG_MAX_LEN = 120;
 const ERROR_TOAST_DURATION_MS = 8000;
+const STEP_STAGGER_DELAY = 0.1;
+const SHEET_MAX_HEIGHT = "90dvh";
 
 const OUTCOME_LABELS: Record<number, string> = {
   0: "Yes / No",
@@ -401,7 +403,7 @@ export default function ConfirmButton() {
                 damping: 32,
               }}
               className="fixed bottom-0 left-1/2 z-101 w-full max-w-md -translate-x-1/2 rounded-t-3xl bg-white"
-              style={{ maxHeight: "90dvh" }}
+              style={{ maxHeight: SHEET_MAX_HEIGHT }}
             >
               <div className="flex items-start justify-between px-6 pt-6 pb-4">
                 <div>
@@ -435,7 +437,7 @@ export default function ConfirmButton() {
                         key={`step-${i}`}
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.1 * i }}
+                        transition={{ delay: STEP_STAGGER_DELAY * i }}
                         className="flex items-center gap-3"
                       >
                         <div
