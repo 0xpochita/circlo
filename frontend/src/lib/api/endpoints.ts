@@ -53,17 +53,7 @@ export const usersApi = {
     }),
 
   search: (query: string) =>
-    fetchApi<
-      {
-        id: string;
-        walletAddress: string;
-        name: string | null;
-        username: string | null;
-        avatarEmoji: string | null;
-        avatarColor: string | null;
-        createdAt: string;
-      }[]
-    >(`/users/search?q=${encodeURIComponent(query)}`),
+    fetchApi<UserApiResponse[]>(`/users/search?q=${encodeURIComponent(query)}`),
 
   myStats: () =>
     fetchApi<{
