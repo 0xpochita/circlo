@@ -11,6 +11,8 @@ import { useAuthStore } from "@/stores/authStore";
 import { useUserStore } from "@/stores/userStore";
 import type { UserAvatar } from "@/types";
 
+const NAME_MAX_LENGTH = 80;
+
 type EditProfileSheetProps = {
   open: boolean;
   onClose: () => void;
@@ -165,7 +167,7 @@ export default function EditProfileSheet({
                     value={name}
                     onChange={(e) => setNameLocal(e.target.value)}
                     placeholder="Your name"
-                    maxLength={80}
+                    maxLength={NAME_MAX_LENGTH}
                     className="w-full rounded-xl bg-white px-4 py-3 text-sm text-main-text placeholder:text-muted outline-none transition-all duration-200 focus:ring-2 focus:ring-brand"
                   />
                 </div>
