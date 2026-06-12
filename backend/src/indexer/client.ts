@@ -2,6 +2,8 @@ import { createPublicClient, http, type PublicClient } from "viem";
 import { celo, celoSepolia } from "viem/chains";
 import { config } from "../config.js";
 
+const POLLING_INTERVAL_MS = 4_000;
+
 export interface IndexerClient {
   getClient: () => PublicClient;
   onReconnect: (cb: () => Promise<void>) => void;
@@ -30,7 +32,7 @@ export function createIndexerClient(testnet = false): IndexerClient {
   const client = createPublicClient({
     chain,
     transport: http(rpcUrl),
-    pollingInterval: 4_000,
+    pollingInterval: POLLING_INTERVAL_MS,
   });
 
   return {
