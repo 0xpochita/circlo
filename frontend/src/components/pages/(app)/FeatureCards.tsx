@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { HiOutlineGlobeAlt, HiOutlineUserGroup } from "react-icons/hi2";
 
+const FEATURE_BG_COLOR = "#3a86ff";
+
 export default function FeatureCards() {
   return (
     <div className="grid grid-cols-2 gap-3 px-4 py-2">
@@ -12,7 +14,7 @@ export default function FeatureCards() {
       >
         <div
           className="flex aspect-4/5 flex-col justify-between rounded-2xl p-4"
-          style={{ backgroundColor: "#3a86ff" }}
+          style={{ backgroundColor: FEATURE_BG_COLOR }}
         >
           <HiOutlineUserGroup className="w-6 h-6 text-white" />
           <div>
@@ -27,7 +29,7 @@ export default function FeatureCards() {
       >
         <div
           className="flex aspect-4/5 flex-col justify-between rounded-2xl p-4"
-          style={{ backgroundColor: "#3a86ff" }}
+          style={{ backgroundColor: FEATURE_BG_COLOR }}
         >
           <HiOutlineGlobeAlt className="w-6 h-6 text-white" />
           <div>
