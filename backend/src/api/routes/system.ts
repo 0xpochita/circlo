@@ -11,6 +11,9 @@ import { config } from "../../config.js";
  * unauthenticated so deployment health checkers and the frontend's
  * pre-login bundle can read them.
  */
+const CATEGORIES = ["general", "crypto", "fitness", "gaming", "music", "other"] as const;
+const DEFAULT_MIN_STAKE = "1.000000";
+
 export default async function systemRoutes(app: FastifyInstance) {
   /**
    * `GET /health` — composite health check.
@@ -75,8 +78,8 @@ export default async function systemRoutes(app: FastifyInstance) {
    */
   app.get("/api/v1/config", async (_req, reply) => {
     return reply.send({
-      minStake: "1.000000",
-      categories: ["general", "crypto", "fitness", "gaming", "music", "other"],
+      minStake: DEFAULT_MIN_STAKE,
+      categories: CATEGORIES,
       contractAddresses: {
         circleFactory: config.contractCircleFactory,
         predictionPool: config.contractPredictionPool,
