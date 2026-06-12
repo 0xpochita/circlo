@@ -11,6 +11,8 @@ import { circlesApi } from "@/lib/api/endpoints";
 import { circleFactoryContract } from "@/lib/web3/contracts";
 import { useAuthStore } from "@/stores/authStore";
 
+const LS_REDIRECT_AFTER_LOGIN = "circlo-redirect-after-login";
+
 type JoinButtonProps = {
   circleId?: number;
   circleBackendId?: string;
@@ -54,7 +56,7 @@ export default function JoinButton({
 
   async function handleJoin() {
     if (!isConnected || !isAuthenticated) {
-      localStorage.setItem("circlo-redirect-after-login", window.location.href);
+      localStorage.setItem(LS_REDIRECT_AFTER_LOGIN, window.location.href);
       router.push("/welcome");
       return;
     }
