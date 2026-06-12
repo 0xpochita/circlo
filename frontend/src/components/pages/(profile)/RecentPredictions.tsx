@@ -12,6 +12,7 @@ import { normalizeSide, toAvatar } from "@/lib/utils";
 import { useDataCache } from "@/stores/dataCache";
 
 const PREVIEW_COUNT = 5;
+const SKELETON_COUNT = 3;
 
 function getResultLabel(goal: GoalWithMyStake): {
   label: string;
@@ -68,7 +69,7 @@ export default function RecentPredictions() {
           </p>
         </div>
         <div className="flex gap-3 overflow-x-auto scrollbar-none pb-1">
-          {Array.from({ length: 3 }).map((_, i) => (
+          {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
             <div
               key={`skel-${i}`}
               className="animate-pulse min-w-[160px] rounded-2xl bg-white p-1"
