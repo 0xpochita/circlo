@@ -195,7 +195,7 @@ export function useFetchCircles() {
     setError(null);
     try {
       const res = await circlesApi.list();
-      setCircles(res.items as unknown as Parameters<typeof setCircles>[0]);
+      setCircles(res.items ?? []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch circles");
     } finally {
