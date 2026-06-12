@@ -13,6 +13,8 @@ import { useSheetOverflow } from "@/hooks";
 import { circlesApi, usersApi } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
 
+const SKELETON_COUNT = 3;
+
 const SEARCH_DEBOUNCE_MS = 300;
 
 type SearchUser = {
@@ -174,7 +176,7 @@ export default function InviteMemberButton({
               <div className="flex-1 overflow-y-auto px-4 pb-8">
                 {isLoading ? (
                   <div className="flex flex-col gap-2">
-                    {Array.from({ length: 3 }).map((_, i) => (
+                    {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
                       <div
                         key={i}
                         className="animate-pulse rounded-2xl bg-gray-100 h-16"
