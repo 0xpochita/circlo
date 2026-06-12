@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { EmojiAvatar } from "@/components/shared";
 import type { UserAvatar } from "@/types";
 
-const positions: {
+const positions: readonly {
   avatar: UserAvatar;
   x: number;
   y: number;
