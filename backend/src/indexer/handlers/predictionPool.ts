@@ -1,7 +1,7 @@
 import { formatUnits } from "viem";
 import { config } from "../../config.js";
 import { prisma } from "../../lib/prisma.js";
-import { redis } from "../../lib/redis.js";
+import { publishNotification } from "../../lib/notifications.js";
 import { celoClient } from "../../lib/viem.js";
 import { goalJobQueue } from "../../jobs/index.js";
 
@@ -81,13 +81,6 @@ const STAKE_OF_ABI = [
     outputs: [{ name: "", type: "uint256" }],
   },
 ] as const;
-
-async function publishNotification(
-  userId: string,
-  notification: object
-): Promise<void> {
-  await redis.publish(`notifications:${userId}`, JSON.stringify(notification));
-}
 
 async function ensureUser(walletAddress: string) {
   const addr = walletAddress.toLowerCase();
