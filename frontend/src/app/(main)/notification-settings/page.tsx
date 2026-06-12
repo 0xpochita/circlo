@@ -24,7 +24,7 @@ type CategoryConfig = {
   examples: string[];
 };
 
-const CATEGORIES: CategoryConfig[] = [
+const CATEGORIES: readonly CategoryConfig[] = [
   {
     id: "circle",
     title: "Circle activity",
