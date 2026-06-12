@@ -12,6 +12,7 @@ export interface AuthenticatedRequest {
 export type NotificationType =
   | "circle.invited"
   | "circle.active"
+  | "circle.joined"
   | "goal.created"
   | "goal.staked"
   | "goal.resolution_needed"
