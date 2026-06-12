@@ -71,9 +71,11 @@ const layoutCoords: readonly { x: number; y: number; size: number }[] = [
   { x: 104, y: 68, size: 68 },
 ];
 
+const MEMBERS_PREVIEW_COUNT = 5;
+
 function buildPositions(members?: MemberResponse[]) {
   if (!members || members.length === 0) return defaultPositions;
-  return members.slice(0, 5).map((m, i) => ({
+  return members.slice(0, MEMBERS_PREVIEW_COUNT).map((m, i) => ({
     avatar: toAvatar(m.user.avatarEmoji, m.user.avatarColor),
     ...layoutCoords[i % layoutCoords.length],
     key: m.userId,
