@@ -1,5 +1,8 @@
 import { explorerAddressUrl } from "@/lib/web3/network";
 
+const TAIL_HEAD_LEN = 6;
+const TAIL_SUFFIX_LEN = 4;
+
 type AddressLinkProps = {
   address: string;
   /** First N chars to display when `withTail` is false. Defaults to 10. */
@@ -23,7 +26,7 @@ export default function AddressLink({
   stopPropagation = false,
 }: AddressLinkProps) {
   const display = withTail
-    ? `${address.slice(0, 6)}...${address.slice(-4)}`
+    ? `${address.slice(0, TAIL_HEAD_LEN)}...${address.slice(-TAIL_SUFFIX_LEN)}`
     : address.slice(0, length);
 
   return (
