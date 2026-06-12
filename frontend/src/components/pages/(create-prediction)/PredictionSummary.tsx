@@ -6,6 +6,9 @@ import { useCreateGoalStore } from "@/stores/createGoalStore";
 const PLATFORM_FEE_BPS = 100;
 const BPS_DENOMINATOR = 10_000;
 const NETWORK_FEE = 0.001;
+const SMALL_AMOUNT_THRESHOLD = 0.01;
+const SMALL_AMOUNT_DECIMALS = 3;
+const DEFAULT_AMOUNT_DECIMALS = 2;
 
 export default function PredictionSummary() {
   const stakeAmount = useCreateGoalStore((s) => s.stakeAmount);
@@ -16,8 +19,8 @@ export default function PredictionSummary() {
 
   function fmt(n: number): string {
     if (n === 0) return "0";
-    if (n < 0.01) return n.toFixed(3);
-    return n.toFixed(2);
+    if (n < SMALL_AMOUNT_THRESHOLD) return n.toFixed(SMALL_AMOUNT_DECIMALS);
+    return n.toFixed(DEFAULT_AMOUNT_DECIMALS);
   }
 
   const rows = [
