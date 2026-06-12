@@ -13,6 +13,8 @@ import { toAvatar } from "@/lib/utils";
 import { useDataCache } from "@/stores/dataCache";
 import type { ExploreSortKey } from "./ExploreHeader";
 
+const SEARCH_DEBOUNCE_MS = 300;
+
 type CircleListProps = {
   search?: string;
   category?: string;
@@ -65,7 +67,7 @@ export default function CircleList({
           })
           .finally(() => setIsLoading(false));
       },
-      search ? 300 : 0,
+      search ? SEARCH_DEBOUNCE_MS : 0,
     );
 
     return () => {
