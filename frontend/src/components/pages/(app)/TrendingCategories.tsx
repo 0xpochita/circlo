@@ -8,7 +8,7 @@ type Category = {
   avatar: UserAvatar;
 };
 
-const categories: Category[] = [
+const categories: readonly Category[] = [
   { label: "Crypto", avatar: { emoji: "💎", color: "#60a5fa" } },
   { label: "Fitness", avatar: { emoji: "⚡", color: "#f87171" } },
   { label: "Gaming", avatar: { emoji: "🎮", color: "#a78bfa" } },
