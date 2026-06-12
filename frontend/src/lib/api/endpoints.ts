@@ -21,15 +21,7 @@ export const authApi = {
     fetchApi<{
       accessToken: string;
       refreshToken?: string;
-      user: {
-        id: string;
-        walletAddress: string;
-        name: string | null;
-        username: string | null;
-        avatarEmoji: string | null;
-        avatarColor: string | null;
-        createdAt: string;
-      };
+      user: UserApiResponse;
     }>("/auth/verify", {
       method: "POST",
       body: JSON.stringify({ message, signature }),
