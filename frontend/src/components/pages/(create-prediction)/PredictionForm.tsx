@@ -22,6 +22,9 @@ const outcomes = [
   { label: "Numeric Range", value: 2, enabled: false },
 ] as const;
 
+const DESCRIPTION_MAX_LENGTH = 200;
+const DESCRIPTION_WARN_THRESHOLD = 180;
+
 export default function PredictionForm() {
   const store = useCreateGoalStore();
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -86,18 +89,18 @@ export default function PredictionForm() {
         <textarea
           value={store.description}
           onChange={(e) => {
-            if (e.target.value.length <= 200)
+            if (e.target.value.length <= DESCRIPTION_MAX_LENGTH)
               store.setDescription(e.target.value);
           }}
           placeholder="Add more context for this goal..."
           rows={3}
-          maxLength={200}
+          maxLength={DESCRIPTION_MAX_LENGTH}
           className="w-full resize-none rounded-xl bg-gray-50 px-4 py-3 text-sm text-main-text placeholder:text-muted outline-none transition-all duration-200 focus:ring-2 focus:ring-brand"
         />
         <p
-          className={`text-xs mt-1 text-right ${store.description.length >= 180 ? "text-red-400" : "text-muted"}`}
+          className={`text-xs mt-1 text-right ${store.description.length >= DESCRIPTION_WARN_THRESHOLD ? "text-red-400" : "text-muted"}`}
         >
-          {store.description.length}/200
+          {store.description.length}/{DESCRIPTION_MAX_LENGTH}
         </p>
       </div>
 
