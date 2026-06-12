@@ -7,6 +7,8 @@ import { UsdtLabel } from "@/components/shared";
 import { predictionPoolContract } from "@/lib/web3/contracts";
 import { fromUSDT } from "@/lib/web3/usdt";
 
+const POOL_DISPLAY_DECIMALS = 4;
+
 type OddsCardProps = {
   goalChainId?: string;
 };
@@ -43,12 +45,12 @@ export default function OddsCard({ goalChainId }: OddsCardProps) {
     {
       label: "Yes",
       percentage: yesPercent,
-      pool: parseFloat(yesPool.toFixed(4)).toString(),
+      pool: parseFloat(yesPool.toFixed(POOL_DISPLAY_DECIMALS)).toString(),
     },
     {
       label: "No",
       percentage: noPercent,
-      pool: parseFloat(noPool.toFixed(4)).toString(),
+      pool: parseFloat(noPool.toFixed(POOL_DISPLAY_DECIMALS)).toString(),
     },
   ];
 
@@ -58,7 +60,7 @@ export default function OddsCard({ goalChainId }: OddsCardProps) {
         <div className="flex items-center justify-between mb-3">
           <p className="text-sm font-semibold text-main-text">Current Odds</p>
           <p className="text-xs text-muted inline-flex items-center gap-1">
-            Total pool: {parseFloat(totalPool.toFixed(4)).toString()}{" "}
+            Total pool: {parseFloat(totalPool.toFixed(POOL_DISPLAY_DECIMALS)).toString()}{" "}
             <UsdtLabel size={11} />
           </p>
         </div>
