@@ -57,7 +57,17 @@ export const useNotificationPrefs = create<NotifPrefsState>()(
  * unmapped type falls through to `true` (always shown) so a
  * brand-new event never gets silently muted by a stale mapping.
  */
-const TYPE_TO_CATEGORY: Record<string, NotifCategory> = {
+type NotifType =
+  | "goal_created"
+  | "goal_staked"
+  | "goal_locked"
+  | "goal_resolved"
+  | "goal_claimed"
+  | "circle_invite"
+  | "member_joined"
+  | "referral_reward";
+
+const TYPE_TO_CATEGORY: Record<NotifType, NotifCategory> = {
   goal_created: "goal",
   goal_staked: "goal",
   goal_locked: "goal",
@@ -81,7 +91,7 @@ export function isNotificationEnabled(
   type: string,
   prefs: NotifPrefs,
 ): boolean {
-  const category = TYPE_TO_CATEGORY[type];
+  const category = TYPE_TO_CATEGORY[type as NotifType];
   if (!category) return true;
   return prefs[category];
 }
