@@ -13,8 +13,10 @@ type GoalDetail = GoalResponse & {
   participationSummary?: { side: string; totalStaked: string; count: number }[];
 };
 
+const STAKE_DECIMALS = 4;
+
 function formatStake(total: number): string {
-  return parseFloat(total.toFixed(4)).toString();
+  return parseFloat(total.toFixed(STAKE_DECIMALS)).toString();
 }
 
 export default function CircleStats({ circleId }: CircleStatsProps) {
