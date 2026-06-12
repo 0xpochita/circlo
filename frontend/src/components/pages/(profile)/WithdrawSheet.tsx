@@ -19,6 +19,7 @@ const quickAmounts = ["25%", "50%", "75%", "Max"] as const;
 
 const NETWORK_FEE_USDT = 0.001;
 const AMOUNT_DECIMALS = 2;
+const SHEET_MAX_HEIGHT = "90dvh";
 const RECEIVE_DECIMALS = 3;
 
 export default function WithdrawSheet({
@@ -76,7 +77,7 @@ export default function WithdrawSheet({
               damping: 32,
             }}
             className="fixed bottom-0 left-1/2 z-101 w-full max-w-md -translate-x-1/2 flex flex-col rounded-t-3xl bg-white"
-            style={{ maxHeight: "90dvh" }}
+            style={{ maxHeight: SHEET_MAX_HEIGHT }}
           >
             <div className="flex items-start justify-between px-6 pt-6 pb-4 shrink-0">
               <div>
