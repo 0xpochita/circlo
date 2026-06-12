@@ -197,9 +197,7 @@ export async function handleCircleCreated(args: {
 
   await publishNotification(owner.id, notification);
 
-  console.log(
-    `[CircleFactory] CircleCreated: chain_id=${args.id} (${circleName}) owner=${owner.wallet_address}`
-  );
+  process.stdout.write(`[CircleFactory] CircleCreated: chain_id=${args.id} (${circleName}) owner=${owner.wallet_address}\n`);
 }
 
 /**
