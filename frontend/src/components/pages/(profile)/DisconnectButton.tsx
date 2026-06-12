@@ -9,6 +9,8 @@ import { useAuthStore } from "@/stores/authStore";
 import { useNotificationStore } from "@/stores/notificationStore";
 import { useUserStore } from "@/stores/userStore";
 
+const LS_ONBOARDING_DONE = "circlo-onboarding-done";
+
 export default function DisconnectButton() {
   const router = useRouter();
   const { disconnectAsync } = useDisconnect();
@@ -24,7 +26,7 @@ export default function DisconnectButton() {
     clearAuth();
     useNotificationStore.getState().reset();
     useUserStore.getState().reset();
-    localStorage.removeItem("circlo-onboarding-done");
+    localStorage.removeItem(LS_ONBOARDING_DONE);
     toast("Wallet disconnected");
     router.replace("/welcome");
   }
