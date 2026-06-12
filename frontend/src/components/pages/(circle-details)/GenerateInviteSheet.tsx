@@ -18,6 +18,8 @@ import {
   INVITE_PROOF_TYPES,
 } from "@/lib/web3/inviteProof";
 
+const COPIED_TIMEOUT_MS = 2000;
+
 type DurationKey = "1h" | "1d" | "7d" | "30d";
 
 const DURATIONS: readonly { key: DurationKey; label: string; seconds: number }[] = [
@@ -133,7 +135,7 @@ export default function GenerateInviteSheet({
       await navigator.clipboard.writeText(generated);
       setCopied(true);
       toast.success("Link copied");
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), COPIED_TIMEOUT_MS);
     } catch {
       toast.error("Copy failed — long-press to copy manually");
     }
