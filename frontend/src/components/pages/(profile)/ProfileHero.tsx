@@ -25,6 +25,11 @@ import EditProfileSheet from "./EditProfileSheet";
 import NotificationSheet from "./NotificationSheet";
 import WithdrawSheet from "./WithdrawSheet";
 
+function formatSigned(n: number, decimals: number): string {
+  const abs = Math.abs(n).toFixed(decimals);
+  return n >= 0 ? `+${abs}` : `-${abs}`;
+}
+
 export default function ProfileHero() {
   const router = useRouter();
   const name = useUserStore((s) => s.name);
@@ -90,10 +95,6 @@ export default function ProfileHero() {
   const isPositivePnl = pnlValue >= 0;
   const pnlPercentageNum =
     stats && usdtBalance > 0 ? (pnlValue / usdtBalance) * 100 : null;
-  const formatSigned = (n: number, decimals: number) => {
-    const abs = Math.abs(n).toFixed(decimals);
-    return n >= 0 ? `+${abs}` : `-${abs}`;
-  };
   const showPnl =
     isConnected && stats && pnlValue !== 0 && pnlPercentageNum !== null;
 
