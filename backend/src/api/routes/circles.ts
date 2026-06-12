@@ -110,11 +110,11 @@ async function publishNotification(
 }
 
 export default async function circleRoutes(app: FastifyInstance) {
-  app.get(
+  app.get<{ Querystring: { cursor?: string } }>(
     "/",
     { preHandler: requireAuth },
     async (req, reply) => {
-      const { cursor } = req.query as { cursor?: string };
+      const { cursor } = req.query;
 
       const memberships = await prisma.circleMember.findMany({
         where: { user_id: req.jwtUser.sub },
