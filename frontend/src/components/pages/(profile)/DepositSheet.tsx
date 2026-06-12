@@ -13,6 +13,9 @@ import {
 import QRCode from "react-qr-code";
 import { explorerAddressUrl } from "@/lib/web3/network";
 
+const QR_SIZE = 168;
+const COPIED_TIMEOUT_MS = 2000;
+
 type DepositSheetProps = {
   open: boolean;
   onClose: () => void;
@@ -42,7 +45,7 @@ export default function DepositSheet({
     try {
       await navigator.clipboard.writeText(walletAddress);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), COPIED_TIMEOUT_MS);
     } catch {
       setCopied(false);
     }
@@ -141,10 +144,10 @@ export default function DepositSheet({
                     <div className="rounded-2xl bg-gray-50 p-4">
                       <QRCode
                         value={walletAddress}
-                        size={168}
+                        size={QR_SIZE}
                         bgColor="transparent"
                         fgColor="#1a1a1a"
-                        viewBox="0 0 168 168"
+                        viewBox={`0 0 ${QR_SIZE} ${QR_SIZE}`}
                       />
                     </div>
                   </motion.div>
