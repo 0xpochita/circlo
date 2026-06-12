@@ -32,6 +32,7 @@ const userSubscriptions = new Map<string, Redis>();
  */
 const PING_INTERVAL = 30_000;
 const WS_CLOSE_POLICY_VIOLATION = 1008;
+const WS_READY_STATE_OPEN = 1;
 
 /**
  * Lazily construct (or return cached) Redis subscriber for a user's
@@ -68,7 +69,7 @@ function getOrCreateSubscriber(userId: string): Redis {
 
     for (const ws of sockets) {
       try {
-        if (ws.readyState === 1) {
+        if (ws.readyState === WS_READY_STATE_OPEN) {
           ws.send(message);
         }
       } catch {}
@@ -141,7 +142,7 @@ export function registerWsGateway(app: FastifyInstance): void {
       app.log.info(`[WS] user ${userId} connected (${userSockets.get(userId)?.size} conn)`);
 
       const pingTimer = setInterval(() => {
-        if (ws.readyState === 1) {
+        if (ws.readyState === WS_READY_STATE_OPEN) {
           ws.ping();
         }
       }, PING_INTERVAL);
