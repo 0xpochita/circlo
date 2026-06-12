@@ -185,10 +185,10 @@ export default async function userRoutes(app: FastifyInstance) {
     }
   );
 
-  app.get(
+  app.get<{ Params: { walletAddress: string } }>(
     "/:walletAddress",
     async (req, reply) => {
-      const { walletAddress } = req.params as { walletAddress: string };
+      const { walletAddress } = req.params;
 
       if (!/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
         return reply.status(400).send({
