@@ -23,6 +23,7 @@ import { useAuthStore } from "@/stores/authStore";
 const STAKED_CALLBACK_DELAY_MS = 1000;
 const ERROR_TOAST_DURATION_MS = 10_000;
 const ERROR_MSG_SLICE_LEN = 100;
+const CLOSE_DELAY_MS = 1500;
 
 type ResolverInfo = {
   userId: string;
@@ -488,7 +489,7 @@ export default function StakeButton({
           const t2 = setTimeout(onStaked, STAKED_CALLBACK_DELAY_MS);
           timeoutRefs.current.push(t2);
         }
-      }, 1500);
+      }, CLOSE_DELAY_MS);
       timeoutRefs.current.push(t1);
     } catch (err) {
       const errObj = err as {
