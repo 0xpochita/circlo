@@ -61,9 +61,9 @@ export function normalizeSide(
   return null;
 }
 
-const MS_PER_DAY = 86_400_000;
-const MS_PER_HOUR = 3_600_000;
-const MS_PER_MINUTE = 60_000;
+export const MS_PER_DAY = 86_400_000;
+export const MS_PER_HOUR = 3_600_000;
+export const MS_PER_MINUTE = 60_000;
 
 /**
  * Render a deadline timestamp as a compact countdown string for
