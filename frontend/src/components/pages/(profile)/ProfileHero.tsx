@@ -25,6 +25,8 @@ import EditProfileSheet from "./EditProfileSheet";
 import NotificationSheet from "./NotificationSheet";
 import WithdrawSheet from "./WithdrawSheet";
 
+const BALANCE_DISPLAY_DECIMALS = 2;
+
 function formatSigned(n: number, decimals: number): string {
   const abs = Math.abs(n).toFixed(decimals);
   return n >= 0 ? `+${abs}` : `-${abs}`;
@@ -75,7 +77,7 @@ export default function ProfileHero() {
     }
   }, [isMiniPayBrowser, isConnected, isAuthenticated]);
 
-  const displayBalance = isBalanceLoading ? "..." : usdtBalance.toFixed(2);
+  const displayBalance = isBalanceLoading ? "..." : usdtBalance.toFixed(BALANCE_DISPLAY_DECIMALS);
   const unreadCount = useNotificationStore((s) => s.unreadCount);
   const fetchNotifications = useNotificationStore((s) => s.fetchNotifications);
 
