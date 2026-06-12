@@ -26,6 +26,8 @@ const ERROR_MSG_SLICE_LEN = 100;
 const CLOSE_DELAY_MS = 1500;
 const QUICK_STAKE_AMOUNTS = ["1", "5", "10", "50"] as const;
 const LS_REDIRECT_AFTER_LOGIN = "circlo-redirect-after-login";
+const STEP_STAGGER_DELAY = 0.1;
+const SHEET_MAX_HEIGHT = "90dvh";
 
 type ResolverInfo = {
   userId: string;
@@ -859,7 +861,7 @@ export default function StakeButton({
                 damping: 32,
               }}
               className="fixed bottom-0 left-1/2 z-101 w-full max-w-md -translate-x-1/2 rounded-t-3xl bg-white"
-              style={{ maxHeight: "90dvh" }}
+              style={{ maxHeight: SHEET_MAX_HEIGHT }}
             >
               <div className="flex items-start justify-between px-6 pt-6 pb-4">
                 <div>
@@ -891,7 +893,7 @@ export default function StakeButton({
                         key={`step-${i}`}
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.1 * i }}
+                        transition={{ delay: STEP_STAGGER_DELAY * i }}
                       >
                         <StepIndicator step={step} />
                       </motion.div>
