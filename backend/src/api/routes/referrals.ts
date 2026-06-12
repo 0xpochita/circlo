@@ -14,6 +14,8 @@ import type { ReferralStatus } from "../../types/index.js";
  * lower bound catches obviously malformed input without rejecting
  * potential future short-link formats.
  */
+const PAGE_SIZE = 20;
+
 const trackSchema = z.object({
   referralCode: z.string().min(3).max(50),
 });
@@ -27,7 +29,7 @@ export default async function referralRoutes(app: FastifyInstance) {
         prisma.referral.findMany({
           where: { referrer_id: req.jwtUser.sub },
           orderBy: { verified_at: "desc" },
-          take: 20,
+          take: PAGE_SIZE,
           include: {
             referred: {
               select: {
