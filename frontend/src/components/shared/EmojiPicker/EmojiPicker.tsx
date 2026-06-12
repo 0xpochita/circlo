@@ -12,6 +12,8 @@ import {
 } from "@/lib/emojiOptions";
 import type { UserAvatar } from "@/types";
 
+const SHEET_MAX_HEIGHT = "90dvh";
+
 type EmojiPickerProps = {
   open: boolean;
   onClose: () => void;
@@ -73,7 +75,7 @@ function EmojiPicker({
               damping: 32,
             }}
             className="fixed bottom-0 left-1/2 z-101 w-full max-w-md -translate-x-1/2 flex flex-col rounded-t-3xl bg-white"
-            style={{ maxHeight: "90dvh" }}
+            style={{ maxHeight: SHEET_MAX_HEIGHT }}
           >
             <div className="flex items-start justify-between px-6 pt-6 pb-4 shrink-0">
               <div>
