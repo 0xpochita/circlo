@@ -7,6 +7,8 @@ import { HiOutlineLockClosed } from "react-icons/hi2";
 import { toast } from "sonner";
 import { usePublicClient, useWalletClient } from "wagmi";
 
+const GOAL_STATUS_OPEN = 0;
+
 type LockMarketButtonProps = {
   goalChainId?: string;
   status?: string;
@@ -51,7 +53,7 @@ export default function LockMarketButton({
     };
   }, [goalChainId, publicClient, circlo]);
 
-  const isOpenOnChain = scStatus === 0;
+  const isOpenOnChain = scStatus === GOAL_STATUS_OPEN;
   const deadlinePassed = deadline
     ? new Date(deadline).getTime() < Date.now()
     : false;
