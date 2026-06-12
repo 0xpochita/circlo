@@ -695,7 +695,7 @@ export async function handleClaimed(args: {
 
   const goal = await prisma.goal.findFirst({ where: { chain_id: args.goalId } });
   if (!goal) {
-    console.warn(`[PredictionPool] Claimed: goal not found for chain_id=${args.goalId}`);
+    process.stderr.write(`[PredictionPool] Claimed: goal not found chain_id=${args.goalId}\n`);
     return;
   }
 
@@ -706,7 +706,5 @@ export async function handleClaimed(args: {
     data: { claimed: true, claimed_amount: amountStr },
   });
 
-  console.log(
-    `[PredictionPool] Claimed: goalId=${goal.id}, user=${user.wallet_address}, amount=${amountStr}`
-  );
+  process.stdout.write(`[PredictionPool] Claimed: goalId=${goal.id} user=${user.wallet_address} amount=${amountStr}\n`);
 }
