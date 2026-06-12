@@ -3,6 +3,7 @@ import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
 import { prisma } from "../../lib/prisma.js";
 import { requireAuth } from "../middlewares/auth.js";
+import type { ReferralStatus } from "../../types/index.js";
 
 /**
  * Validation schema for `POST /referrals/track`.
@@ -47,13 +48,13 @@ export default async function referralRoutes(app: FastifyInstance) {
         }),
       ]);
 
-      const statsMap: Record<string, number> = {
+      const statsMap: Record<ReferralStatus, number> = {
         pending: 0,
         verified: 0,
         rewarded: 0,
       };
       for (const s of stats) {
-        statsMap[s.status] = s._count;
+        statsMap[s.status as ReferralStatus] = s._count;
       }
 
       const me = await prisma.user.findUnique({
