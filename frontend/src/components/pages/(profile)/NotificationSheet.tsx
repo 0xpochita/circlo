@@ -9,6 +9,10 @@ import type { NotificationResponse } from "@/lib/api/endpoints";
 import { useNotificationStore } from "@/stores/notificationStore";
 import type { UserAvatar } from "@/types";
 
+const MS_PER_MINUTE = 60_000;
+const MINUTES_PER_HOUR = 60;
+const HOURS_PER_DAY = 24;
+
 const TYPE_AVATARS: Record<string, UserAvatar> = {
   goal_created: { emoji: "\u{1F3AF}", color: "#60a5fa" },
   goal_staked: { emoji: "\u{1F4B0}", color: "#fbbf24" },
@@ -22,12 +26,12 @@ const TYPE_AVATARS: Record<string, UserAvatar> = {
 
 function formatTime(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
-  const minutes = Math.floor(diff / 60000);
+  const minutes = Math.floor(diff / MS_PER_MINUTE);
   if (minutes < 1) return "just now";
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
+  if (minutes < MINUTES_PER_HOUR) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / MINUTES_PER_HOUR);
+  if (hours < HOURS_PER_DAY) return `${hours}h ago`;
+  const days = Math.floor(hours / HOURS_PER_DAY);
   return `${days}d ago`;
 }
 
