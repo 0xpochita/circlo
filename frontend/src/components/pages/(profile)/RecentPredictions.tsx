@@ -13,6 +13,7 @@ import { useDataCache } from "@/stores/dataCache";
 
 const PREVIEW_COUNT = 5;
 const SKELETON_COUNT = 3;
+const LIST_STAGGER_DELAY = 0.05;
 
 function getResultLabel(goal: GoalWithMyStake): {
   label: string;
@@ -217,7 +218,7 @@ export default function RecentPredictions() {
                           key={g.id}
                           initial={{ opacity: 0, y: 12 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.3, delay: 0.05 * i }}
+                          transition={{ duration: 0.3, delay: LIST_STAGGER_DELAY * i }}
                         >
                           <Link
                             href={`/prediction-detail?id=${g.id}`}
