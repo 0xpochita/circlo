@@ -17,6 +17,8 @@ type Member = {
   avatar: UserAvatar;
 };
 
+const SKELETON_COUNT = 3;
+
 export default function ResolverPicker() {
   const store = useCreateGoalStore();
   const [members, setMembers] = useState<Member[]>([]);
@@ -71,7 +73,7 @@ export default function ResolverPicker() {
           </div>
         </div>
         <div className="flex flex-col gap-2">
-          {Array.from({ length: 3 }).map((_, i) => (
+          {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
             <div
               key={`skel-${i}`}
               className="animate-pulse rounded-xl bg-gray-100 h-14"
