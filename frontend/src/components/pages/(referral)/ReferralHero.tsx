@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { UsdtLabel } from "@/components/shared";
 
-const gridCells: { highlight?: "soft" | "active"; initials?: string }[] = [
+const gridCells: readonly { highlight?: "soft" | "active"; initials?: string }[] = [
   { highlight: "soft" },
   {},
   { highlight: "soft" },
