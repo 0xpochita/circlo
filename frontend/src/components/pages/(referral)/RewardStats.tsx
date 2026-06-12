@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { UsdtLabel } from "@/components/shared";
 import { referralsApi } from "@/lib/api/endpoints";
 
+const STAT_PAD_LENGTH = 2;
+
 export default function RewardStats() {
   const [invitedCount, setInvitedCount] = useState(0);
   const [verifiedCount, setVerifiedCount] = useState(0);
@@ -25,12 +27,12 @@ export default function RewardStats() {
 
   const stats = [
     {
-      value: loading ? "--" : String(invitedCount).padStart(2, "0"),
+      value: loading ? "--" : String(invitedCount).padStart(STAT_PAD_LENGTH, "0"),
       label: "Friends invited",
       usdt: false,
     },
     {
-      value: loading ? "--" : String(verifiedCount).padStart(2, "0"),
+      value: loading ? "--" : String(verifiedCount).padStart(STAT_PAD_LENGTH, "0"),
       label: "Friends verified",
       usdt: false,
     },
