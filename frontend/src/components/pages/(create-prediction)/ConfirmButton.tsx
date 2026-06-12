@@ -21,6 +21,12 @@ const MS_PER_HOUR = 3_600_000;
 const REDIRECT_DELAY_MS = 1200;
 const ERROR_MSG_MAX_LEN = 120;
 
+const OUTCOME_LABELS: Record<number, string> = {
+  0: "Yes / No",
+  1: "Multiple Choice",
+  2: "Numeric Range",
+};
+
 type StepStatus = "pending" | "active" | "done" | "error";
 type Step = { label: string; status: StepStatus };
 
@@ -53,9 +59,7 @@ export default function ConfirmButton() {
   }
 
   function getOutcomeLabel(): string {
-    if (store.outcomeType === 0) return "Yes / No";
-    if (store.outcomeType === 1) return "Multiple Choice";
-    return "Numeric Range";
+    return OUTCOME_LABELS[store.outcomeType] ?? "Numeric Range";
   }
 
   async function handleOpenSheet() {
