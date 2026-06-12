@@ -224,9 +224,7 @@ export async function handleGoalCreated(
   });
 
   if (!circle) {
-    console.warn(
-      `[PredictionPool] GoalCreated: circle not found for chain_id=${args.circleId}. CircleFactory backfill may not have reached it yet.`
-    );
+    process.stderr.write(`[PredictionPool] GoalCreated: circle not found chain_id=${args.circleId}\n`);
     return;
   }
 
@@ -326,9 +324,7 @@ export async function handleGoalCreated(
     })
   );
 
-  console.log(
-    `[PredictionPool] GoalCreated: chain_id=${args.id} (${pending ? pending.title : parseGoalMetadata(args.metadataURI).title}) circle=${circle.chain_id}`
-  );
+  process.stdout.write(`[PredictionPool] GoalCreated: chain_id=${args.id} circle=${circle.chain_id}\n`);
 }
 
 /**
