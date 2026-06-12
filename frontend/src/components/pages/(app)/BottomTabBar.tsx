@@ -29,7 +29,7 @@ export default function BottomTabBar() {
   const active = activeIndex === -1 ? 0 : activeIndex;
 
   return (
-    <nav className="fixed bottom-safe left-1/2 z-50 -translate-x-1/2 w-[calc(100%-32px)] max-w-[calc(448px-32px)]">
+    <nav className="fixed bottom-safe left-1/2 z-50 -translate-x-1/2 w-[calc(100%-32px)] max-w-104">
       <motion.div
         initial={{ y: 80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
