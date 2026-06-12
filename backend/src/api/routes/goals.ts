@@ -181,11 +181,11 @@ export default async function goalRoutes(app: FastifyInstance) {
     }
   );
 
-  app.post(
+  app.post<{ Params: { id: string } }>(
     "/:id/confirm",
     { preHandler: requireAuth },
     async (req, reply) => {
-      const { id } = req.params as { id: string };
+      const { id } = req.params;
       const body = confirmGoalSchema.safeParse(req.body);
       if (!body.success) {
         return reply.status(400).send({
