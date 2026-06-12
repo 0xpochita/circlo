@@ -20,6 +20,9 @@ import { DepositSheet, WithdrawSheet } from "@/components/pages/(profile)";
 import { UsdtLabel } from "@/components/shared";
 import { useSheetOverflow } from "@/hooks";
 import { usdtContract } from "@/lib/web3/contracts";
+
+const FAUCET_GAS_LIMIT = BigInt(200_000);
+const ERROR_MSG_MAX_LEN = 80;
 import { IS_MAINNET } from "@/lib/web3/network";
 import { fromUSDT } from "@/lib/web3/usdt";
 
@@ -61,7 +64,7 @@ export default function BalanceCard() {
         abi: usdtContract.abi,
         functionName: "faucet",
         args: [],
-        gas: BigInt(200_000),
+        gas: FAUCET_GAS_LIMIT,
       });
       if (publicClient) {
         const receipt = await publicClient.waitForTransactionReceipt({
@@ -90,8 +93,8 @@ export default function BalanceCard() {
         );
       } else {
         toast.error(
-          message.length > 80
-            ? `Faucet failed: ${message.slice(0, 80)}...`
+          message.length > ERROR_MSG_MAX_LEN
+            ? `Faucet failed: ${message.slice(0, ERROR_MSG_MAX_LEN)}...`
             : `Faucet failed: ${message || "Unknown error"}`,
         );
       }
