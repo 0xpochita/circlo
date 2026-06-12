@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import { EmojiAvatar } from "@/components/shared";
 import type { UserAvatar } from "@/types";
 
+const AVATAR_STAGGER_DELAY = 0.15;
+
 const positions: readonly {
   avatar: UserAvatar;
   x: number;
@@ -63,7 +65,7 @@ export default function CircleHero() {
                   type: "spring" as const,
                   stiffness: 300,
                   damping: 20,
-                  delay: 0.15 * i,
+                  delay: AVATAR_STAGGER_DELAY * i,
                 }}
                 className="absolute"
                 style={{
