@@ -120,18 +120,20 @@ function outcomeTypeToString(t: number): string {
  * are present — frontend writes are the canonical source going
  * forward. Falls back to a neutral default 🎯 on any parse failure.
  */
+const DEFAULT_GOAL_METADATA = {
+  title: "Goal",
+  description: "",
+  avatarEmoji: "🎯",
+  avatarColor: "#ec4899",
+} as const;
+
 function parseGoalMetadata(uri: string): {
   title: string;
   description: string;
   avatarEmoji: string;
   avatarColor: string;
 } {
-  const fallback = {
-    title: "Goal",
-    description: "",
-    avatarEmoji: "🎯",
-    avatarColor: "#ec4899",
-  };
+  const fallback = DEFAULT_GOAL_METADATA;
   try {
     const p = JSON.parse(uri);
     // Bot uses single "avatar" field as "emoji|color"; frontend uses split fields.
