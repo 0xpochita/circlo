@@ -13,6 +13,8 @@ import { TbTargetArrow } from "react-icons/tb";
 import { EmojiAvatar } from "@/components/shared";
 import { useMyCircles } from "@/hooks";
 
+const SKELETON_COUNT = 3;
+
 export default function CirclesList() {
   const { circles, isLoading } = useMyCircles();
   const [search, setSearch] = useState("");
@@ -31,7 +33,7 @@ export default function CirclesList() {
     return (
       <div className="flex flex-col gap-3 px-4 py-2">
         <div className="animate-pulse rounded-xl bg-white h-11" />
-        {Array.from({ length: 3 }).map((_, i) => (
+        {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
           <div
             key={`skel-${i}`}
             className="animate-pulse rounded-2xl bg-white p-4"
