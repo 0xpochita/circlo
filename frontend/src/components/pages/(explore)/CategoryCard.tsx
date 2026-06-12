@@ -17,7 +17,7 @@ import {
   HiOutlineTrophy,
 } from "react-icons/hi2";
 
-const icons = [
+const icons: readonly typeof HiOutlineBolt[] = [
   HiOutlineBolt,
   HiOutlineCube,
   HiOutlineTrophy,
@@ -32,7 +32,7 @@ const icons = [
   HiOutlineHandRaised,
 ];
 
-const iconPositions = [
+const iconPositions: readonly { x: string; y: string; size: number; rotate: number }[] = [
   { x: "15%", y: "8%", size: 32, rotate: -15 },
   { x: "45%", y: "5%", size: 28, rotate: 10 },
   { x: "72%", y: "10%", size: 34, rotate: -8 },
