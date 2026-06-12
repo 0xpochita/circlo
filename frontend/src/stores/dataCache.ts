@@ -68,7 +68,7 @@ export const useDataCache = create<DataCacheState>((set, get) => ({
     set({ publicCircles, publicCirclesAt: Date.now() }),
 
   isStale: (key) => {
-    const timestamps: Record<string, number> = {
+    const timestamps: Record<CacheKey, number> = {
       myCircles: get().myCirclesAt,
       myGoals: get().myGoalsAt,
       feedGoal: get().feedGoalAt,
@@ -78,7 +78,7 @@ export const useDataCache = create<DataCacheState>((set, get) => ({
   },
 
   invalidate: (key) => {
-    const resets: Record<string, object> = {
+    const resets: Record<CacheKey, object> = {
       myCircles: { myCirclesAt: 0 },
       myGoals: { myGoalsAt: 0 },
       feedGoal: { feedGoalAt: 0 },
