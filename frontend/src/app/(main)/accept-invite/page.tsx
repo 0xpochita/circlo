@@ -23,6 +23,8 @@ import {
 } from "@/lib/web3/inviteProof";
 import { useAuthStore } from "@/stores/authStore";
 
+const REDIRECT_DELAY_MS = 800;
+
 type Status =
   | "loading"
   | "invalid-link"
@@ -105,7 +107,7 @@ function AcceptInviteContent() {
       setStatus("joined");
       setTimeout(() => {
         router.push(`/circle-details?id=${invite.circleId}`);
-      }, 800);
+      }, REDIRECT_DELAY_MS);
     } catch (err) {
       const message = err instanceof Error ? err.message : "";
       if (message.includes("User rejected") || message.includes("denied")) {
