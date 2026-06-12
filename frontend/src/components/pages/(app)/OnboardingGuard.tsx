@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/stores/authStore";
 
+const LS_REDIRECT_AFTER_LOGIN = "circlo-redirect-after-login";
+
 /**
  * Wait for zustand persist to rehydrate from localStorage before reading state.
  * Without this, first render sees default empty state → redirect → flicker loop.
@@ -49,7 +51,7 @@ export default function OnboardingGuard({
   useEffect(() => {
     if (!checked) return;
     if (!accessToken || !isAuthenticated) {
-      localStorage.setItem("circlo-redirect-after-login", window.location.href);
+      localStorage.setItem(LS_REDIRECT_AFTER_LOGIN, window.location.href);
       router.replace("/welcome");
     }
   }, [checked, accessToken, isAuthenticated, router]);
