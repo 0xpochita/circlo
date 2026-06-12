@@ -295,9 +295,7 @@ export async function handleCircleLeft(args: {
   ]);
 
   if (!circle || !user) {
-    console.warn(
-      `[CircleFactory] CircleLeft: circle or user not found (chainId=${args.id}, member=${memberAddress})`
-    );
+    process.stderr.write(`[CircleFactory] CircleLeft: not found chainId=${args.id} member=${memberAddress}\n`);
     return;
   }
 
@@ -305,7 +303,5 @@ export async function handleCircleLeft(args: {
     where: { circle_id: circle.id, user_id: user.id },
   });
 
-  console.log(
-    `[CircleFactory] CircleLeft: circleId=${circle.id}, member=${memberAddress}`
-  );
+  process.stdout.write(`[CircleFactory] CircleLeft: circleId=${circle.id} member=${memberAddress}\n`);
 }
