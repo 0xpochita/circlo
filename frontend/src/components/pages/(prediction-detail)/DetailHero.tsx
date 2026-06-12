@@ -5,6 +5,13 @@ import { HiOutlineClock, HiOutlineUserGroup } from "react-icons/hi2";
 import { EmojiAvatar } from "@/components/shared";
 import { formatTimeLeft, toAvatar } from "@/lib/utils";
 
+const STATUS_CLASSES: Record<string, string> = {
+  active: "bg-emerald-50 text-emerald-500",
+  resolved: "bg-blue-50 text-blue-500",
+};
+
+const DEFAULT_STATUS_CLASS = "bg-gray-100 text-muted";
+
 type DetailHeroProps = {
   title?: string;
   description?: string | null;
@@ -28,12 +35,7 @@ export default function DetailHero({
     status === "active"
       ? "Active Goal"
       : status.charAt(0).toUpperCase() + status.slice(1);
-  const statusClass =
-    status === "active"
-      ? "bg-emerald-50 text-emerald-500"
-      : status === "resolved"
-        ? "bg-blue-50 text-blue-500"
-        : "bg-gray-100 text-muted";
+  const statusClass = STATUS_CLASSES[status] ?? DEFAULT_STATUS_CLASS;
 
   return (
     <div className="px-4 py-2">
