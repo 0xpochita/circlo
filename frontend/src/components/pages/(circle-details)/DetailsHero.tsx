@@ -13,6 +13,8 @@ import type { CircleDetailResponse, MemberResponse } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
 import type { UserAvatar } from "@/types";
 
+const COPIED_TIMEOUT_MS = 2000;
+
 type DetailsHeroProps = {
   circle?: CircleDetailResponse;
 };
@@ -88,7 +90,7 @@ export default function DetailsHero({ circle }: DetailsHeroProps) {
       await navigator.clipboard.writeText(circle.inviteCode);
       setCopied(true);
       toast("Invite code copied");
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), COPIED_TIMEOUT_MS);
     } catch {}
   }
 
