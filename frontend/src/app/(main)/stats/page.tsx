@@ -16,6 +16,9 @@ import { type GoalWithMyStake, goalsApi } from "@/lib/api/endpoints";
 import { normalizeSide, toAvatar } from "@/lib/utils";
 import { useDataCache } from "@/stores/dataCache";
 
+const USDT_DISPLAY_DECIMALS = 3;
+const STAKE_DISPLAY_DECIMALS = 4;
+
 type StakeOutcome = "active" | "won" | "lost" | "claimed";
 
 function outcomeOf(goal: GoalWithMyStake): StakeOutcome {
@@ -182,7 +185,7 @@ export default function StatsPage() {
                   }`}
                 >
                   {totals.pnl >= 0 ? "+" : ""}
-                  {totals.pnl.toFixed(3)} <UsdtLabel size={14} />
+                  {totals.pnl.toFixed(USDT_DISPLAY_DECIMALS)} <UsdtLabel size={14} />
                 </p>
               </div>
             </div>
@@ -224,7 +227,7 @@ export default function StatsPage() {
                   {bestStake.goal.title}
                 </p>
                 <p className="text-xs text-emerald-600 inline-flex items-center gap-1">
-                  +{bestStake.pnl.toFixed(4)} <UsdtLabel size={9} /> profit
+                  +{bestStake.pnl.toFixed(STAKE_DISPLAY_DECIMALS)} <UsdtLabel size={9} /> profit
                 </p>
               </div>
             </div>
@@ -284,7 +287,7 @@ export default function StatsPage() {
                           <span>{c.stakes} stakes</span>
                           <span>·</span>
                           <span className="inline-flex items-center gap-1">
-                            {c.staked.toFixed(3)} <UsdtLabel size={9} />
+                            {c.staked.toFixed(USDT_DISPLAY_DECIMALS)} <UsdtLabel size={9} />
                           </span>
                         </div>
                       </div>
@@ -298,7 +301,7 @@ export default function StatsPage() {
                           }`}
                         >
                           {c.pnl >= 0 ? "+" : ""}
-                          {c.pnl.toFixed(3)} <UsdtLabel size={9} />
+                          {c.pnl.toFixed(USDT_DISPLAY_DECIMALS)} <UsdtLabel size={9} />
                         </p>
                       </div>
                     </Link>
