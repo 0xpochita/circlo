@@ -25,6 +25,7 @@ const ERROR_TOAST_DURATION_MS = 10_000;
 const ERROR_MSG_SLICE_LEN = 100;
 const CLOSE_DELAY_MS = 1500;
 const QUICK_STAKE_AMOUNTS = ["1", "5", "10", "50"] as const;
+const LS_REDIRECT_AFTER_LOGIN = "circlo-redirect-after-login";
 
 type ResolverInfo = {
   userId: string;
@@ -220,7 +221,7 @@ export default function StakeButton({
 
   function handleOpen() {
     if (!isConnected || !isAuthenticated) {
-      localStorage.setItem("circlo-redirect-after-login", window.location.href);
+      localStorage.setItem(LS_REDIRECT_AFTER_LOGIN, window.location.href);
       router.push("/welcome");
       return;
     }
