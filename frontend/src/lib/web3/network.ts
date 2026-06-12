@@ -114,16 +114,11 @@ export function explorerGoalUrl(goalId: bigint | number | string): string {
   return `${NETWORK.explorerUrl}/address/${NETWORK.contracts.predictionPool}#readContract`;
 }
 
-if (typeof window !== "undefined") {
-  const tag = IS_MAINNET ? "%cMAINNET" : "%cTESTNET";
-  const style = IS_MAINNET
-    ? "background:#10b981;color:#fff;padding:2px 6px;border-radius:4px;font-weight:bold"
-    : "background:#f59e0b;color:#fff;padding:2px 6px;border-radius:4px;font-weight:bold";
-  console.info(`Circlo running on ${tag}`, style, NETWORK.name);
-
-  if (NETWORK.contracts.predictionPool === ZERO_ADDRESS) {
-    console.error(
-      `[Circlo] PredictionPool address not configured for ${NETWORK.shortName}. Set NEXT_PUBLIC_PREDICTION_POOL.`,
-    );
-  }
+if (
+  typeof window !== "undefined" &&
+  NETWORK.contracts.predictionPool === ZERO_ADDRESS
+) {
+  process.stderr.write(
+    `[Circlo] PredictionPool address not configured for ${NETWORK.shortName}. Set NEXT_PUBLIC_PREDICTION_POOL.\n`,
+  );
 }
