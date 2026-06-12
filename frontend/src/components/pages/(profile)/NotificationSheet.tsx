@@ -12,6 +12,7 @@ import type { UserAvatar } from "@/types";
 const MS_PER_MINUTE = 60_000;
 const MINUTES_PER_HOUR = 60;
 const HOURS_PER_DAY = 24;
+const SKELETON_COUNT = 4;
 
 const TYPE_AVATARS: Record<string, UserAvatar> = {
   goal_created: { emoji: "\u{1F3AF}", color: "#60a5fa" },
@@ -147,7 +148,7 @@ export default function NotificationSheet({
             <div className="flex-1 overflow-y-auto px-4 pb-8">
               {isLoading ? (
                 <div className="flex flex-col gap-2">
-                  {Array.from({ length: 4 }).map((_, i) => (
+                  {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
                     <div
                       key={i}
                       className="animate-pulse rounded-2xl bg-gray-100 h-[80px]"
