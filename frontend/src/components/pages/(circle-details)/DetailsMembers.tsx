@@ -9,6 +9,11 @@ import type { MemberResponse } from "@/lib/api/endpoints";
 import { circlesApi } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
 
+const ROLE_BADGE_CLASSES: Record<string, string> = {
+  admin: "bg-brand text-white",
+};
+const DEFAULT_ROLE_BADGE = "bg-gray-50 text-muted";
+
 type DetailsMembersProps = {
   circleId?: string;
 };
@@ -97,9 +102,7 @@ export default function DetailsMembers({ circleId }: DetailsMembersProps) {
               </div>
               <span
                 className={`rounded-full px-3 py-1 text-xs font-medium ${
-                  m.role === "admin"
-                    ? "bg-brand text-white"
-                    : "bg-gray-50 text-muted"
+                  ROLE_BADGE_CLASSES[m.role] ?? DEFAULT_ROLE_BADGE
                 }`}
               >
                 {m.role.charAt(0).toUpperCase() + m.role.slice(1)}
