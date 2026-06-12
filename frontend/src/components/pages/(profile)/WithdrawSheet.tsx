@@ -15,7 +15,9 @@ type WithdrawSheetProps = {
   balance: string;
 };
 
-const quickAmounts = ["25%", "50%", "75%", "Max"];
+const quickAmounts = ["25%", "50%", "75%", "Max"] as const;
+
+const NETWORK_FEE_USDT = 0.001;
 
 export default function WithdrawSheet({
   open,
@@ -177,7 +179,7 @@ export default function WithdrawSheet({
                 <div className="flex items-center justify-between py-1">
                   <p className="text-xs text-muted">Network fee</p>
                   <p className="text-xs font-medium text-main-text">
-                    ~0.001 USDT
+                    ~{NETWORK_FEE_USDT} USDT
                   </p>
                 </div>
                 <div className="flex items-center justify-between py-1">
@@ -192,7 +194,7 @@ export default function WithdrawSheet({
                   </p>
                   <p className="text-sm font-bold text-main-text">
                     {amount
-                      ? `${(parseFloat(amount) - 0.001).toFixed(3)} USDT`
+                      ? `${(parseFloat(amount) - NETWORK_FEE_USDT).toFixed(3)} USDT`
                       : "0.00 USDT"}
                   </p>
                 </div>
