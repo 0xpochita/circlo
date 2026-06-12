@@ -14,6 +14,7 @@ import { useDataCache } from "@/stores/dataCache";
 import type { ExploreSortKey } from "./ExploreHeader";
 
 const SEARCH_DEBOUNCE_MS = 300;
+const SKELETON_COUNT = 4;
 
 type CircleListProps = {
   search?: string;
@@ -130,7 +131,7 @@ export default function CircleList({
   if (isLoading) {
     return (
       <div className="flex flex-col gap-3 px-4 py-2">
-        {Array.from({ length: 4 }).map((_, i) => (
+        {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
           <div
             key={`skel-${i}`}
             className="animate-pulse rounded-2xl bg-white p-2 flex items-center gap-3"
