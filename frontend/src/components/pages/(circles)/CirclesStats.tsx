@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { HiOutlineUserGroup } from "react-icons/hi2";
 import { circlesApi } from "@/lib/api/endpoints";
 
+const STAT_PAD_LENGTH = 2;
+
 export default function CirclesStats() {
   const [circleCount, setCircleCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -38,7 +40,7 @@ export default function CirclesStats() {
         </div>
         <div>
           <p className="text-xl font-bold text-main-text">
-            {String(circleCount).padStart(2, "0")}
+            {String(circleCount).padStart(STAT_PAD_LENGTH, "0")}
           </p>
           <p className="text-xs text-muted">Circles joined</p>
         </div>
