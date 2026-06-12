@@ -28,17 +28,15 @@ function getStakeStatus(goal: GoalWithMyStake): StakeStatus {
   return "active";
 }
 
+const STATUS_BADGE_COLORS: Record<StakeStatus, string> = {
+  active: "bg-blue-50 text-blue-500",
+  won: "bg-emerald-50 text-emerald-500",
+  lost: "bg-red-50 text-red-400",
+  claimed: "bg-emerald-50 text-emerald-500",
+};
+
 function statusBadgeColor(status: StakeStatus): string {
-  switch (status) {
-    case "active":
-      return "bg-blue-50 text-blue-500";
-    case "won":
-      return "bg-emerald-50 text-emerald-500";
-    case "lost":
-      return "bg-red-50 text-red-400";
-    case "claimed":
-      return "bg-emerald-50 text-emerald-500";
-  }
+  return STATUS_BADGE_COLORS[status];
 }
 
 function statusLabel(status: StakeStatus): string {
