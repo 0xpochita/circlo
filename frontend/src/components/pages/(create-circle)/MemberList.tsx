@@ -10,6 +10,7 @@ import { toAvatar } from "@/lib/utils";
 import { useCreateCircleStore } from "@/stores/createCircleStore";
 
 const SEARCH_DEBOUNCE_MS = 300;
+const SKELETON_COUNT = 3;
 
 type SearchUser = {
   id: string;
@@ -122,7 +123,7 @@ export default function MemberList({ circleId }: MemberListProps) {
             exit={{ opacity: 0 }}
             className="flex flex-col gap-2"
           >
-            {Array.from({ length: 3 }).map((_, i) => (
+            {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
               <div
                 key={i}
                 className="animate-pulse rounded-2xl bg-gray-100 h-16"
