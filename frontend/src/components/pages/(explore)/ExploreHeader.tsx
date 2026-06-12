@@ -23,7 +23,7 @@ type ExploreHeaderProps = {
   onSortChange: (key: ExploreSortKey) => void;
 };
 
-const SORT_OPTIONS: {
+const SORT_OPTIONS: readonly {
   key: ExploreSortKey;
   label: string;
   description: string;
