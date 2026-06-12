@@ -42,17 +42,17 @@ function isActiveGoal(g: GoalResponse): boolean {
 
 const PREVIEW_COUNT = 3;
 
-function StatusBadge({ status }: { status: string }) {
-  const styles: Record<string, string> = {
-    open: "bg-emerald-50 text-emerald-500",
-    locked: "bg-amber-50 text-amber-500",
-    resolved: "bg-gray-100 text-muted",
-    paidout: "bg-gray-100 text-muted",
-  };
+const STATUS_BADGE_STYLES: Record<string, string> = {
+  open: "bg-emerald-50 text-emerald-500",
+  locked: "bg-amber-50 text-amber-500",
+  resolved: "bg-gray-100 text-muted",
+  paidout: "bg-gray-100 text-muted",
+};
 
+function StatusBadge({ status }: { status: string }) {
   return (
     <span
-      className={`text-[10px] font-semibold rounded-full px-2 py-0.5 capitalize ${styles[status] || "bg-gray-100 text-muted"}`}
+      className={`text-[10px] font-semibold rounded-full px-2 py-0.5 capitalize ${STATUS_BADGE_STYLES[status] || "bg-gray-100 text-muted"}`}
     >
       {status}
     </span>
