@@ -9,7 +9,7 @@ import { useAccount, usePublicClient, useWriteContract } from "wagmi";
 import { UsdtLabel } from "@/components/shared";
 import { useSheetOverflow } from "@/hooks";
 import { circlesApi, goalsApi } from "@/lib/api/endpoints";
-import { normalizeSide } from "@/lib/utils";
+import { MS_PER_DAY, MS_PER_HOUR, MS_PER_MINUTE, normalizeSide } from "@/lib/utils";
 import {
   circleFactoryContract,
   usdtContract,
@@ -657,10 +657,10 @@ export default function StakeButton({
     if (!deadline) return "";
     const diff = new Date(deadline).getTime() - Date.now();
     if (diff <= 0) return "";
-    const days = Math.floor(diff / 86400000);
-    const hours = Math.floor((diff % 86400000) / 3600000);
+    const days = Math.floor(diff / MS_PER_DAY);
+    const hours = Math.floor((diff % MS_PER_DAY) / MS_PER_HOUR);
     if (days > 0) return `${days}d ${hours}h`;
-    const mins = Math.floor((diff % 3600000) / 60000);
+    const mins = Math.floor((diff % MS_PER_HOUR) / MS_PER_MINUTE);
     return `${hours}h ${mins}m`;
   }
 
