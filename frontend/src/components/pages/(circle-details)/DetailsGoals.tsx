@@ -28,7 +28,7 @@ const STATUS_FILTERS = [
   { label: "Open", value: "open" },
   { label: "Locked", value: "locked" },
   { label: "Resolved", value: "resolved" },
-];
+] as const;
 
 const ACTIVE_STATUSES = new Set(["open", "locked", "resolving"]);
 
