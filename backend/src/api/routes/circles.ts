@@ -351,11 +351,11 @@ export default async function circleRoutes(app: FastifyInstance) {
     }
   );
 
-  app.delete(
+  app.delete<{ Params: { id: string } }>(
     "/:id/leave",
     { preHandler: requireAuth },
     async (req, reply) => {
-      const { id } = req.params as { id: string };
+      const { id } = req.params;
 
       const member = await prisma.circleMember.findUnique({
         where: {
