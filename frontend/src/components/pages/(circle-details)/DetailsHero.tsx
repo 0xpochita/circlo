@@ -72,6 +72,7 @@ const layoutCoords: readonly { x: number; y: number; size: number }[] = [
 ];
 
 const MEMBERS_PREVIEW_COUNT = 5;
+const AVATAR_STAGGER_DELAY = 0.1;
 
 function buildPositions(members?: MemberResponse[]) {
   if (!members || members.length === 0) return defaultPositions;
@@ -158,7 +159,7 @@ export default function DetailsHero({ circle }: DetailsHeroProps) {
                   type: "spring" as const,
                   stiffness: 300,
                   damping: 20,
-                  delay: 0.1 * i,
+                  delay: AVATAR_STAGGER_DELAY * i,
                 }}
                 className="absolute"
                 style={{
