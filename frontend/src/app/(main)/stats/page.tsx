@@ -18,6 +18,7 @@ import { useDataCache } from "@/stores/dataCache";
 
 const USDT_DISPLAY_DECIMALS = 3;
 const STAKE_DISPLAY_DECIMALS = 4;
+const PERCENTAGE_DECIMALS = 0;
 
 type StakeOutcome = "active" | "won" | "lost" | "claimed";
 
@@ -172,7 +173,7 @@ export default function StatsPage() {
                   Win rate
                 </p>
                 <p className="mt-1 text-4xl font-bold">
-                  {totals.winRate.toFixed(0)}%
+                  {totals.winRate.toFixed(PERCENTAGE_DECIMALS)}%
                 </p>
               </div>
               <div className="text-right">
@@ -293,7 +294,7 @@ export default function StatsPage() {
                       </div>
                       <div className="text-right shrink-0">
                         <p className="text-sm font-bold text-main-text">
-                          {wr.toFixed(0)}%
+                          {wr.toFixed(PERCENTAGE_DECIMALS)}%
                         </p>
                         <p
                           className={`text-xs font-medium inline-flex items-center gap-1 ${
