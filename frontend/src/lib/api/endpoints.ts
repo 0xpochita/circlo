@@ -47,15 +47,7 @@ export const usersApi = {
     avatarEmoji?: string;
     avatarColor?: string;
   }) =>
-    fetchApi<{
-      id: string;
-      walletAddress: string;
-      name: string | null;
-      username: string | null;
-      avatarEmoji: string | null;
-      avatarColor: string | null;
-      createdAt: string;
-    }>("/users/me", {
+    fetchApi<UserApiResponse>("/users/me", {
       method: "PATCH",
       body: JSON.stringify(data),
     }),
