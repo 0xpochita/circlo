@@ -17,6 +17,7 @@ import { config } from "../../config.js";
  * shorter window enforced by the verifier.
  */
 const NONCE_TTL = 300;
+const SIG_HASH_PREVIEW_LEN = 10;
 
 /** Redis key prefix for the per-IP nonce-rate counter. */
 const NONCE_RATE_KEY = "rate:nonce:";
@@ -195,7 +196,7 @@ export default async function authRoutes(app: FastifyInstance) {
     await redis.del(`nonce:${walletAddress}`);
 
     app.log.info(
-      { wallet: walletAddress, sigHash: signature.slice(0, 10) },
+      { wallet: walletAddress, sigHash: signature.slice(0, SIG_HASH_PREVIEW_LEN) },
       "SIWE verify success"
     );
 
