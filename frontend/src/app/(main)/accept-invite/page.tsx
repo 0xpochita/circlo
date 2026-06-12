@@ -24,6 +24,7 @@ import {
 import { useAuthStore } from "@/stores/authStore";
 
 const REDIRECT_DELAY_MS = 800;
+const LS_REDIRECT_AFTER_LOGIN = "circlo-redirect-after-login";
 
 type Status =
   | "loading"
@@ -79,7 +80,7 @@ function AcceptInviteContent() {
   async function handleAccept() {
     if (!invite || !circle || !isConnected) return;
     if (!isAuthenticated) {
-      localStorage.setItem("circlo-redirect-after-login", window.location.href);
+      localStorage.setItem(LS_REDIRECT_AFTER_LOGIN, window.location.href);
       router.push("/welcome");
       return;
     }
