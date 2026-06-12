@@ -42,6 +42,7 @@ function isActiveGoal(g: GoalResponse): boolean {
 
 const PREVIEW_COUNT = 3;
 const SKELETON_COUNT = 3;
+const LIST_STAGGER_DELAY = 0.05;
 
 const STATUS_BADGE_STYLES: Record<string, string> = {
   open: "bg-emerald-50 text-emerald-500",
@@ -284,7 +285,7 @@ export default function DetailsGoals({ circleId }: DetailsGoalsProps) {
                         key={g.id}
                         initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3, delay: 0.05 * i }}
+                        transition={{ duration: 0.3, delay: LIST_STAGGER_DELAY * i }}
                       >
                         <Link
                           href={`/prediction-detail?id=${g.id}`}
