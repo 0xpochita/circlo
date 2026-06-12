@@ -27,7 +27,7 @@ export default function ActiveCircles() {
           {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
             <div
               key={`skel-${i}`}
-              className="animate-pulse min-w-[160px] rounded-2xl bg-white p-1"
+              className="animate-pulse min-w-40 rounded-2xl bg-white p-1"
             >
               <div className="aspect-square rounded-2xl bg-gray-50 p-3 flex flex-col justify-between">
                 <div className="h-10 w-10 rounded-2xl bg-gray-100" />
@@ -80,7 +80,7 @@ export default function ActiveCircles() {
             <Link
               key={c.id}
               href={`/circle-details?id=${c.id}`}
-              className="flex min-w-[160px] flex-col rounded-2xl bg-white p-1 cursor-pointer transition-all duration-200 active:scale-[0.97]"
+              className="flex min-w-40 flex-col rounded-2xl bg-white p-1 cursor-pointer transition-all duration-200 active:scale-[0.97]"
             >
               <div className="flex aspect-square flex-col justify-between rounded-2xl bg-gray-50 p-3">
                 <div>
