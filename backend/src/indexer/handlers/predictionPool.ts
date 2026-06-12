@@ -354,9 +354,7 @@ export async function handleStaked(
 
   const goal = await prisma.goal.findFirst({ where: { chain_id: args.goalId } });
   if (!goal) {
-    console.warn(
-      `[PredictionPool] Staked: goal not found for chain_id=${args.goalId}. GoalCreated event missed?`
-    );
+    process.stderr.write(`[PredictionPool] Staked: goal not found chain_id=${args.goalId}\n`);
     return;
   }
 
@@ -424,9 +422,7 @@ export async function handleStaked(
     goalId: goal.id,
   });
 
-  console.log(
-    `[PredictionPool] Staked: goalId=${goal.id}, user=${user.wallet_address}, side=${sideStr}, amount=${amountStr}`
-  );
+  process.stdout.write(`[PredictionPool] Staked: goalId=${goal.id} user=${user.wallet_address} side=${sideStr} amount=${amountStr}\n`);
 }
 
 /**
