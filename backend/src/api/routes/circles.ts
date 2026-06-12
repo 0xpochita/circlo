@@ -3,7 +3,7 @@ import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
 import { randomBytes } from "crypto";
 import { prisma } from "../../lib/prisma.js";
-import { redis } from "../../lib/redis.js";
+import { publishNotification } from "../../lib/notifications.js";
 import { requireAuth } from "../middlewares/auth.js";
 import type { CircleCategory } from "../../types/index.js";
 
@@ -100,13 +100,6 @@ function serializeCircle(
     memberCount,
     createdAt: circle.created_at,
   };
-}
-
-async function publishNotification(
-  userId: string,
-  notification: object
-): Promise<void> {
-  await redis.publish(`notifications:${userId}`, JSON.stringify(notification));
 }
 
 export default async function circleRoutes(app: FastifyInstance) {
