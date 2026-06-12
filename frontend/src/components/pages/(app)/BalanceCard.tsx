@@ -21,9 +21,10 @@ import { UsdtLabel } from "@/components/shared";
 import { useSheetOverflow } from "@/hooks";
 import { usdtContract } from "@/lib/web3/contracts";
 
+import { IS_MAINNET } from "@/lib/web3/network";
+
 const FAUCET_GAS_LIMIT = BigInt(200_000);
 const ERROR_MSG_MAX_LEN = 80;
-import { IS_MAINNET } from "@/lib/web3/network";
 import { fromUSDT } from "@/lib/web3/usdt";
 
 export default function BalanceCard() {
