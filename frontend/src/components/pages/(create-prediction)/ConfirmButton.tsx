@@ -9,6 +9,7 @@ import { useAccount, usePublicClient, useWriteContract } from "wagmi";
 import { EmojiAvatar, UsdtLabel } from "@/components/shared";
 import { useSheetOverflow } from "@/hooks";
 import { circlesApi, goalsApi } from "@/lib/api/endpoints";
+import { MS_PER_HOUR } from "@/lib/utils";
 import {
   circleFactoryContract,
   predictionPoolContract,
@@ -17,7 +18,6 @@ import { explorerTxUrl, NETWORK } from "@/lib/web3/network";
 import { DEFAULT_MIN_STAKE, toUSDT } from "@/lib/web3/usdt";
 import { useCreateGoalStore } from "@/stores/createGoalStore";
 
-const MS_PER_HOUR = 3_600_000;
 const REDIRECT_DELAY_MS = 1200;
 const ERROR_MSG_MAX_LEN = 120;
 const ERROR_TOAST_DURATION_MS = 8000;
