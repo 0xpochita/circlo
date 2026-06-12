@@ -13,6 +13,7 @@ const ROLE_BADGE_CLASSES: Record<string, string> = {
   admin: "bg-brand text-white",
 };
 const DEFAULT_ROLE_BADGE = "bg-gray-50 text-muted";
+const SKELETON_COUNT = 4;
 
 type DetailsMembersProps = {
   circleId?: string;
@@ -44,7 +45,7 @@ export default function DetailsMembers({ circleId }: DetailsMembersProps) {
 
       {loading ? (
         <div className="rounded-2xl bg-white divide-y divide-gray-50">
-          {Array.from({ length: 4 }).map((_, i) => (
+          {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
             <div
               key={`skel-${i}`}
               className="flex items-center justify-between px-4 py-3 animate-pulse"
