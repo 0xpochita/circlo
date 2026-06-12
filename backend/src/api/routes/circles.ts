@@ -620,12 +620,12 @@ export default async function circleRoutes(app: FastifyInstance) {
     }
   );
 
-  app.get(
+  app.get<{ Params: { id: string }; Querystring: { cursor?: string; status?: string } }>(
     "/:id/goals",
     { preHandler: requireAuth },
     async (req, reply) => {
-      const { id } = req.params as { id: string };
-      const { cursor, status } = req.query as { cursor?: string; status?: string };
+      const { id } = req.params;
+      const { cursor, status } = req.query;
 
       const circle = await prisma.circle.findUnique({ where: { id } });
       if (!circle) {
