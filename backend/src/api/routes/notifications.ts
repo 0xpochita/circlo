@@ -28,14 +28,11 @@ const markReadSchema = z
   });
 
 export default async function notificationRoutes(app: FastifyInstance) {
-  app.get(
+  app.get<{ Querystring: { cursor?: string; unreadOnly?: string } }>(
     "/",
     { preHandler: requireAuth },
     async (req, reply) => {
-      const { cursor, unreadOnly } = req.query as {
-        cursor?: string;
-        unreadOnly?: string;
-      };
+      const { cursor, unreadOnly } = req.query;
 
       const notifications = await prisma.notification.findMany({
         where: {
