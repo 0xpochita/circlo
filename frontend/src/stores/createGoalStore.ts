@@ -29,6 +29,8 @@ type CreateGoalState = {
   reset: () => void;
 };
 
+const DEFAULT_DURATION_HOURS = 168;
+
 const initialState = {
   circleId: "",
   circleChainId: "",
@@ -36,7 +38,7 @@ const initialState = {
   title: "",
   description: "",
   outcomeType: 0,
-  durationHours: 168,
+  durationHours: DEFAULT_DURATION_HOURS,
   customDeadline: "",
   stakeAmount: "",
   avatar: { emoji: "🎯", color: "#ec4899" },
