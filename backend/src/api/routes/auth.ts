@@ -275,7 +275,7 @@ export default async function authRoutes(app: FastifyInstance) {
 
     const accessToken = app.jwt.sign(
       { sub: payload.sub, wallet: payload.wallet },
-      { expiresIn: "1h" }
+      { expiresIn: ACCESS_TOKEN_EXPIRY }
     );
 
     return reply.send({ accessToken });
