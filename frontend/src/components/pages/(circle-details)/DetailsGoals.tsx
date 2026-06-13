@@ -45,6 +45,8 @@ const SKELETON_COUNT = 3;
 const LIST_STAGGER_DELAY = 0.05;
 const SHEET_MAX_HEIGHT = "85dvh";
 const CARD_STAGGER_DELAY = 0.08;
+const SHEET_SPRING_STIFFNESS = 300;
+const SHEET_SPRING_DAMPING = 32;
 
 const STATUS_BADGE_STYLES: Record<string, string> = {
   open: "bg-emerald-50 text-emerald-500",
@@ -228,8 +230,8 @@ export default function DetailsGoals({ circleId }: DetailsGoalsProps) {
               exit={{ y: "100%" }}
               transition={{
                 type: "spring" as const,
-                stiffness: 300,
-                damping: 32,
+                stiffness: SHEET_SPRING_STIFFNESS,
+                damping: SHEET_SPRING_DAMPING,
               }}
               className="fixed bottom-0 left-1/2 z-101 w-full max-w-md -translate-x-1/2 flex flex-col rounded-t-3xl bg-white"
               style={{ maxHeight: SHEET_MAX_HEIGHT }}
