@@ -20,6 +20,7 @@ const SHEET_MAX_HEIGHT = "85dvh";
 const LIST_STAGGER_DELAY = 0.04;
 const SHEET_SPRING_STIFFNESS = 300;
 const SHEET_SPRING_DAMPING = 32;
+const LIST_ANIMATION_DURATION = 0.25;
 
 type SearchUser = {
   id: string;
@@ -222,7 +223,7 @@ export default function InviteMemberButton({
                           key={user.id}
                           initial={{ opacity: 0, y: 8 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.25, delay: LIST_STAGGER_DELAY * i }}
+                          transition={{ duration: LIST_ANIMATION_DURATION, delay: LIST_STAGGER_DELAY * i }}
                           className="flex items-center justify-between rounded-2xl bg-gray-50 px-4 py-3"
                         >
                           <div className="flex items-center gap-3 min-w-0">
