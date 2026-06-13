@@ -15,6 +15,7 @@ const ROLE_BADGE_CLASSES: Record<string, string> = {
 const DEFAULT_ROLE_BADGE = "bg-gray-50 text-muted";
 const SKELETON_COUNT = 4;
 const LIST_STAGGER_DELAY = 0.05;
+const ITEM_ANIMATION_DURATION = 0.3;
 
 type DetailsMembersProps = {
   circleId?: string;
@@ -81,7 +82,7 @@ export default function DetailsMembers({ circleId }: DetailsMembersProps) {
               key={m.userId}
               initial={{ opacity: 0, x: -12 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3, delay: LIST_STAGGER_DELAY * i }}
+              transition={{ duration: ITEM_ANIMATION_DURATION, delay: LIST_STAGGER_DELAY * i }}
               className="flex items-center justify-between px-4 py-3"
             >
               <div className="flex items-center gap-3">
