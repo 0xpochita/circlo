@@ -15,6 +15,7 @@ import { useSheetOverflow } from "@/hooks";
 import { toAvatar } from "@/lib/utils";
 
 const COPIED_TIMEOUT_MS = 2000;
+const SHEET_MAX_HEIGHT = "85dvh";
 
 type ShareSheetProps = {
   open: boolean;
@@ -94,7 +95,7 @@ export default function ShareSheet({
               damping: 32,
             }}
             className="fixed bottom-0 left-1/2 z-101 w-full max-w-md -translate-x-1/2 flex flex-col rounded-t-3xl bg-white"
-            style={{ maxHeight: "85dvh" }}
+            style={{ maxHeight: SHEET_MAX_HEIGHT }}
           >
             <div className="flex items-start justify-between px-6 pt-6 pb-4 shrink-0">
               <div>
