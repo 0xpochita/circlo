@@ -17,6 +17,7 @@ const SKELETON_COUNT = 3;
 
 const SEARCH_DEBOUNCE_MS = 300;
 const SHEET_MAX_HEIGHT = "85dvh";
+const LIST_STAGGER_DELAY = 0.04;
 
 type SearchUser = {
   id: string;
@@ -219,7 +220,7 @@ export default function InviteMemberButton({
                           key={user.id}
                           initial={{ opacity: 0, y: 8 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.25, delay: 0.04 * i }}
+                          transition={{ duration: 0.25, delay: LIST_STAGGER_DELAY * i }}
                           className="flex items-center justify-between rounded-2xl bg-gray-50 px-4 py-3"
                         >
                           <div className="flex items-center gap-3 min-w-0">
