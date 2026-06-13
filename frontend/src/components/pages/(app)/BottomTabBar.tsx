@@ -16,6 +16,9 @@ const tabs = [
   { icon: HiOutlineUser, label: "Profile", href: "/profile" },
 ] as const;
 
+const NAV_ENTRANCE_DELAY = 0.3;
+const LABEL_TRANSITION_DURATION = 0.2;
+
 const labelVariants: Variants = {
   hidden: { width: 0, opacity: 0 },
   visible: { width: "auto", opacity: 1 },
@@ -33,7 +36,7 @@ export default function BottomTabBar() {
       <motion.div
         initial={{ y: 80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ type: "spring", stiffness: 300, damping: 30, delay: 0.3 }}
+        transition={{ type: "spring", stiffness: 300, damping: 30, delay: NAV_ENTRANCE_DELAY }}
         className="flex items-center justify-between rounded-full bg-white/95 shadow-lg px-2 py-2"
       >
         {tabs.map((tab, i) => (
@@ -56,7 +59,7 @@ export default function BottomTabBar() {
                   initial="hidden"
                   animate="visible"
                   exit="hidden"
-                  transition={{ duration: 0.2, ease: "easeInOut" }}
+                  transition={{ duration: LABEL_TRANSITION_DURATION, ease: "easeInOut" }}
                   className="text-sm font-medium text-main-text whitespace-nowrap overflow-hidden"
                 >
                   {tab.label}
