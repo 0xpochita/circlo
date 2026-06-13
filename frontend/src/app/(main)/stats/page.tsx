@@ -20,6 +20,7 @@ const USDT_DISPLAY_DECIMALS = 3;
 const STAKE_DISPLAY_DECIMALS = 4;
 const SKELETON_COUNT = 3;
 const PERCENTAGE_DECIMALS = 0;
+const LIST_STAGGER_DELAY = 0.04;
 
 type StakeOutcome = "active" | "won" | "lost" | "claimed";
 
@@ -271,7 +272,7 @@ export default function StatsPage() {
                     key={c.circleId}
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.25, delay: 0.04 * i }}
+                    transition={{ duration: 0.25, delay: LIST_STAGGER_DELAY * i }}
                   >
                     <Link
                       href={`/circle-details?id=${c.circleId}`}
