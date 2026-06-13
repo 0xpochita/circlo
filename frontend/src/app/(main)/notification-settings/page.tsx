@@ -24,6 +24,8 @@ type CategoryConfig = {
   examples: string[];
 };
 
+const LIST_STAGGER_DELAY = 0.04;
+
 const CATEGORIES: readonly CategoryConfig[] = [
   {
     id: "circle",
@@ -137,7 +139,7 @@ export default function NotificationSettingsPage() {
                   key={cat.id}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.25, delay: 0.04 * i }}
+                  transition={{ duration: 0.25, delay: LIST_STAGGER_DELAY * i }}
                   className="rounded-2xl bg-white p-4"
                 >
                   <div className="flex items-start justify-between gap-3">
