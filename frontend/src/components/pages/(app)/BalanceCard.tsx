@@ -30,6 +30,8 @@ const ERROR_MSG_MAX_LEN = 80;
 const BALANCE_DISPLAY_DECIMALS = 2;
 const USDT_LOGO_SIZE = 14;
 const CELO_LOGO_SIZE = 28;
+const SHEET_SPRING_STIFFNESS = 300;
+const SHEET_SPRING_DAMPING = 32;
 import { fromUSDT } from "@/lib/web3/usdt";
 
 export default function BalanceCard() {
@@ -213,8 +215,8 @@ export default function BalanceCard() {
               exit={{ y: "100%" }}
               transition={{
                 type: "spring" as const,
-                stiffness: 300,
-                damping: 32,
+                stiffness: SHEET_SPRING_STIFFNESS,
+                damping: SHEET_SPRING_DAMPING,
               }}
               className="fixed bottom-0 left-1/2 z-101 w-full max-w-md -translate-x-1/2 rounded-t-3xl bg-white px-6 pt-6 pb-12"
               style={{ maxHeight: SHEET_MAX_HEIGHT }}
