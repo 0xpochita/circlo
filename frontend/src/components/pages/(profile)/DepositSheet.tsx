@@ -20,6 +20,10 @@ const ADDR_SUFFIX_LEN = 4;
 const SHEET_MAX_HEIGHT = "90dvh";
 const TAP_SCALE = 0.97;
 const COIN_LOGO_SIZE = 20;
+const SHEET_SPRING_STIFFNESS = 300;
+const SHEET_SPRING_DAMPING = 32;
+const QR_SPRING_DAMPING = 22;
+const QR_CONTAINER_SIZE = 232;
 
 type DepositSheetProps = {
   open: boolean;
@@ -77,8 +81,8 @@ export default function DepositSheet({
             exit={{ y: "100%" }}
             transition={{
               type: "spring" as const,
-              stiffness: 300,
-              damping: 32,
+              stiffness: SHEET_SPRING_STIFFNESS,
+              damping: SHEET_SPRING_DAMPING,
             }}
             className="fixed bottom-0 left-1/2 z-101 w-full max-w-md -translate-x-1/2 flex flex-col rounded-t-3xl bg-white"
             style={{ maxHeight: SHEET_MAX_HEIGHT }}
@@ -140,11 +144,11 @@ export default function DepositSheet({
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{
                       type: "spring" as const,
-                      stiffness: 300,
-                      damping: 22,
+                      stiffness: SHEET_SPRING_STIFFNESS,
+                      damping: QR_SPRING_DAMPING,
                     }}
                     className="mx-auto mb-5 flex items-center justify-center rounded-3xl bg-white p-5"
-                    style={{ width: 232 }}
+                    style={{ width: QR_CONTAINER_SIZE }}
                   >
                     <div className="rounded-2xl bg-gray-50 p-4">
                       <QRCode
