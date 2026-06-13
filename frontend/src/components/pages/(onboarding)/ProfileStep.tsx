@@ -14,6 +14,9 @@ const USERNAME_MAX_LENGTH = 20;
 const SECTION_ANIMATION_DURATION = 0.5;
 const CTA_ENTRANCE_DELAY = 0.3;
 const TAP_SCALE = 0.97;
+const AVATAR_SPRING_STIFFNESS = 300;
+const AVATAR_SPRING_DAMPING = 20;
+const PROFILE_AVATAR_SIZE = 88;
 
 type ProfileStepProps = {
   onNext: () => void;
@@ -104,11 +107,11 @@ export default function ProfileStep({ onNext, onBack }: ProfileStepProps) {
                 animate={{ scale: 1 }}
                 transition={{
                   type: "spring" as const,
-                  stiffness: 300,
-                  damping: 20,
+                  stiffness: AVATAR_SPRING_STIFFNESS,
+                  damping: AVATAR_SPRING_DAMPING,
                 }}
               >
-                <EmojiAvatar avatar={avatar} size={88} />
+                <EmojiAvatar avatar={avatar} size={PROFILE_AVATAR_SIZE} />
               </motion.div>
               <div className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-white border border-gray-100">
                 <HiOutlinePencil className="w-3.5 h-3.5 text-main-text" />
