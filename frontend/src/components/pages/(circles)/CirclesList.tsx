@@ -14,6 +14,7 @@ import { EmojiAvatar } from "@/components/shared";
 import { useMyCircles } from "@/hooks";
 
 const SKELETON_COUNT = 3;
+const CARD_STAGGER_DELAY = 0.08;
 
 export default function CirclesList() {
   const { circles, isLoading } = useMyCircles();
@@ -104,7 +105,7 @@ export default function CirclesList() {
             key={circle.id}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, delay: 0.08 * i }}
+            transition={{ duration: 0.35, delay: CARD_STAGGER_DELAY * i }}
           >
             <Link
               href={`/circle-details?id=${circle.id}`}
