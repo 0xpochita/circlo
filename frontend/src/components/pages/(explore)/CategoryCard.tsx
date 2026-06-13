@@ -50,6 +50,7 @@ const iconPositions: readonly { x: string; y: string; size: number; rotate: numb
 const ICON_INITIAL_DELAY = 0.1;
 const ICON_STAGGER_DELAY = 0.05;
 const CARD_ENTRANCE_DURATION = 0.5;
+const TAP_SCALE = 0.97;
 
 interface CategoryCardProps {
   title: string;
@@ -111,7 +112,7 @@ function CategoryCard({ title, difficulty, color }: CategoryCardProps) {
 
       <motion.button
         type="button"
-        whileTap={{ scale: 0.97 }}
+        whileTap={{ scale: TAP_SCALE }}
         className="w-full rounded-full py-3.5 text-base font-semibold cursor-pointer"
         style={{ backgroundColor: lightColor, color: "white" }}
       >
