@@ -32,6 +32,7 @@ const HIGHLIGHT_CLASSES: Record<string, string> = {
   soft: "bg-gray-100",
 };
 const DEFAULT_CELL_CLASS = "bg-white";
+const CELL_STAGGER_DELAY = 0.02;
 
 export default function ReferralHero() {
   return (
@@ -54,7 +55,7 @@ export default function ReferralHero() {
             animate={{ scale: 1, opacity: 1 }}
             transition={{
               duration: 0.3,
-              delay: 0.02 * i,
+              delay: CELL_STAGGER_DELAY * i,
               type: "spring" as const,
               stiffness: 300,
               damping: 25,
