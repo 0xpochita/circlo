@@ -17,6 +17,9 @@ import { useUserStore } from "@/stores/userStore";
 const SECTION_ANIMATION_DURATION = 0.5;
 const CTA_ENTRANCE_DELAY = 0.5;
 const TAP_SCALE = 0.97;
+const CARD_ENTRANCE_DELAY = 0.2;
+const TEXT_ENTRANCE_DELAY = 0.3;
+const CELO_LOGO_SIZE = 28;
 
 type ConnectStepProps = {
   onNext: () => void;
@@ -204,7 +207,7 @@ export default function ConnectStep({ onNext, onBack }: ConnectStepProps) {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: SECTION_ANIMATION_DURATION, delay: 0.2 }}
+          transition={{ duration: SECTION_ANIMATION_DURATION, delay: CARD_ENTRANCE_DELAY }}
           className="w-full rounded-3xl bg-white overflow-hidden mb-6"
         >
           <div className="flex flex-col items-center justify-end h-56 relative">
@@ -214,8 +217,8 @@ export default function ConnectStep({ onNext, onBack }: ConnectStepProps) {
                 <Image
                   src="/Assets/Images/Logo/logo-coin/celo-logo.svg"
                   alt="Celo"
-                  width={28}
-                  height={28}
+                  width={CELO_LOGO_SIZE}
+                  height={CELO_LOGO_SIZE}
                 />
               </div>
               <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
@@ -231,7 +234,7 @@ export default function ConnectStep({ onNext, onBack }: ConnectStepProps) {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: SECTION_ANIMATION_DURATION, delay: 0.3 }}
+          transition={{ duration: SECTION_ANIMATION_DURATION, delay: TEXT_ENTRANCE_DELAY }}
           className="text-center mb-auto"
         >
           <p className="text-sm text-gray-400 leading-relaxed max-w-70 mx-auto">
