@@ -23,6 +23,8 @@ const SHEET_MAX_HEIGHT = "90dvh";
 const RECEIVE_DECIMALS = 3;
 const COIN_LOGO_SIZE = 20;
 const USDT_INLINE_LOGO_SIZE = 16;
+const SHEET_SPRING_STIFFNESS = 300;
+const SHEET_SPRING_DAMPING = 32;
 
 export default function WithdrawSheet({
   open,
@@ -75,8 +77,8 @@ export default function WithdrawSheet({
             exit={{ y: "100%" }}
             transition={{
               type: "spring" as const,
-              stiffness: 300,
-              damping: 32,
+              stiffness: SHEET_SPRING_STIFFNESS,
+              damping: SHEET_SPRING_DAMPING,
             }}
             className="fixed bottom-0 left-1/2 z-101 w-full max-w-md -translate-x-1/2 flex flex-col rounded-t-3xl bg-white"
             style={{ maxHeight: SHEET_MAX_HEIGHT }}
