@@ -27,6 +27,8 @@ import WithdrawSheet from "./WithdrawSheet";
 
 const BALANCE_DISPLAY_DECIMALS = 2;
 const AVATAR_SIZE = 44;
+const BG_IMAGE_WIDTH = 448;
+const BG_IMAGE_HEIGHT = 320;
 
 function formatSigned(n: number, decimals: number): string {
   const abs = Math.abs(n).toFixed(decimals);
@@ -133,8 +135,8 @@ export default function ProfileHero() {
         <Image
           src="/Assets/Images/Background/bg-cloud.webp"
           alt="Background"
-          width={448}
-          height={320}
+          width={BG_IMAGE_WIDTH}
+          height={BG_IMAGE_HEIGHT}
           className="absolute inset-0 h-full w-full object-cover"
           priority
         />
