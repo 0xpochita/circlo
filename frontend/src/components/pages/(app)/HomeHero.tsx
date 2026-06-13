@@ -4,14 +4,17 @@ import Image from "next/image";
 import BalanceCard from "./BalanceCard";
 import Header from "./Header";
 
+const BG_IMAGE_WIDTH = 448;
+const BG_IMAGE_HEIGHT = 360;
+
 export default function HomeHero() {
   return (
     <div className="relative overflow-hidden rounded-b-3xl">
       <Image
         src="/Assets/Images/Background/bg-cloud.webp"
         alt="Background"
-        width={448}
-        height={360}
+        width={BG_IMAGE_WIDTH}
+        height={BG_IMAGE_HEIGHT}
         className="absolute inset-0 h-full w-full object-cover"
         priority
       />
