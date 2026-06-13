@@ -11,6 +11,7 @@ const STATUS_CLASSES: Record<string, string> = {
 };
 
 const DEFAULT_STATUS_CLASS = "bg-gray-100 text-muted";
+const AVATAR_SIZE = 72;
 
 type DetailHeroProps = {
   title?: string;
@@ -54,7 +55,7 @@ export default function DetailHero({
             >
               <EmojiAvatar
                 avatar={toAvatar(avatarEmoji, avatarColor)}
-                size={72}
+                size={AVATAR_SIZE}
               />
             </motion.div>
             <span
