@@ -24,6 +24,8 @@ const outcomes = [
 
 const DESCRIPTION_MAX_LENGTH = 200;
 const DESCRIPTION_WARN_THRESHOLD = 180;
+const GOAL_AVATAR_SIZE = 72;
+const USDT_LOGO_SIZE = 18;
 
 export default function PredictionForm() {
   const store = useCreateGoalStore();
@@ -55,7 +57,7 @@ export default function PredictionForm() {
             onClick={() => setPickerOpen(true)}
             className="relative cursor-pointer transition-transform duration-200 active:scale-95"
           >
-            <EmojiAvatar avatar={store.avatar} size={72} />
+            <EmojiAvatar avatar={store.avatar} size={GOAL_AVATAR_SIZE} />
             <div className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-white border border-gray-100">
               <HiOutlinePencil className="w-3.5 h-3.5 text-main-text" />
             </div>
@@ -200,8 +202,8 @@ export default function PredictionForm() {
             <Image
               src="/Assets/Images/Logo/logo-coin/usdt-logo.svg"
               alt="USDT"
-              width={18}
-              height={18}
+              width={USDT_LOGO_SIZE}
+              height={USDT_LOGO_SIZE}
             />
             <span className="text-sm font-medium text-main-text">USDT</span>
           </div>
