@@ -9,6 +9,8 @@ import { IS_MAINNET, NETWORK } from "@/lib/web3/network";
  * Celo Sepolia. Clicking it opens the active block explorer
  * homepage in a new tab.
  */
+const CELO_LOGO_SIZE = 14;
+
 export default function NetworkBadge() {
   const tone = IS_MAINNET ? "bg-emerald-500" : "bg-amber-500";
   const label = IS_MAINNET ? "Celo Mainnet" : "Celo Sepolia";
@@ -27,8 +29,8 @@ export default function NetworkBadge() {
         <Image
           src="/Assets/Images/Logo/logo-coin/celo-logo.svg"
           alt=""
-          width={14}
-          height={14}
+          width={CELO_LOGO_SIZE}
+          height={CELO_LOGO_SIZE}
           className="rounded-full bg-white p-px"
         />
         {label}
