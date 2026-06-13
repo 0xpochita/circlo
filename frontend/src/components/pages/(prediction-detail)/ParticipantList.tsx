@@ -14,6 +14,7 @@ import { useUserStore } from "@/stores/userStore";
 
 const STAKE_DISPLAY_DECIMALS = 4;
 const LIST_STAGGER_DELAY = 0.05;
+const LIST_ANIMATION_DURATION = 0.3;
 
 type ParticipantListProps = {
   goalId?: string;
@@ -145,7 +146,7 @@ export default function ParticipantList({
             key={p.userId}
             initial={{ opacity: 0, x: -12 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3, delay: LIST_STAGGER_DELAY * i }}
+            transition={{ duration: LIST_ANIMATION_DURATION, delay: LIST_STAGGER_DELAY * i }}
             className="flex items-center justify-between px-4 py-3"
           >
             <div className="flex items-center gap-3">
