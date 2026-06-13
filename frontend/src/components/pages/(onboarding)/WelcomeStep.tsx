@@ -5,6 +5,7 @@ import Image from "next/image";
 
 const HERO_ANIMATION_DURATION = 0.6;
 const CTA_ENTRANCE_DELAY = 0.5;
+const TAP_SCALE = 0.97;
 
 type WelcomeStepProps = {
   onNext: () => void;
@@ -84,7 +85,7 @@ export default function WelcomeStep({ onNext }: WelcomeStepProps) {
         <motion.button
           type="button"
           onClick={onNext}
-          whileTap={{ scale: 0.97 }}
+          whileTap={{ scale: TAP_SCALE }}
           className="w-full rounded-full bg-gray-900 py-4 text-base font-semibold text-white cursor-pointer"
         >
           Continue
