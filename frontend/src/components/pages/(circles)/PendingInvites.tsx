@@ -18,6 +18,7 @@ import { useDataCache } from "@/stores/dataCache";
 
 const CARD_TRANSITION_DURATION = 0.25;
 const SHEET_MAX_HEIGHT = "85dvh";
+const TAP_SCALE = 0.97;
 
 type Invite = {
   notificationId: string;
@@ -282,7 +283,7 @@ export default function PendingInvites() {
                   type="button"
                   onClick={() => handleAccept(activeInvite)}
                   disabled={acceptingId !== null}
-                  whileTap={acceptingId !== null ? {} : { scale: 0.97 }}
+                  whileTap={acceptingId !== null ? {} : { scale: TAP_SCALE }}
                   className="w-full rounded-full bg-gray-900 py-4 text-base font-semibold text-white cursor-pointer disabled:bg-gray-200 disabled:text-muted disabled:cursor-not-allowed"
                 >
                   {acceptingId === activeInvite.notificationId
