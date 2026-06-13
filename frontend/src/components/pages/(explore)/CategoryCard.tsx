@@ -51,6 +51,8 @@ const ICON_INITIAL_DELAY = 0.1;
 const ICON_STAGGER_DELAY = 0.05;
 const CARD_ENTRANCE_DURATION = 0.5;
 const TAP_SCALE = 0.97;
+const ICON_SPRING_STIFFNESS = 260;
+const ICON_SPRING_DAMPING = 20;
 
 interface CategoryCardProps {
   title: string;
@@ -79,8 +81,8 @@ function CategoryCard({ title, difficulty, color }: CategoryCardProps) {
               animate={{ scale: 1, opacity: 1 }}
               transition={{
                 type: "spring" as const,
-                stiffness: 260,
-                damping: 20,
+                stiffness: ICON_SPRING_STIFFNESS,
+                damping: ICON_SPRING_DAMPING,
                 delay: ICON_INITIAL_DELAY + i * ICON_STAGGER_DELAY,
               }}
               className="absolute"
