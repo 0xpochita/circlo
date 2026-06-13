@@ -14,6 +14,8 @@ import type { UserAvatar } from "@/types";
 const NAME_MAX_LENGTH = 80;
 const USERNAME_MAX_LENGTH = 20;
 const SHEET_MAX_HEIGHT = "90dvh";
+const SHEET_SPRING_STIFFNESS = 300;
+const SHEET_SPRING_DAMPING = 32;
 
 type EditProfileSheetProps = {
   open: boolean;
@@ -121,8 +123,8 @@ export default function EditProfileSheet({
               exit={{ y: "100%" }}
               transition={{
                 type: "spring" as const,
-                stiffness: 300,
-                damping: 32,
+                stiffness: SHEET_SPRING_STIFFNESS,
+                damping: SHEET_SPRING_DAMPING,
               }}
               className="fixed bottom-0 left-1/2 z-101 w-full max-w-md -translate-x-1/2 flex flex-col rounded-t-3xl bg-white"
               style={{ maxHeight: SHEET_MAX_HEIGHT }}
