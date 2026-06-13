@@ -16,6 +16,7 @@ import { useUserStore } from "@/stores/userStore";
 
 const SECTION_ANIMATION_DURATION = 0.5;
 const CTA_ENTRANCE_DELAY = 0.5;
+const TAP_SCALE = 0.97;
 
 type ConnectStepProps = {
   onNext: () => void;
@@ -273,7 +274,7 @@ export default function ConnectStep({ onNext, onBack }: ConnectStepProps) {
             <motion.button
               type="button"
               onClick={handleConnect}
-              whileTap={{ scale: 0.97 }}
+              whileTap={{ scale: TAP_SCALE }}
               className="w-full rounded-full bg-gray-900 py-4 text-base font-semibold text-white cursor-pointer"
             >
               {statusText === "Retry sign-in"
@@ -287,7 +288,7 @@ export default function ConnectStep({ onNext, onBack }: ConnectStepProps) {
               type="button"
               onClick={handleConnect}
               disabled={isConnecting}
-              whileTap={isConnecting ? {} : { scale: 0.97 }}
+              whileTap={isConnecting ? {} : { scale: TAP_SCALE }}
               className="w-full rounded-full bg-gray-900 py-4 text-base font-semibold text-white cursor-pointer disabled:bg-gray-200 disabled:text-muted disabled:cursor-not-allowed"
             >
               {isConnecting ? statusText : "Connect Wallet"}
