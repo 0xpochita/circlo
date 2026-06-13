@@ -26,6 +26,7 @@ import NotificationSheet from "./NotificationSheet";
 import WithdrawSheet from "./WithdrawSheet";
 
 const BALANCE_DISPLAY_DECIMALS = 2;
+const AVATAR_SIZE = 44;
 
 function formatSigned(n: number, decimals: number): string {
   const abs = Math.abs(n).toFixed(decimals);
@@ -146,7 +147,7 @@ export default function ProfileHero() {
                 className="relative cursor-pointer transition-transform duration-200 active:scale-95"
                 aria-label="Edit profile"
               >
-                <EmojiAvatar avatar={avatar} size={44} />
+                <EmojiAvatar avatar={avatar} size={AVATAR_SIZE} />
                 <div className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-white">
                   <HiOutlinePencil className="w-3 h-3 text-main-text" />
                 </div>
