@@ -19,6 +19,8 @@ import { useDataCache } from "@/stores/dataCache";
 const CARD_TRANSITION_DURATION = 0.25;
 const SHEET_MAX_HEIGHT = "85dvh";
 const TAP_SCALE = 0.97;
+const SHEET_SPRING_STIFFNESS = 300;
+const SHEET_SPRING_DAMPING = 32;
 
 type Invite = {
   notificationId: string;
@@ -214,8 +216,8 @@ export default function PendingInvites() {
               exit={{ y: "100%" }}
               transition={{
                 type: "spring" as const,
-                stiffness: 300,
-                damping: 32,
+                stiffness: SHEET_SPRING_STIFFNESS,
+                damping: SHEET_SPRING_DAMPING,
               }}
               className="fixed bottom-0 left-1/2 z-101 w-full max-w-md -translate-x-1/2 rounded-t-3xl bg-white"
             >
