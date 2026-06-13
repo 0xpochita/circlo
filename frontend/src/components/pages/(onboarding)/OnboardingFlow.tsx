@@ -13,6 +13,7 @@ import WelcomeStep from "./WelcomeStep";
 
 const LS_ONBOARDING_DONE = LS_ONBOARDING_DONE;
 const LS_REDIRECT_AFTER_LOGIN = LS_REDIRECT_AFTER_LOGIN;
+const STEP_TRANSITION_DURATION = 0.3;
 
 export default function OnboardingFlow() {
   const router = useRouter();
@@ -81,7 +82,7 @@ export default function OnboardingFlow() {
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -50 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: STEP_TRANSITION_DURATION }}
           >
             <WelcomeStep onNext={() => setStep(1)} />
           </motion.div>
@@ -92,7 +93,7 @@ export default function OnboardingFlow() {
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -50 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: STEP_TRANSITION_DURATION }}
           >
             <ConnectStep onNext={handleConnectNext} onBack={() => setStep(0)} />
           </motion.div>
@@ -103,7 +104,7 @@ export default function OnboardingFlow() {
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -50 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: STEP_TRANSITION_DURATION }}
           >
             <ProfileStep onNext={handleComplete} onBack={() => setStep(1)} />
           </motion.div>
