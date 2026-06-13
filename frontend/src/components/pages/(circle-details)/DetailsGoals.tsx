@@ -44,6 +44,7 @@ const PREVIEW_COUNT = 3;
 const SKELETON_COUNT = 3;
 const LIST_STAGGER_DELAY = 0.05;
 const SHEET_MAX_HEIGHT = "85dvh";
+const CARD_STAGGER_DELAY = 0.08;
 
 const STATUS_BADGE_STYLES: Record<string, string> = {
   open: "bg-emerald-50 text-emerald-500",
@@ -339,7 +340,7 @@ function GoalCard({ goal, index }: { goal: GoalResponse; index: number }) {
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, delay: 0.08 * index }}
+      transition={{ duration: 0.35, delay: CARD_STAGGER_DELAY * index }}
     >
       <Link
         href={`/prediction-detail?id=${goal.id}`}
