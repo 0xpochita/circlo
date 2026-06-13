@@ -18,6 +18,7 @@ const COPIED_TIMEOUT_MS = 2000;
 const ADDR_PREFIX_LEN = 6;
 const ADDR_SUFFIX_LEN = 4;
 const SHEET_MAX_HEIGHT = "90dvh";
+const TAP_SCALE = 0.97;
 
 type DepositSheetProps = {
   open: boolean;
@@ -168,7 +169,7 @@ export default function DepositSheet({
                   <motion.button
                     type="button"
                     onClick={handleCopy}
-                    whileTap={{ scale: 0.97 }}
+                    whileTap={{ scale: TAP_SCALE }}
                     className="mb-3 flex w-full items-center justify-center gap-2 rounded-full bg-main-text py-4 text-base font-semibold text-white cursor-pointer"
                   >
                     {copied ? (
