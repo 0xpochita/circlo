@@ -19,6 +19,7 @@ import {
 } from "@/lib/web3/inviteProof";
 
 const COPIED_TIMEOUT_MS = 2000;
+const TAP_SCALE = 0.97;
 
 type DurationKey = "1h" | "1d" | "7d" | "30d";
 
@@ -200,7 +201,7 @@ export default function GenerateInviteSheet({
                   <motion.button
                     type="button"
                     onClick={handleCopy}
-                    whileTap={{ scale: 0.97 }}
+                    whileTap={{ scale: TAP_SCALE }}
                     className="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-full bg-gray-900 py-4 text-base font-semibold text-white cursor-pointer transition-all duration-200"
                   >
                     {copied ? (
@@ -271,7 +272,7 @@ export default function GenerateInviteSheet({
                     type="button"
                     onClick={handleGenerate}
                     disabled={isSigning}
-                    whileTap={isSigning ? {} : { scale: 0.97 }}
+                    whileTap={isSigning ? {} : { scale: TAP_SCALE }}
                     className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-gray-900 py-4 text-base font-semibold text-white cursor-pointer disabled:bg-gray-200 disabled:text-muted disabled:cursor-not-allowed transition-all duration-200"
                   >
                     {isSigning ? (
