@@ -29,6 +29,7 @@ const BALANCE_DISPLAY_DECIMALS = 2;
 const AVATAR_SIZE = 44;
 const BG_IMAGE_WIDTH = 448;
 const BG_IMAGE_HEIGHT = 320;
+const USDT_LOGO_SIZE = 16;
 
 function formatSigned(n: number, decimals: number): string {
   const abs = Math.abs(n).toFixed(decimals);
@@ -193,8 +194,8 @@ export default function ProfileHero() {
                 <Image
                   src="/Assets/Images/Logo/logo-coin/usdt-logo.svg"
                   alt="USDT"
-                  width={16}
-                  height={16}
+                  width={USDT_LOGO_SIZE}
+                  height={USDT_LOGO_SIZE}
                 />
               </div>
             </div>
