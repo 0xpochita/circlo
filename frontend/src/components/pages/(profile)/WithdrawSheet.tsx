@@ -21,6 +21,8 @@ const NETWORK_FEE_USDT = 0.001;
 const AMOUNT_DECIMALS = 2;
 const SHEET_MAX_HEIGHT = "90dvh";
 const RECEIVE_DECIMALS = 3;
+const COIN_LOGO_SIZE = 20;
+const USDT_INLINE_LOGO_SIZE = 16;
 
 export default function WithdrawSheet({
   open,
@@ -103,8 +105,8 @@ export default function WithdrawSheet({
                   <Image
                     src="/Assets/Images/Logo/logo-coin/usdt-logo.svg"
                     alt="USDT"
-                    width={20}
-                    height={20}
+                    width={COIN_LOGO_SIZE}
+                    height={COIN_LOGO_SIZE}
                   />
                   <span className="text-sm font-semibold text-main-text">
                     USDT
@@ -114,8 +116,8 @@ export default function WithdrawSheet({
                   <Image
                     src="/Assets/Images/Logo/logo-coin/celo-logo.svg"
                     alt="Celo"
-                    width={20}
-                    height={20}
+                    width={COIN_LOGO_SIZE}
+                    height={COIN_LOGO_SIZE}
                   />
                   <span className="text-sm font-semibold text-main-text">
                     Celo Mainnet
@@ -145,8 +147,8 @@ export default function WithdrawSheet({
                     <Image
                       src="/Assets/Images/Logo/logo-coin/usdt-logo.svg"
                       alt="USDT"
-                      width={16}
-                      height={16}
+                      width={USDT_INLINE_LOGO_SIZE}
+                      height={USDT_INLINE_LOGO_SIZE}
                     />
                     <span className="text-sm font-semibold text-main-text">
                       USDT
