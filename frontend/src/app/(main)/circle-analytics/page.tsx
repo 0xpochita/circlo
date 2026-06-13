@@ -26,6 +26,7 @@ const TOP_COUNT = 5;
 const USDT_DISPLAY_DECIMALS = 3;
 const STATUS_ORDER = ["open", "locked", "resolving", "resolved", "paidout", "disputed"] as const;
 const SKELETON_COUNT = 4;
+const LIST_STAGGER_DELAY = 0.04;
 
 type StakerStat = {
   userId: string;
@@ -340,7 +341,7 @@ function CircleAnalyticsContent() {
                       key={s.userId}
                       initial={{ opacity: 0, y: 6 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.2, delay: 0.04 * i }}
+                      transition={{ duration: 0.2, delay: LIST_STAGGER_DELAY * i }}
                       className="flex items-center gap-3 rounded-2xl bg-white p-3"
                     >
                       <div className="relative">
@@ -404,7 +405,7 @@ function CircleAnalyticsContent() {
                       key={gs.goal.id}
                       initial={{ opacity: 0, y: 6 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.2, delay: 0.04 * i }}
+                      transition={{ duration: 0.2, delay: LIST_STAGGER_DELAY * i }}
                       className="flex items-center gap-3 rounded-2xl bg-white p-3"
                     >
                       <EmojiAvatar
