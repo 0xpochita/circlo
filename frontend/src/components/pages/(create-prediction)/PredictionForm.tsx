@@ -26,6 +26,8 @@ const DESCRIPTION_MAX_LENGTH = 200;
 const DESCRIPTION_WARN_THRESHOLD = 180;
 const GOAL_AVATAR_SIZE = 72;
 const USDT_LOGO_SIZE = 18;
+const BAR_SPRING_STIFFNESS = 300;
+const BAR_SPRING_DAMPING = 30;
 
 export default function PredictionForm() {
   const store = useCreateGoalStore();
@@ -166,8 +168,8 @@ export default function PredictionForm() {
             }}
             transition={{
               type: "spring" as const,
-              stiffness: 300,
-              damping: 30,
+              stiffness: BAR_SPRING_STIFFNESS,
+              damping: BAR_SPRING_DAMPING,
             }}
           />
         </div>
