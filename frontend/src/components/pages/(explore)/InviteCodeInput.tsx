@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import { useAccount } from "wagmi";
 import { circlesApi } from "@/lib/api/endpoints";
 
+const TAP_SCALE = 0.95;
+
 export default function InviteCodeInput() {
   const [code, setCode] = useState("");
   const [isJoining, setIsJoining] = useState(false);
@@ -78,7 +80,7 @@ export default function InviteCodeInput() {
           />
           <motion.button
             type="submit"
-            whileTap={{ scale: 0.95 }}
+            whileTap={{ scale: TAP_SCALE }}
             disabled={!code.trim() || isJoining}
             className="rounded-xl bg-brand px-5 py-3 text-sm font-semibold text-white cursor-pointer transition-all duration-200 disabled:bg-gray-100 disabled:text-muted disabled:cursor-not-allowed"
           >
