@@ -18,6 +18,10 @@ const tabs = [
 
 const NAV_ENTRANCE_DELAY = 0.3;
 const LABEL_TRANSITION_DURATION = 0.2;
+const NAV_SPRING_STIFFNESS = 300;
+const NAV_SPRING_DAMPING = 30;
+const TAB_SPRING_STIFFNESS = 400;
+const TAB_SPRING_DAMPING = 30;
 
 const labelVariants: Variants = {
   hidden: { width: 0, opacity: 0 },
@@ -36,7 +40,7 @@ export default function BottomTabBar() {
       <motion.div
         initial={{ y: 80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ type: "spring", stiffness: 300, damping: 30, delay: NAV_ENTRANCE_DELAY }}
+        transition={{ type: "spring", stiffness: NAV_SPRING_STIFFNESS, damping: NAV_SPRING_DAMPING, delay: NAV_ENTRANCE_DELAY }}
         className="flex items-center justify-between rounded-full bg-white/95 shadow-lg px-2 py-2"
       >
         {tabs.map((tab, i) => (
@@ -45,7 +49,7 @@ export default function BottomTabBar() {
             key={tab.label}
             onClick={() => router.push(tab.href)}
             layout
-            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+            transition={{ type: "spring", stiffness: TAB_SPRING_STIFFNESS, damping: TAB_SPRING_DAMPING }}
             className={`relative flex items-center gap-2 rounded-full px-4 py-2.5 cursor-pointer ${active === i ? "bg-white" : ""}`}
           >
             <tab.icon
