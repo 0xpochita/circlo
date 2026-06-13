@@ -47,6 +47,9 @@ const iconPositions: readonly { x: string; y: string; size: number; rotate: numb
   { x: "70%", y: "68%", size: 32, rotate: 10 },
 ];
 
+const ICON_INITIAL_DELAY = 0.1;
+const ICON_STAGGER_DELAY = 0.05;
+
 interface CategoryCardProps {
   title: string;
   difficulty: string;
@@ -76,7 +79,7 @@ function CategoryCard({ title, difficulty, color }: CategoryCardProps) {
                 type: "spring" as const,
                 stiffness: 260,
                 damping: 20,
-                delay: 0.1 + i * 0.05,
+                delay: ICON_INITIAL_DELAY + i * ICON_STAGGER_DELAY,
               }}
               className="absolute"
               style={{
