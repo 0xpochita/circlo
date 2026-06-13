@@ -16,6 +16,9 @@ import { circlesApi, notificationsApi } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
 import { useDataCache } from "@/stores/dataCache";
 
+const CARD_TRANSITION_DURATION = 0.25;
+const SHEET_MAX_HEIGHT = "85dvh";
+
 type Invite = {
   notificationId: string;
   circleId: string;
@@ -159,7 +162,7 @@ export default function PendingInvites() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, x: 50 }}
-                transition={{ duration: 0.25 }}
+                transition={{ duration: CARD_TRANSITION_DURATION }}
                 className="flex items-center gap-3 rounded-2xl bg-emerald-50 ring-1 ring-emerald-100 p-3"
               >
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white">
