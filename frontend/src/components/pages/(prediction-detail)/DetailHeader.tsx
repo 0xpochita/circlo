@@ -13,6 +13,7 @@ import {
 import { toast } from "sonner";
 
 const COPIED_TIMEOUT_MS = 2000;
+const TAP_SCALE = 0.97;
 
 type DetailHeaderProps = {
   goalId?: string;
@@ -141,7 +142,7 @@ export default function DetailHeader({ goalId, title }: DetailHeaderProps) {
                 <motion.button
                   type="button"
                   onClick={handleNativeShare}
-                  whileTap={{ scale: 0.97 }}
+                  whileTap={{ scale: TAP_SCALE }}
                   className="w-full rounded-full bg-gray-900 py-4 text-base font-semibold text-white cursor-pointer"
                 >
                   Share with friends
