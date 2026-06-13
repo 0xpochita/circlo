@@ -49,6 +49,7 @@ const iconPositions: readonly { x: string; y: string; size: number; rotate: numb
 
 const ICON_INITIAL_DELAY = 0.1;
 const ICON_STAGGER_DELAY = 0.05;
+const CARD_ENTRANCE_DURATION = 0.5;
 
 interface CategoryCardProps {
   title: string;
@@ -63,7 +64,7 @@ function CategoryCard({ title, difficulty, color }: CategoryCardProps) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: CARD_ENTRANCE_DURATION }}
       className="mx-4 rounded-3xl p-6 pb-5 flex flex-col"
       style={{ backgroundColor: color }}
     >
