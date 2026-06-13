@@ -13,6 +13,7 @@ import type { UserAvatar } from "@/types";
 const USERNAME_MAX_LENGTH = 20;
 const SECTION_ANIMATION_DURATION = 0.5;
 const CTA_ENTRANCE_DELAY = 0.3;
+const TAP_SCALE = 0.97;
 
 type ProfileStepProps = {
   onNext: () => void;
@@ -155,7 +156,7 @@ export default function ProfileStep({ onNext, onBack }: ProfileStepProps) {
           type="button"
           onClick={handleComplete}
           disabled={isSaving}
-          whileTap={isSaving ? {} : { scale: 0.97 }}
+          whileTap={isSaving ? {} : { scale: TAP_SCALE }}
           className="w-full rounded-full bg-brand py-4 text-base font-semibold text-white cursor-pointer disabled:bg-gray-200 disabled:text-muted disabled:cursor-not-allowed"
         >
           {isSaving
