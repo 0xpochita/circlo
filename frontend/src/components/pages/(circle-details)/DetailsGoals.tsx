@@ -47,6 +47,8 @@ const SHEET_MAX_HEIGHT = "85dvh";
 const CARD_STAGGER_DELAY = 0.08;
 const SHEET_SPRING_STIFFNESS = 300;
 const SHEET_SPRING_DAMPING = 32;
+const LIST_ANIMATION_DURATION = 0.3;
+const CARD_ANIMATION_DURATION = 0.35;
 
 const STATUS_BADGE_STYLES: Record<string, string> = {
   open: "bg-emerald-50 text-emerald-500",
@@ -289,7 +291,7 @@ export default function DetailsGoals({ circleId }: DetailsGoalsProps) {
                         key={g.id}
                         initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3, delay: LIST_STAGGER_DELAY * i }}
+                        transition={{ duration: LIST_ANIMATION_DURATION, delay: LIST_STAGGER_DELAY * i }}
                       >
                         <Link
                           href={`/prediction-detail?id=${g.id}`}
@@ -342,7 +344,7 @@ function GoalCard({ goal, index }: { goal: GoalResponse; index: number }) {
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, delay: CARD_STAGGER_DELAY * index }}
+      transition={{ duration: CARD_ANIMATION_DURATION, delay: CARD_STAGGER_DELAY * index }}
     >
       <Link
         href={`/prediction-detail?id=${goal.id}`}
