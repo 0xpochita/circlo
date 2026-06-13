@@ -30,6 +30,8 @@ const layoutPositions: readonly { x: number; y: number; size: number }[] = [
 
 const MEMBERS_PREVIEW_COUNT = 5;
 const AVATAR_STAGGER_DELAY = 0.15;
+const SPRING_STIFFNESS = 300;
+const SPRING_DAMPING = 20;
 
 type SuccessHeroProps = {
   circle?: CircleDetailResponse | null;
@@ -54,7 +56,7 @@ export default function SuccessHero({ circle }: SuccessHeroProps) {
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          transition={{ type: "spring" as const, stiffness: 300, damping: 20 }}
+          transition={{ type: "spring" as const, stiffness: SPRING_STIFFNESS, damping: SPRING_DAMPING }}
           className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500"
         >
           <HiCheck className="w-4 h-4 text-white" />
@@ -89,8 +91,8 @@ export default function SuccessHero({ circle }: SuccessHeroProps) {
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{
                   type: "spring" as const,
-                  stiffness: 300,
-                  damping: 20,
+                  stiffness: SPRING_STIFFNESS,
+                  damping: SPRING_DAMPING,
                   delay: AVATAR_STAGGER_DELAY * i,
                 }}
                 className="absolute"
