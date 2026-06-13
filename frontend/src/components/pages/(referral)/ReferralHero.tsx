@@ -33,6 +33,8 @@ const HIGHLIGHT_CLASSES: Record<string, string> = {
 };
 const DEFAULT_CELL_CLASS = "bg-white";
 const CELL_STAGGER_DELAY = 0.02;
+const CELL_SPRING_STIFFNESS = 300;
+const CELL_SPRING_DAMPING = 25;
 
 export default function ReferralHero() {
   return (
@@ -57,8 +59,8 @@ export default function ReferralHero() {
               duration: 0.3,
               delay: CELL_STAGGER_DELAY * i,
               type: "spring" as const,
-              stiffness: 300,
-              damping: 25,
+              stiffness: CELL_SPRING_STIFFNESS,
+              damping: CELL_SPRING_DAMPING,
             }}
             className={`aspect-square rounded-xl flex items-center justify-center ${
               HIGHLIGHT_CLASSES[cell.highlight ?? ""] ?? DEFAULT_CELL_CLASS
