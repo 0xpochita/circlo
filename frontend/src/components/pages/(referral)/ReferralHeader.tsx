@@ -4,6 +4,8 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { HiXMark } from "react-icons/hi2";
 
+const LOGO_SIZE = 32;
+
 export default function ReferralHeader() {
   const router = useRouter();
 
@@ -13,8 +15,8 @@ export default function ReferralHeader() {
         <Image
           src="/Assets/Images/Logo/logo-brand/logo-brand.webp"
           alt="Circlo Logo"
-          width={32}
-          height={32}
+          width={LOGO_SIZE}
+          height={LOGO_SIZE}
           className="rounded-lg"
         />
         <p className="text-xl font-bold tracking-tight text-main-text">
