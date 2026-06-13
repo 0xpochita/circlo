@@ -13,6 +13,7 @@ import { circlesApi } from "@/lib/api/endpoints";
 import { toAvatar } from "@/lib/utils";
 
 const LIST_STAGGER_DELAY = 0.05;
+const SLIDE_ANIMATION_DURATION = 0.3;
 
 type MemberActivityProps = {
   circleId?: string;
@@ -70,7 +71,7 @@ export default function MemberActivity({ circleId }: MemberActivityProps) {
               key={m.userId}
               initial={{ opacity: 0, x: -12 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3, delay: LIST_STAGGER_DELAY * i }}
+              transition={{ duration: SLIDE_ANIMATION_DURATION, delay: LIST_STAGGER_DELAY * i }}
               className="flex items-center justify-between px-4 py-3.5"
             >
               <div className="flex items-center gap-3">
