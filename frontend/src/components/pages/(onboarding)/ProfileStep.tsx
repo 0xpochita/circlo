@@ -11,6 +11,8 @@ import { useUserStore } from "@/stores/userStore";
 import type { UserAvatar } from "@/types";
 
 const USERNAME_MAX_LENGTH = 20;
+const SECTION_ANIMATION_DURATION = 0.5;
+const CTA_ENTRANCE_DELAY = 0.3;
 
 type ProfileStepProps = {
   onNext: () => void;
@@ -78,7 +80,7 @@ export default function ProfileStep({ onNext, onBack }: ProfileStepProps) {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: SECTION_ANIMATION_DURATION }}
         >
           <div className="text-center mb-6">
             <h1 className="text-2xl font-bold tracking-tight text-emerald-500">
@@ -146,7 +148,7 @@ export default function ProfileStep({ onNext, onBack }: ProfileStepProps) {
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.3 }}
+        transition={{ duration: 0.4, delay: CTA_ENTRANCE_DELAY }}
         className="shrink-0 px-6 pb-8 pt-3 bg-main-bg"
       >
         <motion.button
