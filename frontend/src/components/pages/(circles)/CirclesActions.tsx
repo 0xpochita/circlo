@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useState } from "react";
 import { HiOutlineGlobeAlt, HiOutlineTicket } from "react-icons/hi2";
 
+const TAP_SCALE = 0.95;
+
 export default function CirclesActions() {
   const [code, setCode] = useState("");
 
@@ -32,7 +34,7 @@ export default function CirclesActions() {
           </div>
         </div>
         <motion.span
-          whileTap={{ scale: 0.95 }}
+          whileTap={{ scale: TAP_SCALE }}
           className="rounded-full bg-gray-50 px-4 py-1.5 text-xs font-medium text-main-text"
         >
           Browse
@@ -63,7 +65,7 @@ export default function CirclesActions() {
           />
           <motion.button
             type="submit"
-            whileTap={{ scale: 0.95 }}
+            whileTap={{ scale: TAP_SCALE }}
             disabled={!code.trim()}
             className="rounded-xl bg-brand px-5 py-3 text-sm font-semibold text-white cursor-pointer transition-all duration-200 disabled:bg-gray-100 disabled:text-muted disabled:cursor-not-allowed"
           >
