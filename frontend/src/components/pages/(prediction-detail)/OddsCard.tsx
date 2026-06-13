@@ -8,6 +8,7 @@ import { predictionPoolContract } from "@/lib/web3/contracts";
 import { fromUSDT } from "@/lib/web3/usdt";
 
 const POOL_DISPLAY_DECIMALS = 4;
+const BAR_ANIMATION_DURATION = 0.6;
 
 type OddsCardProps = {
   goalChainId?: string;
@@ -92,7 +93,7 @@ export default function OddsCard({ goalChainId }: OddsCardProps) {
                   className={`h-1.5 rounded-full ${selected === i ? "bg-white" : "bg-brand"}`}
                   initial={{ width: 0 }}
                   animate={{ width: `${opt.percentage}%` }}
-                  transition={{ duration: 0.6, ease: "easeOut" as const }}
+                  transition={{ duration: BAR_ANIMATION_DURATION, ease: "easeOut" as const }}
                 />
               </div>
               <p
