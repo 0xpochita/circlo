@@ -18,6 +18,7 @@ type Member = {
 };
 
 const SKELETON_COUNT = 3;
+const TAP_SCALE = 0.98;
 
 export default function ResolverPicker() {
   const store = useCreateGoalStore();
@@ -131,7 +132,7 @@ export default function ResolverPicker() {
               type="button"
               key={member.userId}
               onClick={() => toggle(member.userId)}
-              whileTap={{ scale: 0.98 }}
+              whileTap={{ scale: TAP_SCALE }}
               className={`flex items-center gap-3 rounded-xl p-3 cursor-pointer transition-all duration-200 ${
                 isSelected
                   ? "bg-brand-light ring-2 ring-main-text"
