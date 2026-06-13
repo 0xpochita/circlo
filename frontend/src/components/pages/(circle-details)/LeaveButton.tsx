@@ -13,6 +13,8 @@ import { useAuthStore } from "@/stores/authStore";
 
 const REDIRECT_DELAY_MS = 600;
 const TAP_SCALE = 0.97;
+const SHEET_SPRING_STIFFNESS = 300;
+const SHEET_SPRING_DAMPING = 32;
 
 type LeaveButtonProps = {
   circleId?: number;
@@ -107,8 +109,8 @@ export default function LeaveButton({
               exit={{ y: "100%" }}
               transition={{
                 type: "spring" as const,
-                stiffness: 300,
-                damping: 32,
+                stiffness: SHEET_SPRING_STIFFNESS,
+                damping: SHEET_SPRING_DAMPING,
               }}
               className="fixed bottom-0 left-1/2 z-101 w-full max-w-md -translate-x-1/2 rounded-t-3xl bg-white"
             >
