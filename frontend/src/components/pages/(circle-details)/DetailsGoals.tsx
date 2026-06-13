@@ -43,6 +43,7 @@ function isActiveGoal(g: GoalResponse): boolean {
 const PREVIEW_COUNT = 3;
 const SKELETON_COUNT = 3;
 const LIST_STAGGER_DELAY = 0.05;
+const SHEET_MAX_HEIGHT = "85dvh";
 
 const STATUS_BADGE_STYLES: Record<string, string> = {
   open: "bg-emerald-50 text-emerald-500",
@@ -230,7 +231,7 @@ export default function DetailsGoals({ circleId }: DetailsGoalsProps) {
                 damping: 32,
               }}
               className="fixed bottom-0 left-1/2 z-101 w-full max-w-md -translate-x-1/2 flex flex-col rounded-t-3xl bg-white"
-              style={{ maxHeight: "85dvh" }}
+              style={{ maxHeight: SHEET_MAX_HEIGHT }}
             >
               <div className="flex items-start justify-between px-6 pt-6 pb-3 shrink-0">
                 <div>
