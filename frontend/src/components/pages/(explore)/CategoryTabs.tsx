@@ -2,6 +2,9 @@
 
 import { motion } from "framer-motion";
 
+const TAB_SPRING_STIFFNESS = 400;
+const TAB_SPRING_DAMPING = 30;
+
 type CategoryTab = {
   label: string;
   emoji: string;
@@ -38,8 +41,8 @@ export default function CategoryTabs({
                 className="absolute inset-0 rounded-full bg-brand"
                 transition={{
                   type: "spring" as const,
-                  stiffness: 400,
-                  damping: 30,
+                  stiffness: TAB_SPRING_STIFFNESS,
+                  damping: TAB_SPRING_DAMPING,
                 }}
               />
             )}
