@@ -28,6 +28,8 @@ const SHEET_MAX_HEIGHT = "85dvh";
 const FAUCET_GAS_LIMIT = BigInt(200_000);
 const ERROR_MSG_MAX_LEN = 80;
 const BALANCE_DISPLAY_DECIMALS = 2;
+const USDT_LOGO_SIZE = 14;
+const CELO_LOGO_SIZE = 28;
 import { fromUSDT } from "@/lib/web3/usdt";
 
 export default function BalanceCard() {
@@ -138,8 +140,8 @@ export default function BalanceCard() {
                   <Image
                     src="/Assets/Images/Logo/logo-coin/usdt-logo.svg"
                     alt="USDT"
-                    width={14}
-                    height={14}
+                    width={USDT_LOGO_SIZE}
+                    height={USDT_LOGO_SIZE}
                   />
                   <span className="text-xs font-semibold text-white">USDT</span>
                 </div>
@@ -148,8 +150,8 @@ export default function BalanceCard() {
             <Image
               src="/Assets/Images/Logo/logo-coin/celo-logo.svg"
               alt="Celo"
-              width={28}
-              height={28}
+              width={CELO_LOGO_SIZE}
+              height={CELO_LOGO_SIZE}
               className="opacity-60"
             />
           </div>
