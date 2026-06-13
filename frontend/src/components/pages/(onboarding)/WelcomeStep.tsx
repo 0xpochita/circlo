@@ -6,6 +6,9 @@ import Image from "next/image";
 const HERO_ANIMATION_DURATION = 0.6;
 const CTA_ENTRANCE_DELAY = 0.5;
 const TAP_SCALE = 0.97;
+const CARD_ANIMATION_DURATION = 0.7;
+const CARD_ENTRANCE_DELAY = 0.2;
+const BRAND_LOGO_SIZE = 72;
 
 type WelcomeStepProps = {
   onNext: () => void;
@@ -35,7 +38,7 @@ export default function WelcomeStep({ onNext }: WelcomeStepProps) {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.7, delay: 0.2 }}
+          transition={{ duration: CARD_ANIMATION_DURATION, delay: CARD_ENTRANCE_DELAY }}
           className="w-full rounded-3xl bg-white overflow-hidden"
         >
           <div className="flex flex-col items-center py-20 px-6 relative">
@@ -50,8 +53,8 @@ export default function WelcomeStep({ onNext }: WelcomeStepProps) {
               <Image
                 src="/Assets/Images/Logo/logo-brand/logo-brand.webp"
                 alt="Circlo"
-                width={72}
-                height={72}
+                width={BRAND_LOGO_SIZE}
+                height={BRAND_LOGO_SIZE}
                 className="rounded-2xl"
               />
             </div>
