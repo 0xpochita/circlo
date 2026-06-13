@@ -16,6 +16,7 @@ import { toAvatar } from "@/lib/utils";
 const SKELETON_COUNT = 3;
 
 const SEARCH_DEBOUNCE_MS = 300;
+const SHEET_MAX_HEIGHT = "85dvh";
 
 type SearchUser = {
   id: string;
@@ -140,7 +141,7 @@ export default function InviteMemberButton({
                 damping: 32,
               }}
               className="fixed bottom-0 left-1/2 z-101 w-full max-w-md -translate-x-1/2 flex flex-col rounded-t-3xl bg-white"
-              style={{ maxHeight: "85dvh" }}
+              style={{ maxHeight: SHEET_MAX_HEIGHT }}
             >
               <div className="flex items-start justify-between px-6 pt-6 pb-3 shrink-0">
                 <div>
