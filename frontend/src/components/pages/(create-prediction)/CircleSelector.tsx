@@ -9,6 +9,8 @@ import { toAvatar } from "@/lib/utils";
 import { useCreateGoalStore } from "@/stores/createGoalStore";
 import type { UserAvatar } from "@/types";
 
+const DROPDOWN_TRANSITION_DURATION = 0.2;
+
 type CircleOption = {
   id: string;
   chainId: string;
@@ -130,7 +132,7 @@ export default function CircleSelector() {
         </div>
         <motion.div
           animate={{ rotate: open ? 180 : 0 }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: DROPDOWN_TRANSITION_DURATION }}
         >
           <HiChevronDown className="w-5 h-5 text-muted" />
         </motion.div>
@@ -142,7 +144,7 @@ export default function CircleSelector() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: DROPDOWN_TRANSITION_DURATION }}
             className="overflow-hidden"
           >
             <div className="mt-2 rounded-2xl bg-white divide-y divide-gray-50">
