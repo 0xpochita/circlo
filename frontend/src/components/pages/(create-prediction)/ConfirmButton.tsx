@@ -24,6 +24,7 @@ const ERROR_TOAST_DURATION_MS = 8000;
 const STEP_STAGGER_DELAY = 0.1;
 const SHEET_MAX_HEIGHT = "90dvh";
 const CTA_ENTRANCE_DELAY = 0.5;
+const TAP_SCALE = 0.97;
 
 const OUTCOME_LABELS: Record<number, string> = {
   0: "Yes / No",
@@ -377,7 +378,7 @@ export default function ConfirmButton() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: CTA_ENTRANCE_DELAY }}
-          whileTap={{ scale: 0.97 }}
+          whileTap={{ scale: TAP_SCALE }}
           className="w-full rounded-full bg-gray-900 py-4 text-base font-semibold text-white cursor-pointer"
         >
           Confirm Prediction
@@ -522,7 +523,7 @@ export default function ConfirmButton() {
                       type="button"
                       onClick={handleConfirm}
                       disabled={isCreating}
-                      whileTap={isCreating ? {} : { scale: 0.97 }}
+                      whileTap={isCreating ? {} : { scale: TAP_SCALE }}
                       className="w-full rounded-full bg-gray-900 py-4 text-base font-semibold text-white cursor-pointer disabled:bg-gray-200 disabled:text-muted disabled:cursor-not-allowed"
                     >
                       Create Prediction
