@@ -3,6 +3,9 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 
+const HERO_ANIMATION_DURATION = 0.6;
+const CTA_ENTRANCE_DELAY = 0.5;
+
 type WelcomeStepProps = {
   onNext: () => void;
 };
@@ -14,7 +17,7 @@ export default function WelcomeStep({ onNext }: WelcomeStepProps) {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: HERO_ANIMATION_DURATION }}
           className="text-center mb-6"
         >
           <h1 className="text-3xl font-bold tracking-tight text-main-text">
@@ -69,7 +72,7 @@ export default function WelcomeStep({ onNext }: WelcomeStepProps) {
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.5 }}
+        transition={{ duration: 0.4, delay: CTA_ENTRANCE_DELAY }}
         className="px-6 pb-8 pt-6"
       >
         <div className="flex justify-center mb-25">
