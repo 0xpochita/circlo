@@ -13,6 +13,7 @@ import { useDataCache } from "@/stores/dataCache";
 
 const STAKE_DISPLAY_DECIMALS = 4;
 const SKELETON_COUNT = 5;
+const LIST_STAGGER_DELAY = 0.03;
 
 type StakeStatus = "active" | "won" | "lost" | "claimed";
 type FilterTab = "all" | StakeStatus;
@@ -258,7 +259,7 @@ export default function StakeHistoryPage() {
                     key={g.id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.25, delay: 0.03 * i }}
+                    transition={{ duration: 0.25, delay: LIST_STAGGER_DELAY * i }}
                   >
                     <Link
                       href={`/prediction-detail?id=${g.id}`}
