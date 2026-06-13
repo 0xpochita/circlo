@@ -14,6 +14,9 @@ import { NETWORK } from "@/lib/web3/network";
 import { useAuthStore } from "@/stores/authStore";
 import { useUserStore } from "@/stores/userStore";
 
+const SECTION_ANIMATION_DURATION = 0.5;
+const CTA_ENTRANCE_DELAY = 0.5;
+
 type ConnectStepProps = {
   onNext: () => void;
   onBack: () => void;
@@ -186,7 +189,7 @@ export default function ConnectStep({ onNext, onBack }: ConnectStepProps) {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: SECTION_ANIMATION_DURATION }}
           className="text-center mt-6 mb-4"
         >
           <h1 className="text-2xl font-bold tracking-tight text-emerald-500">
@@ -200,7 +203,7 @@ export default function ConnectStep({ onNext, onBack }: ConnectStepProps) {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+          transition={{ duration: SECTION_ANIMATION_DURATION, delay: 0.2 }}
           className="w-full rounded-3xl bg-white overflow-hidden mb-6"
         >
           <div className="flex flex-col items-center justify-end h-56 relative">
@@ -227,7 +230,7 @@ export default function ConnectStep({ onNext, onBack }: ConnectStepProps) {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+          transition={{ duration: SECTION_ANIMATION_DURATION, delay: 0.3 }}
           className="text-center mb-auto"
         >
           <p className="text-sm text-gray-400 leading-relaxed max-w-70 mx-auto">
@@ -244,7 +247,7 @@ export default function ConnectStep({ onNext, onBack }: ConnectStepProps) {
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.5 }}
+        transition={{ duration: 0.4, delay: CTA_ENTRANCE_DELAY }}
         className="px-6 pb-8 pt-6"
       >
         <div className="flex justify-center mb-25">
