@@ -12,6 +12,7 @@ import { circlesApi } from "@/lib/api/endpoints";
 import { formatTimeLeft, MS_PER_DAY, toAvatar } from "@/lib/utils";
 
 const CLOSING_SOON_THRESHOLD_MS = MS_PER_DAY * 2;
+const CARD_STAGGER_DELAY = 0.08;
 
 type PredictionMarketListProps = {
   circleId?: string;
@@ -79,7 +80,7 @@ export default function PredictionMarketList({
                 key={g.id}
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35, delay: 0.08 * i }}
+                transition={{ duration: 0.35, delay: CARD_STAGGER_DELAY * i }}
               >
                 <Link
                   href={`/prediction-detail?id=${g.id}`}
