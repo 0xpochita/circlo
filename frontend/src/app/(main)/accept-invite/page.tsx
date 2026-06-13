@@ -25,6 +25,8 @@ import { useAuthStore } from "@/stores/authStore";
 
 const REDIRECT_DELAY_MS = 800;
 const LS_REDIRECT_AFTER_LOGIN = "circlo-redirect-after-login";
+const TAP_SCALE = 0.97;
+const AVATAR_SIZE = 72;
 
 type Status =
   | "loading"
@@ -204,7 +206,7 @@ function AcceptInviteContent() {
               >
                 <EmojiAvatar
                   avatar={toAvatar(circle.avatarEmoji, circle.avatarColor)}
-                  size={72}
+                  size={AVATAR_SIZE}
                 />
                 <p className="mt-4 text-xl font-bold text-main-text text-center">
                   You're invited to
@@ -243,7 +245,7 @@ function AcceptInviteContent() {
                     type="button"
                     onClick={handleAccept}
                     disabled={status === "joining" || !isConnected}
-                    whileTap={status === "joining" ? {} : { scale: 0.97 }}
+                    whileTap={status === "joining" ? {} : { scale: TAP_SCALE }}
                     className="mt-8 w-full rounded-full bg-gray-900 py-4 text-base font-semibold text-white cursor-pointer disabled:bg-gray-200 disabled:text-muted disabled:cursor-not-allowed transition-all duration-200"
                   >
                     {status === "joining"
