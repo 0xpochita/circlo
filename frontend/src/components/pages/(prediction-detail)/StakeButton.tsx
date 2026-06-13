@@ -28,6 +28,7 @@ const QUICK_STAKE_AMOUNTS = ["1", "5", "10", "50"] as const;
 const LS_REDIRECT_AFTER_LOGIN = "circlo-redirect-after-login";
 const STEP_STAGGER_DELAY = 0.1;
 const SHEET_MAX_HEIGHT = "90dvh";
+const TAP_SCALE = 0.97;
 
 type ResolverInfo = {
   userId: string;
@@ -758,7 +759,7 @@ export default function StakeButton({
             type="button"
             onClick={handleClaim}
             disabled={isClaiming}
-            whileTap={isClaiming ? {} : { scale: 0.97 }}
+            whileTap={isClaiming ? {} : { scale: TAP_SCALE }}
             className="w-full rounded-full bg-emerald-500 py-4 text-base font-semibold text-white cursor-pointer disabled:bg-gray-200 disabled:text-muted disabled:cursor-not-allowed"
           >
             {isClaiming ? "Claiming..." : "Claim Reward"}
@@ -802,7 +803,7 @@ export default function StakeButton({
                   ? setResolveSheetOpen(true)
                   : toast(`Resolve opens in ${getTimeUntilDeadline()}`)
               }
-              whileTap={deadlinePassed ? { scale: 0.97 } : {}}
+              whileTap={deadlinePassed ? { scale: TAP_SCALE } : {}}
               className={`w-full rounded-full py-4 text-base font-semibold cursor-pointer transition-all duration-200 ${
                 deadlinePassed
                   ? "bg-amber-500 text-white"
@@ -825,7 +826,7 @@ export default function StakeButton({
           <motion.button
             type="button"
             onClick={handleOpen}
-            whileTap={{ scale: 0.97 }}
+            whileTap={{ scale: TAP_SCALE }}
             className="w-full rounded-full bg-brand py-4 text-base font-semibold text-white cursor-pointer"
           >
             {!isConnected || !isAuthenticated
@@ -1014,7 +1015,7 @@ export default function StakeButton({
                         (!!minStake &&
                           parseFloat(amount) < parseFloat(minStake))
                       }
-                      whileTap={isStaking ? {} : { scale: 0.97 }}
+                      whileTap={isStaking ? {} : { scale: TAP_SCALE }}
                       className="w-full rounded-full bg-gray-900 py-4 text-base font-semibold text-white cursor-pointer disabled:bg-gray-200 disabled:text-muted disabled:cursor-not-allowed"
                     >
                       Confirm Stake
@@ -1100,7 +1101,7 @@ export default function StakeButton({
                 type="button"
                 onClick={handleResolve}
                 disabled={isResolving || resolveChoice === null}
-                whileTap={isResolving ? {} : { scale: 0.97 }}
+                whileTap={isResolving ? {} : { scale: TAP_SCALE }}
                 className="w-full rounded-full bg-amber-500 py-4 text-base font-semibold text-white cursor-pointer disabled:bg-gray-200 disabled:text-muted disabled:cursor-not-allowed"
               >
                 {isResolving ? "Submitting vote..." : "Submit Vote"}
