@@ -20,6 +20,8 @@ import {
 
 const COPIED_TIMEOUT_MS = 2000;
 const TAP_SCALE = 0.97;
+const SHEET_SPRING_STIFFNESS = 300;
+const SHEET_SPRING_DAMPING = 32;
 
 type DurationKey = "1h" | "1d" | "7d" | "30d";
 
@@ -159,8 +161,8 @@ export default function GenerateInviteSheet({
             exit={{ y: "100%" }}
             transition={{
               type: "spring" as const,
-              stiffness: 300,
-              damping: 32,
+              stiffness: SHEET_SPRING_STIFFNESS,
+              damping: SHEET_SPRING_DAMPING,
             }}
             className="fixed bottom-0 left-1/2 z-101 w-full max-w-md -translate-x-1/2 rounded-t-3xl bg-white"
           >
