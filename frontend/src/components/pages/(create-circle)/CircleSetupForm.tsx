@@ -18,6 +18,9 @@ const categories = [
   { emoji: "🎧", label: "Music", value: "music" },
 ] as const;
 
+const FIELD_ANIMATION_DURATION = 0.4;
+const FIELD_STAGGER_DELAY = 0.08;
+
 export default function CircleSetupForm() {
   const store = useCreateCircleStore();
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -31,7 +34,7 @@ export default function CircleSetupForm() {
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
+        transition={{ duration: FIELD_ANIMATION_DURATION }}
         className="rounded-2xl bg-white p-4"
       >
         <p className="text-sm font-medium text-main-text mb-3">Circle Logo</p>
@@ -58,7 +61,7 @@ export default function CircleSetupForm() {
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.08 }}
+        transition={{ duration: FIELD_ANIMATION_DURATION, delay: FIELD_STAGGER_DELAY }}
         className="rounded-2xl bg-white p-4"
       >
         <label className="text-sm font-medium text-main-text mb-2 block">
@@ -76,7 +79,7 @@ export default function CircleSetupForm() {
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.16 }}
+        transition={{ duration: FIELD_ANIMATION_DURATION, delay: FIELD_STAGGER_DELAY * 2 }}
         className="rounded-2xl bg-white p-4"
       >
         <label className="text-sm font-medium text-main-text mb-2 block">
@@ -94,7 +97,7 @@ export default function CircleSetupForm() {
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.24 }}
+        transition={{ duration: FIELD_ANIMATION_DURATION, delay: FIELD_STAGGER_DELAY * 3 }}
         className="rounded-2xl bg-white p-4"
       >
         <p className="text-sm font-medium text-main-text mb-3">Category</p>
@@ -120,7 +123,7 @@ export default function CircleSetupForm() {
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.32 }}
+        transition={{ duration: FIELD_ANIMATION_DURATION, delay: FIELD_STAGGER_DELAY * 4 }}
         className="rounded-2xl bg-white p-4"
       >
         <p className="text-sm font-medium text-main-text mb-3">Privacy</p>
