@@ -2,12 +2,15 @@
 
 import { motion } from "framer-motion";
 
+const STAGGER_CHILDREN_DELAY = 0.08;
+const ITEM_TRANSITION_DURATION = 0.4;
+
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.08,
+      staggerChildren: STAGGER_CHILDREN_DELAY,
     },
   },
 };
@@ -17,7 +20,7 @@ const itemVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.4, ease: "easeOut" as const },
+    transition: { duration: ITEM_TRANSITION_DURATION, ease: "easeOut" as const },
   },
 };
 
