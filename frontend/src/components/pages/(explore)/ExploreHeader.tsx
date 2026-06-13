@@ -16,6 +16,8 @@ import { EmojiAvatar } from "@/components/shared";
 import { useSheetOverflow } from "@/hooks";
 import { useUserStore } from "@/stores/userStore";
 
+const AVATAR_SIZE = 36;
+
 export type ExploreSortKey = "newest" | "members" | "alphabetical";
 
 type ExploreHeaderProps = {
@@ -68,7 +70,7 @@ export default function ExploreHeader({
     <>
       <div className="flex items-center justify-between px-4 pt-14 pb-2">
         <div className="flex items-center gap-3">
-          <EmojiAvatar avatar={avatar} size={36} />
+          <EmojiAvatar avatar={avatar} size={AVATAR_SIZE} />
           <h1 className="text-base font-semibold text-main-text">Explore</h1>
         </div>
         <div className="flex items-center gap-2">
