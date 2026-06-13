@@ -5,13 +5,15 @@ import { HiOutlinePlus } from "react-icons/hi2";
 import { EmojiAvatar } from "@/components/shared";
 import { useUserStore } from "@/stores/userStore";
 
+const AVATAR_SIZE = 40;
+
 export default function CirclesHeader() {
   const avatar = useUserStore((s) => s.avatar);
 
   return (
     <div className="flex items-center justify-between px-4 pt-14 pb-2">
       <div className="flex items-center gap-3">
-        <EmojiAvatar avatar={avatar} size={40} />
+        <EmojiAvatar avatar={avatar} size={AVATAR_SIZE} />
         <div>
           <p className="text-xs text-muted">Your</p>
           <h1 className="text-xl font-bold tracking-tight text-main-text">
