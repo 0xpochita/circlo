@@ -23,6 +23,8 @@ import { usdtContract } from "@/lib/web3/contracts";
 
 import { IS_MAINNET } from "@/lib/web3/network";
 
+const SHEET_MAX_HEIGHT = "85dvh";
+
 const FAUCET_GAS_LIMIT = BigInt(200_000);
 const ERROR_MSG_MAX_LEN = 80;
 const BALANCE_DISPLAY_DECIMALS = 2;
@@ -213,7 +215,7 @@ export default function BalanceCard() {
                 damping: 32,
               }}
               className="fixed bottom-0 left-1/2 z-101 w-full max-w-md -translate-x-1/2 rounded-t-3xl bg-white px-6 pt-6 pb-12"
-              style={{ maxHeight: "85dvh" }}
+              style={{ maxHeight: SHEET_MAX_HEIGHT }}
             >
               <div className="flex items-start justify-between mb-6">
                 <div>
