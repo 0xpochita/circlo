@@ -16,6 +16,7 @@ import { toAvatar } from "@/lib/utils";
 
 const COPIED_TIMEOUT_MS = 2000;
 const SHEET_MAX_HEIGHT = "85dvh";
+const TAP_SCALE = 0.97;
 
 type ShareSheetProps = {
   open: boolean;
@@ -193,7 +194,7 @@ export default function ShareSheet({
               <motion.button
                 type="button"
                 onClick={handleNativeShare}
-                whileTap={{ scale: 0.97 }}
+                whileTap={{ scale: TAP_SCALE }}
                 className="mb-2 w-full rounded-full bg-brand py-4 text-base font-semibold text-white cursor-pointer"
               >
                 Share with friends
