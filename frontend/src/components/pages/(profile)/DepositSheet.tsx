@@ -19,6 +19,7 @@ const ADDR_PREFIX_LEN = 6;
 const ADDR_SUFFIX_LEN = 4;
 const SHEET_MAX_HEIGHT = "90dvh";
 const TAP_SCALE = 0.97;
+const COIN_LOGO_SIZE = 20;
 
 type DepositSheetProps = {
   open: boolean;
@@ -114,8 +115,8 @@ export default function DepositSheet({
                       <Image
                         src="/Assets/Images/Logo/logo-coin/usdt-logo.svg"
                         alt="USDT"
-                        width={20}
-                        height={20}
+                        width={COIN_LOGO_SIZE}
+                        height={COIN_LOGO_SIZE}
                       />
                       <span className="text-sm font-semibold text-main-text">
                         USDT
@@ -125,8 +126,8 @@ export default function DepositSheet({
                       <Image
                         src="/Assets/Images/Logo/logo-coin/celo-logo.svg"
                         alt="Celo"
-                        width={20}
-                        height={20}
+                        width={COIN_LOGO_SIZE}
+                        height={COIN_LOGO_SIZE}
                       />
                       <span className="text-sm font-semibold text-main-text">
                         Celo Mainnet
