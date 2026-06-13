@@ -10,6 +10,9 @@ import { circlesApi } from "@/lib/api/endpoints";
 import { circleFactoryContract } from "@/lib/web3/contracts";
 import { useCreateCircleStore } from "@/stores/createCircleStore";
 
+const ENTRANCE_DURATION = 0.4;
+const ENTRANCE_DELAY = 0.7;
+
 export default function NextButton() {
   const router = useRouter();
   const { isConnected } = useAccount();
@@ -150,7 +153,7 @@ export default function NextButton() {
         disabled={isCreating}
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.7 }}
+        transition={{ duration: ENTRANCE_DURATION, delay: ENTRANCE_DELAY }}
         whileTap={isCreating ? {} : { scale: 0.97 }}
         className="w-full rounded-full bg-brand py-4 text-base font-semibold text-white cursor-pointer disabled:bg-gray-200 disabled:text-muted disabled:cursor-not-allowed"
       >
