@@ -13,6 +13,7 @@ import {
 import type { UserAvatar } from "@/types";
 
 const SHEET_MAX_HEIGHT = "90dvh";
+const TAP_SCALE = 0.97;
 
 type EmojiPickerProps = {
   open: boolean;
@@ -173,7 +174,7 @@ function EmojiPicker({
               <motion.button
                 type="button"
                 onClick={handleSave}
-                whileTap={{ scale: 0.97 }}
+                whileTap={{ scale: TAP_SCALE }}
                 className="flex w-full items-center justify-center gap-2 rounded-full bg-brand py-4 text-base font-semibold text-white cursor-pointer"
               >
                 <HiCheck className="w-5 h-5" />
