@@ -12,6 +12,7 @@ import { circlesApi } from "@/lib/api/endpoints";
 import { useAuthStore } from "@/stores/authStore";
 
 const REDIRECT_DELAY_MS = 600;
+const TAP_SCALE = 0.97;
 
 type LeaveButtonProps = {
   circleId?: number;
@@ -146,7 +147,7 @@ export default function LeaveButton({
                   type="button"
                   onClick={handleLeave}
                   disabled={isLoading}
-                  whileTap={isLoading ? {} : { scale: 0.97 }}
+                  whileTap={isLoading ? {} : { scale: TAP_SCALE }}
                   className="w-full rounded-full bg-red-500 py-4 text-base font-semibold text-white cursor-pointer disabled:bg-red-300 disabled:cursor-not-allowed transition-all duration-200"
                 >
                   {isLoading ? "Leaving..." : "Leave Circle"}
