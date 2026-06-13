@@ -17,6 +17,7 @@ const LIST_STAGGER_DELAY = 0.05;
 const SHEET_MAX_HEIGHT = "85dvh";
 const SHEET_SPRING_STIFFNESS = 300;
 const SHEET_SPRING_DAMPING = 32;
+const LIST_ANIMATION_DURATION = 0.3;
 
 const TYPE_AVATARS: Record<string, UserAvatar> = {
   goal_created: { emoji: "\u{1F3AF}", color: "#60a5fa" },
@@ -184,7 +185,7 @@ export default function NotificationSheet({
                       }}
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: LIST_STAGGER_DELAY * i }}
+                      transition={{ duration: LIST_ANIMATION_DURATION, delay: LIST_STAGGER_DELAY * i }}
                       className={`flex items-start gap-3 rounded-2xl p-3 cursor-pointer transition-all duration-200 active:scale-[0.98] ${
                         n.unread ? "bg-gray-50" : "bg-white"
                       }`}
