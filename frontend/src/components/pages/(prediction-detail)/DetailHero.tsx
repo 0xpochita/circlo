@@ -12,6 +12,8 @@ const STATUS_CLASSES: Record<string, string> = {
 
 const DEFAULT_STATUS_CLASS = "bg-gray-100 text-muted";
 const AVATAR_SIZE = 72;
+const AVATAR_SPRING_STIFFNESS = 300;
+const AVATAR_SPRING_DAMPING = 20;
 
 type DetailHeroProps = {
   title?: string;
@@ -48,8 +50,8 @@ export default function DetailHero({
               animate={{ scale: 1, opacity: 1 }}
               transition={{
                 type: "spring" as const,
-                stiffness: 300,
-                damping: 20,
+                stiffness: AVATAR_SPRING_STIFFNESS,
+                damping: AVATAR_SPRING_DAMPING,
               }}
               className="mb-4"
             >
