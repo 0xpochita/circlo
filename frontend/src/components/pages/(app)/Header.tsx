@@ -13,6 +13,9 @@ import { NETWORK } from "@/lib/web3/network";
 import { useAuthStore } from "@/stores/authStore";
 import { useUserStore } from "@/stores/userStore";
 
+const LOGO_SIZE = 44;
+const AVATAR_SIZE = 44;
+
 export default function Header() {
   const avatar = useUserStore((s) => s.avatar);
   const userName = useUserStore((s) => s.name);
@@ -73,8 +76,8 @@ export default function Header() {
         <Image
           src="/Assets/Images/Logo/logo-brand/logo-brand.webp"
           alt="Circlo Logo"
-          width={44}
-          height={44}
+          width={LOGO_SIZE}
+          height={LOGO_SIZE}
           className="rounded-xl"
         />
         <div>
@@ -93,7 +96,7 @@ export default function Header() {
         // wagmi disconnection during MiniPay page navigation. The
         // silent-reattach effect above will restore wagmi state.
         <Link href="/profile" className="cursor-pointer">
-          <EmojiAvatar avatar={avatar} size={44} />
+          <EmojiAvatar avatar={avatar} size={AVATAR_SIZE} />
         </Link>
       ) : isMiniPayBrowser ? // Unauthenticated AND in MiniPay → first-connect in flight.
       null : (
